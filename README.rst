@@ -10,4 +10,12 @@ dlog monitor
 .. section-numbering::
 
 
+compile
 ============
+export GOPATH=$GOPATH:this_dir
+go build dlogmon
+
+cd src/pkg
+go test foo_test.go
+
+go clean
