@@ -3,7 +3,7 @@ dlog monitor
 =========================
 
 :Author: Gao Peng <funky.gao@gmail.com>
-:Description: NA
+:Description: kaixin dlog monitor framework
 :Revision: $Id$
 
 .. contents:: Table Of Contents
