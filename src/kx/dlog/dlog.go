@@ -6,8 +6,21 @@ const (
     EOL = '\n'
 )
 
+
+// dlog interface
 type DlogAware interface {
     ReadLines()
+    IsLineValid(string) bool
+}
+
+// request interface
+type RequestParser interface {
+    ParseLine(string)
+}
+
+type Request struct {
+    RequestParser
+    http_method, uri, rid string
 }
 
 type Dlog struct {

@@ -3,11 +3,58 @@ package dlog
 
 import (
     "bufio"
+    "fmt"
     "io"
     "log"
     "os/exec"
     "strings"
+    "strconv"
 )
+
+// a single line meta info
+type amfRequest struct {
+    Request
+    class, method, args string
+    time int16
+}
+
+// parse a line into meta info
+// ret -> valid line?
+func (req *amfRequest) ParseLine(line string) {
+    // major parts seperated by space
+    parts := strings.Split(line, " ")
+
+    // uri related
+    uriInfo := strings.Split(parts[5], "+")
+    if len(uriInfo) < 3 {
+        log.Fatal(line)
+    }
+    req.http_method, req.uri, req.rid = uriInfo[0], uriInfo[1], uriInfo[2]
+
+    // class call and args related
+    callRaw := strings.Replace(parts[6], "{", "", -1) 
+    callRaw = strings.Replace(callRaw, "}", "", -1) 
+    callRaw = strings.Replace(callRaw, "\"", "", -1) 
+    callRaw = strings.Replace(callRaw, "[", "", -1) 
+    callRaw = strings.Replace(callRaw, "]", "", -1) 
+    callRaw = strings.Replace(callRaw, ",", ":", -1) 
+    callInfo := strings.Split(callRaw, ":")
+    time, err := strconv.Atoi(callInfo[1])
+    if err != nil {
+        log.Fatal(line, err)
+    }
+    req.time = int16(time)
+    req.class = callInfo[3]
+    if len(callInfo) > 10 {
+        req.method = callInfo[10]
+    }
+}
+
+// better printable Request
+func (req *amfRequest) String() string {
+    return fmt.Sprintf("{http:%s uri:%s rid:%s class:%s method:%s time:%d args:%s}",
+        req.http_method, req.uri, req.rid, req.class, req.method, req.time, req.args)
+}
 
 // AMF_SLOW dlog analyzer
 type AmfDlog struct {
@@ -57,7 +104,13 @@ func (dlog AmfDlog) IsLineValid(line string) bool {
     return true
 }
 
+// operate on a valid dlog line
 func (dlog *AmfDlog) OperateLine(line string) {
     println(dlog.filename, line)
+
+    req := new(amfRequest)
+    req.ParseLine(line)
+
+    fmt.Printf("%5d%36s%20s %s\n", req.time, req.uri, req.class, req.method)
 }
 
