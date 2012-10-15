@@ -2,7 +2,7 @@
 package dlog
 
 import (
-    "bytes"
+    "bufio"
     "io"
     "log"
     "os/exec"
@@ -16,14 +16,14 @@ type AmfDlog struct {
 
 func (dlog AmfDlog) ReadLines() {
     run := exec.Command(LZOP_CMD, LZOP_OPTION, dlog.filename)
-    var stdout bytes.Buffer
-    run.Stdout = &stdout
-    if err := run.Run(); err != nil {
+    out, err := run.StdoutPipe()
+    if err != nil {
         log.Fatal(err)
     }
 
+    inputReader := bufio.NewReader(out)
     for {
-        line, err := stdout.ReadString(EOL)
+        line, err := inputReader.ReadString(EOL)
         if err != nil {
             if err != io.EOF {
                 log.Fatal(err)
