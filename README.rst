@@ -15,13 +15,16 @@ Project
 
 compile
 -------
-export GOPATH=$GOPATH:this_dir
 
-go install kx/mapreduce
-go install kx/dlogmon
-go test kx/mapreduce
+::
 
-cd src/kx/mapreduce
-go test mapreduce_test.go
-
-go clean
+    export GOPATH=$GOPATH:this_dir
+    
+    go install kx/mapreduce
+    go install kx/dlogmon
+    go test kx/mapreduce
+    
+    cd src/kx/mapreduce
+    go test mapreduce_test.go
+    
+    go clean
