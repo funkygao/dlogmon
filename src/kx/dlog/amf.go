@@ -13,6 +13,11 @@ import (
 
 var lineValidatorRegexes = [][]string{{"AMF_SLOW", "100.123", "PHP.CDlog"}, {"Q=DLog.log"}}
 
+// AMF_SLOW dlog analyzer
+type AmfDlog struct {
+    Dlog
+}
+
 // a single line meta info
 type amfRequest struct {
     Request
@@ -58,11 +63,6 @@ func (req *amfRequest) String() string {
         req.http_method, req.uri, req.rid, req.class, req.method, req.time, req.args)
 }
 
-// AMF_SLOW dlog analyzer
-type AmfDlog struct {
-    Dlog
-}
-
 func (dlog AmfDlog) ReadLines() {
     run := exec.Command(LZOP_CMD, LZOP_OPTION, dlog.filename)
     out, err := run.StdoutPipe()
@@ -71,6 +71,10 @@ func (dlog AmfDlog) ReadLines() {
     }
     if err := run.Start(); err != nil {
         log.Fatal(err)
+    }
+
+    if dlog.options.mapper != "" {
+        //mapper := exec.Command(dlog.options.mapper)
     }
 
     inputReader := bufio.NewReader(out)
