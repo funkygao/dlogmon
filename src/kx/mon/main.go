@@ -11,7 +11,9 @@ import (
 
 func main() {
     // parallel level
-    runtime.GOMAXPROCS((runtime.NumCPU() + 1)/2)
+    parallel := runtime.NumCPU()/2 + 1
+    runtime.GOMAXPROCS(parallel)
+    fmt.Printf("Parallel: %d\n", parallel)
 
     // cli options
     options := parseFlags()
