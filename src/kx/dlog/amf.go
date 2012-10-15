@@ -18,7 +18,7 @@ func (dlog *AmfDlog) SetFile(file string) {
     dlog.filename = file
 }
 
-func (dlog AmfDlog) ReadLines() {
+func (dlog AmfDlog) ReadLines(ch chan bool) {
     run := exec.Command(LZOP_CMD, LZOP_OPTION, dlog.filename)
     var stdout bytes.Buffer
     run.Stdout = &stdout
@@ -43,6 +43,8 @@ func (dlog AmfDlog) ReadLines() {
         // extract info from this line
         dlog.OperateLine(line)
     }
+
+    ch <- true
 }
 
 func (dlog AmfDlog) IsLineValid(line string) bool {
