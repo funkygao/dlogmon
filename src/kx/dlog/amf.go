@@ -90,6 +90,10 @@ func (dlog AmfDlog) ReadLines() {
         dlog.OperateLine(line)
     }
 
+    if err := run.Wait(); err != nil {
+        log.Fatal(err)
+    }
+
     dlog.chEof <- true
 }
 
@@ -101,16 +105,18 @@ func (dlog AmfDlog) IsLineValid(line string) bool {
         }
     }
 
+    if strings.Contains(line, "Q=DLog.log") {
+        return false
+    }
+
     return true
 }
 
 // operate on a valid dlog line
 func (dlog *AmfDlog) OperateLine(line string) {
-    println(dlog.filename, line)
-
     req := new(amfRequest)
     req.ParseLine(line)
 
-    fmt.Printf("%5d%36s%20s %s\n", req.time, req.uri, req.class, req.method)
+    fmt.Printf("%6d%25s %35s   %s\n", req.time, req.class, req.method, req.uri)
 }
 
