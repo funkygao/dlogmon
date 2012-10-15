@@ -38,3 +38,5 @@ Todo
   integrate with python, php
 
 - profiler
+
+- ReadLines should be move to dlog.go
