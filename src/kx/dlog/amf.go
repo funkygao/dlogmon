@@ -58,6 +58,6 @@ func (dlog AmfDlog) IsLineValid(line string) bool {
 }
 
 func (dlog *AmfDlog) OperateLine(line string) {
-    print(dlog.filename, line)
+    println(dlog.filename, line)
 }
 
