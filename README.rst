@@ -10,12 +10,18 @@ dlog monitor
 .. section-numbering::
 
 
-compile
+Project
 ============
-export GOPATH=$GOPATH:this_dir
-go build dlogmon
 
-cd src/pkg
-go test foo_test.go
+compile
+-------
+export GOPATH=$GOPATH:this_dir
+
+go install kx/mapreduce
+go install kx/dlogmon
+go test kx/mapreduce
+
+cd src/kx/mapreduce
+go test mapreduce_test.go
 
 go clean
