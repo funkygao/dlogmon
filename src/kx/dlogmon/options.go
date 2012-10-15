@@ -28,6 +28,7 @@ func parseFlags() *Options {
 
     d := flag.String("D", "", "day of dlog[default today] e,g 121005")
     h := flag.String("H", "10", "hour of dlog[default 10] e,g 9-11")
+    f := flag.String("f", "", "specify a single dlog file to analyze")
     regex := flag.String("e", "", "line pattern e,g PHP.CDlog|AMF_SLOW")
     flag.Parse()
 
@@ -77,6 +78,10 @@ func parseFlags() *Options {
         for _, file := range files {
             options.files = append(options.files, file)
         }
+    }
+
+    if *f != "" {
+        options.files = []string{*f}
     }
 
     // regex list
