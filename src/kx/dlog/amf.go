@@ -11,6 +11,8 @@ import (
     "strconv"
 )
 
+var lineValidatorRegexes = [][]string{{"AMF_SLOW", "100.123", "PHP.CDlog"}, {"Q=DLog.log"}}
+
 // a single line meta info
 type amfRequest struct {
     Request
@@ -101,15 +103,18 @@ func (dlog AmfDlog) ReadLines() {
 }
 
 func (dlog AmfDlog) IsLineValid(line string) bool {
-    regexes := []string{"AMF_SLOW", "100.123", "PHP.CDlog"}
-    for _, regex := range regexes {
+    // must exists
+    for _, regex := range lineValidatorRegexes[0] {
         if !strings.Contains(line, regex) {
             return false
         }
     }
 
-    if strings.Contains(line, "Q=DLog.log") {
-        return false
+    // must not exists
+    for _, regex := range lineValidatorRegexes[1] {
+        if strings.Contains(line, regex) {
+            return false
+        }
     }
 
     return true
