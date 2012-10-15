@@ -1,8 +1,8 @@
-install:
+install:clean
 	go install kx/dlog
 	go install kx/dlogmon
 
-test:
+test:install
 	go test -v kx/dlog
 
 clean:
