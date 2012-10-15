@@ -1,5 +1,7 @@
 package dlog
 
+import "sync"
+
 const (
     LZOP_CMD = "lzop"
     LZOP_OPTION = "-dcf"
@@ -27,12 +29,14 @@ type Dlog struct {
     DlogAware
     filename string
     chEof chan bool
+    lock *sync.Mutex
 }
 
-func NewAmfDlog(filename string, ch chan bool) *AmfDlog {
+func NewAmfDlog(filename string, ch chan bool, lock *sync.Mutex) *AmfDlog {
     dlog := new(AmfDlog)
     dlog.filename = filename
     dlog.chEof  = ch
+    dlog.lock = lock
 
     return dlog
 }

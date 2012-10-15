@@ -4,6 +4,7 @@ package main
 import (
     "kx/dlog"
     "runtime"
+    "sync"
 )
 
 func main() {
@@ -14,9 +15,10 @@ func main() {
     options := parseFlags()
 
     chDlogDone := make(chan bool, len(options.files))
+    lock := new(sync.Mutex)
 
     for _, file := range options.files {
-        dlog := dlog.NewAmfDlog(file, chDlogDone)
+        dlog := dlog.NewAmfDlog(file, chDlogDone, lock)
         go dlog.ReadLines()
     }
 

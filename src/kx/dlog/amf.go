@@ -117,6 +117,8 @@ func (dlog *AmfDlog) OperateLine(line string) {
     req := new(amfRequest)
     req.ParseLine(line)
 
+    dlog.lock.Lock()
+    defer dlog.lock.Unlock()
     fmt.Printf("%6d%25s %35s   %s\n", req.time, req.class, req.method, req.uri)
 }
 
