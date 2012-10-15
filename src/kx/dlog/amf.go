@@ -20,6 +20,9 @@ func (dlog AmfDlog) ReadLines() {
     if err != nil {
         log.Fatal(err)
     }
+    if err := run.Start(); err != nil {
+        log.Fatal(err)
+    }
 
     inputReader := bufio.NewReader(out)
     for {
@@ -55,6 +58,6 @@ func (dlog AmfDlog) IsLineValid(line string) bool {
 }
 
 func (dlog *AmfDlog) OperateLine(line string) {
-    print(line)
+    print(dlog.filename, line)
 }
 
