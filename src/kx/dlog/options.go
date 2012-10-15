@@ -1,4 +1,4 @@
-package main
+package dlog
 
 import (
     "flag"
@@ -27,8 +27,12 @@ func (opt *Options) String() string {
     return fmt.Sprintf("{files: %#v debug:%#v mapper:%s reducer:%s}", opt.files, opt.debug, opt.mapper, opt.reducer)
 }
 
+func (options *Options) GetFiles() []string {
+    return options.files
+}
+
 // parse CLI options
-func parseFlags() *Options {
+func ParseFlags() *Options {
     options := new(Options)
 
     d := flag.String("D", "", "day of dlog[default today] e,g 121005")

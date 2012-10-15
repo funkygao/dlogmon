@@ -16,26 +16,24 @@ func main() {
     fmt.Printf("Parallel: %d\n", parallel)
 
     // cli options
-    options := parseFlags()
-    if options.debug {
-        fmt.Println(options)
-    }
+    options := dlog.ParseFlags()
+    files := options.GetFiles()
 
-    chLines := make(chan int, len(options.files))
+    chLines := make(chan int, len(files))
     lock := new(sync.Mutex)
 
     // timing all the jobs up
     start := time.Now()
 
     // each dlog file is a goroutine
-    for _, file := range options.files {
-        dlog := dlog.NewAmfDlog(file, chLines, lock, options.debug)
+    for _, file := range files {
+        dlog := dlog.NewAmfDlog(file, chLines, lock, options)
         go dlog.ReadLines()
     }
 
     // wait for all dlog runner finish
     lines := 0
-    for i:=0; i<len(options.files); i++ {
+    for i:=0; i<len(files); i++ {
         lines += <- chLines
     }
 
@@ -43,7 +41,7 @@ func main() {
     delta := end.Sub(start)
     fmt.Printf("\nParsed %d lines in %d files within %s [%.1f lines per second]\n", 
         lines, 
-        len(options.files),
+        len(files),
         delta, float64(lines)/delta.Seconds())
 }
 
