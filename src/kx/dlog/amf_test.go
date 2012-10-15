@@ -1,9 +1,12 @@
 package dlog
 
-import "testing"
+import (
+    "testing"
+    "sync"
+)
 
 func newDlog() *AmfDlog {
-    return new(AmfDlog)
+    return NewAmfDlog("", make(chan int), new(sync.Mutex))
 }
 
 func TestIsLineValid(t *testing.T) {
@@ -11,7 +14,7 @@ func TestIsLineValid(t *testing.T) {
         "we are here": false,
         "amf_slow": false,
         "AMF_SLOW": false,
-        ">121015-100043 192.168.100.123 3309 KProxy KXI.SQA /SAMPLE:1/S T=0.000 9999/127.0.0.1:31892 0 Q=DLog.log X{CALLER^POST+www.kaixin001.com/city/gateway.php+2d5e99a6} {identity^PHP.CDlog; tag^AMF_SLOW;": true,
+        ">121015-180201 192.168.100.123 10282 KP:PHP.CDlog AMF_SLOW POST+www.kaixin001.com/city/gateway.php+30600bfc {'calltime':2043,'classname':'CCityConfig','method':'callfunc','args':['47116815_1226_47116815_1350293555_9af3436e3a716f7afc298bb77ece48fe','16616590','CCityConfig.callfunc','getConfig','68680510']}": true,
     }
     amf := newDlog()
 
@@ -19,15 +22,6 @@ func TestIsLineValid(t *testing.T) {
         if amf.IsLineValid(k) != expected[k] {
             t.Error(k)
         }
-    }
-}
-
-func TestSetFile(t *testing.T) {
-    amf := newDlog()
-    file, expected := "/kx/dlog/121015/lz.121015-113035", "/kx/dlog/121015/lz.121015-113035"
-    amf.SetFile(file)
-    if expected != amf.filename {
-        t.Error("Invalid filename")
     }
 }
 

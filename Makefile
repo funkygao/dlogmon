@@ -3,7 +3,7 @@ install:
 	go install kx/mon
 
 test:
-	go test kx/dlog
+	go test -v kx/dlog
 
 clean:
 	rm -f bin/*
