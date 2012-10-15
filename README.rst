@@ -28,3 +28,13 @@ compile
     go test mapreduce_test.go
     
     go clean
+
+
+Todo
+====
+
+- stream
+
+  integrate with python, php
+
+- profiler
