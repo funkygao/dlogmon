@@ -11,7 +11,6 @@ import (
 )
 
 const (
-    DLOG_BASE_DIR = "/kx/dlog/"
     SPAN_SEP = "-"
 )
 

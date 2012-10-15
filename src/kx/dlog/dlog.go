@@ -6,6 +6,7 @@ const (
     LZOP_CMD = "lzop"
     LZOP_OPTION = "-dcf"
     EOL = '\n'
+    DLOG_BASE_DIR = "/kx/dlog/"
 )
 
 

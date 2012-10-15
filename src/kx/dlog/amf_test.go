@@ -6,7 +6,8 @@ import (
 )
 
 func newDlog() *AmfDlog {
-    return NewAmfDlog("", make(chan int), new(sync.Mutex))
+    options := new(Options)
+    return NewAmfDlog("", make(chan int), new(sync.Mutex), options)
 }
 
 func TestIsLineValid(t *testing.T) {
