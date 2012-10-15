@@ -1,6 +1,6 @@
 install:
 	go install kx/dlog
-	go install kx/mon
+	go install kx/dlogmon
 
 test:
 	go test -v kx/dlog
@@ -10,5 +10,5 @@ clean:
 	rm -rf pkg/*
 
 run:install
-	./bin/mon -f fixture/lz.121015-104410
+	./bin/dlogmon -f fixture/lz.121015-104410
 
