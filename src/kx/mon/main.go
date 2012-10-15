@@ -41,6 +41,9 @@ func main() {
 
     end := time.Now()
     delta := end.Sub(start)
-    fmt.Printf("\nParsed %d lines in %s [%.1f lines per second]\n", lines, delta, float64(lines)/delta.Seconds())
+    fmt.Printf("\nParsed %d lines in %d files within %s [%.1f lines per second]\n", 
+        lines, 
+        len(options.files),
+        delta, float64(lines)/delta.Seconds())
 }
 
