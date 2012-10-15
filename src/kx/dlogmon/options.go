@@ -13,13 +13,11 @@ import (
 const (
     DLOG_BASE_DIR = "/kx/dlog/"
     SPAN_SEP = "-"
-    REGEX_SEP = "|"
 )
 
 // CLI options object
 type Options struct {
     files []string
-    regexs[] string
 }
 
 // parse CLI options
@@ -29,7 +27,6 @@ func parseFlags() *Options {
     d := flag.String("D", "", "day of dlog[default today] e,g 121005")
     h := flag.String("H", "10", "hour of dlog[default 10] e,g 9-11")
     f := flag.String("f", "", "specify a single dlog file to analyze")
-    regex := flag.String("e", "", "line pattern e,g PHP.CDlog|AMF_SLOW")
     flag.Parse()
 
     // day
@@ -52,11 +49,11 @@ func parseFlags() *Options {
         hp = []string{*h, *h}
     }
 
-    h1, err = strconv.Atoi(hp[0])
+    h1, err = strconv.Atoi(strings.TrimSpace(hp[0]))
     if err != nil {
         panic(err)
     }
-    h2, err = strconv.Atoi(hp[1])
+    h2, err = strconv.Atoi(strings.TrimSpace(hp[1]))
     if err != nil {
         panic(err)
     }
@@ -82,16 +79,6 @@ func parseFlags() *Options {
 
     if *f != "" {
         options.files = []string{*f}
-    }
-
-    // regex list
-    if strings.Contains(*regex, REGEX_SEP) {
-        parts := strings.Split(*regex, REGEX_SEP)
-        for _, p := range parts {
-            options.regexs = append(options.regexs, p)
-        }
-    } else {
-        options.regexs = append(options.regexs, *regex) // a single regex
     }
 
     return options
