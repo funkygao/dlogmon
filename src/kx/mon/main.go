@@ -11,9 +11,8 @@ func main() {
     chDlogDone := make(chan bool, 10)
 
     for _, file := range options.files {
-        dlog := new(dlog.AmfDlog)
-        dlog.SetFile(file)
-        go dlog.ReadLines(chDlogDone)
+        dlog := dlog.NewAmfDlog(file, chDlogDone)
+        go dlog.ReadLines()
     }
 
     // wait for all dlog runner finish

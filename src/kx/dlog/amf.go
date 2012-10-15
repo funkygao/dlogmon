@@ -14,11 +14,7 @@ type AmfDlog struct {
     Dlog
 }
 
-func (dlog *AmfDlog) SetFile(file string) {
-    dlog.filename = file
-}
-
-func (dlog AmfDlog) ReadLines(ch chan bool) {
+func (dlog AmfDlog) ReadLines() {
     run := exec.Command(LZOP_CMD, LZOP_OPTION, dlog.filename)
     var stdout bytes.Buffer
     run.Stdout = &stdout
@@ -44,7 +40,7 @@ func (dlog AmfDlog) ReadLines(ch chan bool) {
         dlog.OperateLine(line)
     }
 
-    ch <- true
+    dlog.chEof <- true
 }
 
 func (dlog AmfDlog) IsLineValid(line string) bool {
