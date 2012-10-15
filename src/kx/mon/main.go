@@ -17,6 +17,9 @@ func main() {
 
     // cli options
     options := parseFlags()
+    if options.debug {
+        fmt.Println(options)
+    }
 
     chLines := make(chan int, len(options.files))
     lock := new(sync.Mutex)
@@ -26,7 +29,7 @@ func main() {
 
     // each dlog file is a goroutine
     for _, file := range options.files {
-        dlog := dlog.NewAmfDlog(file, chLines, lock)
+        dlog := dlog.NewAmfDlog(file, chLines, lock, options.debug)
         go dlog.ReadLines()
     }
 

@@ -18,6 +18,13 @@ const (
 // CLI options object
 type Options struct {
     files []string
+    debug bool
+    mapper string
+    reducer string
+}
+
+func (opt *Options) String() string {
+    return fmt.Sprintf("{files: %#v debug:%#v mapper:%s reducer:%s}", opt.files, opt.debug, opt.mapper, opt.reducer)
 }
 
 // parse CLI options
@@ -27,7 +34,14 @@ func parseFlags() *Options {
     d := flag.String("D", "", "day of dlog[default today] e,g 121005")
     h := flag.String("H", "10", "hour of dlog[default 10] e,g 9-11")
     f := flag.String("f", "", "specify a single dlog file to analyze")
+    debug := flag.Bool("d", false, "debug mode")
+    mapper := flag.String("mapper", "", "let a runnable script be the mapper")
+    reducer := flag.String("reducer", "", "let a runnable script be the reducer")
     flag.Parse()
+
+    options.debug = *debug
+    options.mapper = *mapper
+    options.reducer = *reducer
 
     // day
     dir := *d
