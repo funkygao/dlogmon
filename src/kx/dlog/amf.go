@@ -72,6 +72,7 @@ func (dlog AmfDlog) ReadLines() {
     }
 
     inputReader := bufio.NewReader(out)
+    lineCount := 0
     for {
         line, err := inputReader.ReadString(EOL)
         if err != nil {
@@ -81,6 +82,8 @@ func (dlog AmfDlog) ReadLines() {
 
             break
         }
+
+        lineCount += 1
 
         if !dlog.IsLineValid(line) {
             continue
@@ -94,7 +97,7 @@ func (dlog AmfDlog) ReadLines() {
         log.Fatal(err)
     }
 
-    dlog.chEof <- true
+    dlog.chLines <- lineCount
 }
 
 func (dlog AmfDlog) IsLineValid(line string) bool {
