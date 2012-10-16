@@ -5,7 +5,7 @@ import (
     "sync"
 )
 
-func newDlog() *AmfDlog {
+func newDlog() IDlogExecutor {
     options := new(Options)
     return NewAmfDlog("", make(chan int), new(sync.Mutex), options)
 }

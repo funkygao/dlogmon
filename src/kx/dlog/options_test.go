@@ -12,7 +12,7 @@ func newOptions() *Options {
 func TestEmptyOptionsString(t *testing.T) {
     options := newOptions()
     s := fmt.Sprintf("%s", options)
-    expected := "{files: []string(nil) debug:false mapper: reducer:}"
+    expected := "Options{files: []string(nil) debug:false mapper: reducer:}"
     if s != expected {
         t.Error(s, expected)
     }
