@@ -106,6 +106,6 @@ func (this *AmfDlog) OperateLine(line string) {
 
     this.lock.Lock()
     defer this.lock.Unlock()
-    fmt.Printf("%6d%25s %35s   %s\n", req.time, req.class, req.method, req.uri)
+    fmt.Printf("%6d%58s   %s\n", req.time, req.class + "." + req.method, req.uri)
 }
 
