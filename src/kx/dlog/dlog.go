@@ -28,10 +28,11 @@ type IDlogExecutor interface {
     OperateLine(string)
 }
 
+// an executor for 1 dlog file
 type Dlog struct {
     options *Options
-    filename string
-    chLines chan int
+    filename string // dlog filename
+    chLines chan int // lines parsed channel
     lock *sync.Mutex
 }
 
