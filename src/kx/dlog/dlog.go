@@ -23,7 +23,7 @@ type Request struct {
 
 // dlog interface
 type IDlogExecutor interface {
-    ScanLines()
+    ScanLines(IDlogExecutor) // IDlogExecutor param for dynamic polymorphism
     IsLineValid(string) bool
     OperateLine(string)
 }
@@ -41,7 +41,7 @@ func (this *Dlog) String() string {
 }
 
 // the main loop
-func (this *Dlog) ScanLines() {
+func (this *Dlog) ScanLines(dlog IDlogExecutor) {
     run := exec.Command(LZOP_CMD, LZOP_OPTION, this.filename)
     out, err := run.StdoutPipe()
     if err != nil {
@@ -73,12 +73,12 @@ func (this *Dlog) ScanLines() {
 
         lineCount += 1
 
-        if !this.IsLineValid(line) {
+        if !dlog.IsLineValid(line) {
             continue
         }
 
         // extract info from this line
-        this.OperateLine(line)
+        dlog.OperateLine(line)
     }
 
     if err := run.Wait(); err != nil {

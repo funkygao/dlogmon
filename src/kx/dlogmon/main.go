@@ -32,7 +32,7 @@ func main() {
     for _, file := range files {
         var executor dlog.IDlogExecutor
         executor = kindMapping[options.GetKind()](file, chLines, lock, options)
-        go executor.ScanLines()
+        go executor.ScanLines(executor)
     }
 
     // wait for all dlog runner finish

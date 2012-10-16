@@ -7,10 +7,6 @@ import (
     "strings"
     "strconv"
     "sync"
-    
-    "os/exec"
-    "bufio"
-    "io"
 )
 
 var lineValidatorRegexes = [][]string{
@@ -20,6 +16,20 @@ var lineValidatorRegexes = [][]string{
 // AMF_SLOW dlog analyzer
 type AmfDlog struct {
     Dlog
+}
+
+// a single line meta info
+type amfRequest struct {
+    Request
+    class, method, args string
+    time int16
+}
+
+// parse a line into meta info
+// better printable Request
+func (this *amfRequest) String() string {
+    return fmt.Sprintf("amfRequest{http:%s uri:%s rid:%s class:%s method:%s time:%d args:%s}",
+        this.http_method, this.uri, this.rid, this.class, this.method, this.time, this.args)
 }
 
 // the constructor
@@ -33,14 +43,6 @@ func NewAmfDlog(filename string, ch chan int, lock *sync.Mutex, options *Options
     return this
 }
 
-// a single line meta info
-type amfRequest struct {
-    Request
-    class, method, args string
-    time int16
-}
-
-// parse a line into meta info
 // ret -> valid line?
 func (this *amfRequest) ParseLine(line string) {
     // major parts seperated by space
@@ -70,60 +72,6 @@ func (this *amfRequest) ParseLine(line string) {
     if len(callInfo) > 10 {
         this.method = callInfo[10]
     }
-}
-
-// better printable Request
-func (this *amfRequest) String() string {
-    return fmt.Sprintf("amfRequest{http:%s uri:%s rid:%s class:%s method:%s time:%d args:%s}",
-        this.http_method, this.uri, this.rid, this.class, this.method, this.time, this.args)
-}
-
-// TODO use dynamic base polymorphism
-func (this *AmfDlog) ScanLines() {
-    run := exec.Command(LZOP_CMD, LZOP_OPTION, this.filename)
-    out, err := run.StdoutPipe()
-    if err != nil {
-        log.Fatal(err)
-    }
-    if err := run.Start(); err != nil {
-        log.Fatal(err)
-    }
-
-    if this.options.debug {
-        fmt.Println(this)
-    }
-
-    if this.options.mapper != "" {
-        //mapper := exec.Command(this.options.mapper)
-    }
-
-    inputReader := bufio.NewReader(out)
-    lineCount := 0
-    for {
-        line, err := inputReader.ReadString(EOL)
-        if err != nil {
-            if err != io.EOF {
-                log.Fatal(err)
-            }
-
-            break
-        }
-
-        lineCount += 1
-
-        if !this.IsLineValid(line) {
-            continue
-        }
-
-        // extract info from this line
-        this.OperateLine(line)
-    }
-
-    if err := run.Wait(); err != nil {
-        log.Fatal(err)
-    }
-
-    this.chLines <- lineCount
 }
 
 func (this *AmfDlog) IsLineValid(line string) bool {
