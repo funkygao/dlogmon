@@ -43,8 +43,7 @@ func NewAmfDlog(filename string, ch chan int, lock *sync.Mutex, options *Options
     return this
 }
 
-// ret -> valid line?
-func (this *amfRequest) ParseLine(line string) {
+func (this *amfRequest) parseLine(line string) {
     // major parts seperated by space
     parts := strings.Split(line, " ")
 
@@ -102,7 +101,7 @@ func (this *AmfDlog) OperateLine(line string) {
     this.Dlog.OperateLine(line) // super
 
     req := new(amfRequest)
-    req.ParseLine(line)
+    req.parseLine(line)
 
     this.lock.Lock()
     defer this.lock.Unlock()
