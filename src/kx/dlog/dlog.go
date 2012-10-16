@@ -1,11 +1,11 @@
+// dlog base
 package dlog
 
 import (
-    "bufio"
     "fmt"
+    "kx/stream"
     "io"
     "log"
-    "os/exec"
     "sync"
 )
 
@@ -43,15 +43,6 @@ func (this *Dlog) String() string {
 
 // the main loop
 func (this *Dlog) ScanLines(dlog IDlogExecutor) {
-    run := exec.Command(LZOP_CMD, LZOP_OPTION, this.filename)
-    out, err := run.StdoutPipe()
-    if err != nil {
-        log.Fatal(err)
-    }
-    if err := run.Start(); err != nil {
-        log.Fatal(err)
-    }
-
     if this.options.debug {
         fmt.Println(this)
     }
@@ -60,7 +51,10 @@ func (this *Dlog) ScanLines(dlog IDlogExecutor) {
         //mapper := exec.Command(this.options.mapper)
     }
 
-    inputReader := bufio.NewReader(out)
+    stream := stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
+    stream.Open()
+
+    inputReader := stream.GetReader()
     lineCount := 0
     for {
         line, err := inputReader.ReadString(EOL)
@@ -82,9 +76,8 @@ func (this *Dlog) ScanLines(dlog IDlogExecutor) {
         dlog.OperateLine(line)
     }
 
-    if err := run.Wait(); err != nil {
-        log.Fatal(err)
-    }
+    // done for this stream
+    stream.Close()
 
     this.chLines <- lineCount
 }

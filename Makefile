@@ -1,6 +1,7 @@
 install:
 	go install kx/dlog
 	go install kx/dlogmon
+	go install kx/stream
 	@strip bin/dlogmon 2> /dev/null
 
 test:install
