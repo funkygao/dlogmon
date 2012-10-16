@@ -2,6 +2,7 @@
 package dlog
 
 import (
+    "bufio"
     "fmt"
     "kx/stream"
     "io"
@@ -36,6 +37,8 @@ type Dlog struct {
     filename string // dlog filename
     chLines chan int // lines parsed channel
     lock *sync.Mutex
+    mapReader *bufio.Reader
+    mapWriter *bufio.Writer
 }
 
 // java's toString()
@@ -50,7 +53,10 @@ func (this *Dlog) ScanLines(dlog IDlogExecutor) {
     }
 
     if this.options.mapper != "" {
-        //mapper := exec.Command(this.options.mapper)
+        mapper := stream.NewStream(this.options.mapper)
+        mapper.Open()
+        this.mapReader = mapper.GetReader()
+        this.mapWriter = mapper.GetWriter()
     }
 
     stream := stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
@@ -92,8 +98,23 @@ func (this *Dlog) IsLineValid(line string) bool {
     return true
 }
 
-// base
+// base of valid line handler
 func (this *Dlog) OperateLine(line string) {
-    // do nothing
+    if this.mapReader == nil || this.mapWriter == nil {
+        return
+    }
+
+    _, err := this.mapWriter.WriteString(line)
+    this.mapWriter.Flush() // must flush, else script will not get this line
+    if err != nil {
+        if err != io.EOF {
+            panic(err)
+        }
+    }
+
+    mapperLine, _ := this.mapReader.ReadString(EOL)
+    if this.options.debug {
+        println("<<==", mapperLine)
+    }
 }
 
