@@ -21,4 +21,4 @@ loc:
 	@find . -name '*.go' | xargs wc -l | tail -1
 
 help:
-	@echo 'make [install | test | clean | run | loc]'
+	@echo 'make [install | test | clean | run | mr | loc]'
