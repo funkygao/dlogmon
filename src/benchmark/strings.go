@@ -10,22 +10,29 @@ import (
 const (
     SUBSTR1 = "100.123"
     SUBSTR2 = "123.123"
+    SUBSTR3 = "123.123.123.123"
     LINE = ">121016-140231 192.168.100.123 3309 KProxy KXI.SQA /SAMPLE:1/S T=0.000 9999/127.0.0.1:26630 1065 Q=LCache.get X{CALLER^GET+3g.kaixin001.com/parking/index.php+65ced944} {key^uobject_s_user_info:70839223:70839223; expire^3600} A=0 {value^~601!C:14:'CUObjectResult':573:`7B`03&result`03&fields`02#uid%email$nick)real_name&gender(birthday$city%mtime(hometown$logo(privacy1(privacy2*lunarbirth(privacy3(privacy4%state)stateTime%atime`01$rows`02`02·×ã¡@5sunjiang21539@tom.com"
-    LOOPS = 10000000
+    LOOPS = 2000000
 )
 
-func bench(line string, substr string) {
+func bench(line string, substr string) time.Duration {
     start := time.Now()
     for i:=0; i<LOOPS; i++ {
         strings.Contains(line, substr)
     }
     end := time.Now()
     delta := end.Sub(start)
-    fmt.Printf("%s\t%16s %s\n", substr, delta, delta/LOOPS)
+    fmt.Printf("%20s\t%16s %10s %s\n", substr, delta, delta/LOOPS, line)
+    return delta
 }
 
 func main() {
+    fmt.Printf("%s\n%s\n", time.Now(), strings.Repeat("=", 80))
+
     bench(LINE, SUBSTR1)
     bench(LINE, SUBSTR2)
+    bench(LINE, SUBSTR3)
+
+    fmt.Printf("%s\n%s\n", strings.Repeat("=", 80), time.Now())
 }
 
