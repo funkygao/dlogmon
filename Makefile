@@ -14,7 +14,7 @@ run:install
 	./bin/dlogmon -f fixture/lz.121015-104410
 
 loc:
-	find . -name '*.go' | xargs wc -l | tail -1
+	@find . -name '*.go' | xargs wc -l | tail -1
 
 help:
 	@echo 'make [install | test | clean | run | loc]'
