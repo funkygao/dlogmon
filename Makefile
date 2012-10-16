@@ -14,6 +14,9 @@ clean:
 run:install
 	./bin/dlogmon -f fixture/lz.121015-104410
 
+mr:install
+	./bin/dlogmon -f fixture/lz.121015-104410 -d -mapper ./scripts/amfMapper.py
+
 loc:
 	@find . -name '*.go' | xargs wc -l | tail -1
 

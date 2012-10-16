@@ -49,7 +49,7 @@ func (this *Dlog) String() string {
 // the main loop
 func (this *Dlog) ScanLines(dlog IDlogExecutor) {
     if this.options.debug {
-        fmt.Println(this)
+        fmt.Println("\n", this, "\n")
     }
 
     if this.options.mapper != "" {
