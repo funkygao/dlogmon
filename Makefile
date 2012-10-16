@@ -14,3 +14,6 @@ run:install
 
 loc:
 	find . -name '*.go' | xargs wc -l | tail -1
+
+help:
+	@echo 'make [install | test | clean | run | loc]'
