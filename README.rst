@@ -40,3 +40,5 @@ Todo
 - profiler
 
 - ReadLines should be move to dlog.go
+
+- why first strings.Contains(100.123) will be slower to 280000 per sec

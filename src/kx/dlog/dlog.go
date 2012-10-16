@@ -6,6 +6,7 @@ import (
     "kx/stream"
     "io"
     "log"
+    "strings"
     "sync"
 )
 
@@ -14,6 +15,7 @@ const (
     LZOP_OPTION = "-dcf"
     EOL = '\n'
     DLOG_BASE_DIR = "/kx/dlog/"
+    SAMPLER_HOST = "100.123"
 )
 
 // request object for a line
@@ -84,6 +86,9 @@ func (this *Dlog) ScanLines(dlog IDlogExecutor) {
 
 // base
 func (this *Dlog) IsLineValid(line string) bool {
+    if !strings.Contains(line, SAMPLER_HOST) {
+        return false
+    }
     return true
 }
 

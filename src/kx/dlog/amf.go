@@ -9,9 +9,9 @@ import (
     "sync"
 )
 
-var lineValidatorRegexes = [][]string{
-    {"AMF_SLOW", "100.123", "PHP.CDlog"}, // must exists
-    {"Q=DLog.log"}}                       // must not exists
+var lineValidatorRegexes = [...][]string{
+    {"AMF_SLOW", "PHP.CDlog"}, // must exists
+    {"Q=DLog.log"}} // must not exists
 
 // AMF_SLOW dlog analyzer
 type AmfDlog struct {
