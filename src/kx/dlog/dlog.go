@@ -1,6 +1,13 @@
 package dlog
 
-import "sync"
+import (
+    "bufio"
+    "fmt"
+    "io"
+    "log"
+    "os/exec"
+    "sync"
+)
 
 const (
     LZOP_CMD = "lzop"
@@ -9,38 +16,85 @@ const (
     DLOG_BASE_DIR = "/kx/dlog/"
 )
 
-
-// dlog interface
-type DlogAware interface {
-    ReadLines()
-    IsLineValid(string) bool
-}
-
-// request interface
-type RequestParser interface {
-    ParseLine(string)
-}
-
+// request object for a line
 type Request struct {
-    RequestParser
     http_method, uri, rid string
 }
 
+// dlog interface
+type IDlogExecutor interface {
+    ScanLines()
+    IsLineValid(string) bool
+    OperateLine(string)
+}
+
 type Dlog struct {
-    DlogAware
     options *Options
     filename string
     chLines chan int
     lock *sync.Mutex
 }
 
-func NewAmfDlog(filename string, ch chan int, lock *sync.Mutex, options *Options) *AmfDlog {
-    dlog := new(AmfDlog)
-    dlog.filename = filename
-    dlog.chLines = ch
-    dlog.lock = lock
-    dlog.options = options
+// java's toString()
+func (this *Dlog) String() string {
+    return fmt.Sprintf("Dlog{filename: %s, options: %#v}", this.filename, this.options)
+}
 
-    return dlog
+// the main loop
+func (this *Dlog) ScanLines() {
+    run := exec.Command(LZOP_CMD, LZOP_OPTION, this.filename)
+    out, err := run.StdoutPipe()
+    if err != nil {
+        log.Fatal(err)
+    }
+    if err := run.Start(); err != nil {
+        log.Fatal(err)
+    }
+
+    if this.options.debug {
+        fmt.Println(this)
+    }
+
+    if this.options.mapper != "" {
+        //mapper := exec.Command(this.options.mapper)
+    }
+
+    inputReader := bufio.NewReader(out)
+    lineCount := 0
+    for {
+        line, err := inputReader.ReadString(EOL)
+        if err != nil {
+            if err != io.EOF {
+                log.Fatal(err)
+            }
+
+            break
+        }
+
+        lineCount += 1
+
+        if !this.IsLineValid(line) {
+            continue
+        }
+
+        // extract info from this line
+        this.OperateLine(line)
+    }
+
+    if err := run.Wait(); err != nil {
+        log.Fatal(err)
+    }
+
+    this.chLines <- lineCount
+}
+
+// base
+func (this *Dlog) IsLineValid(line string) bool {
+    return true
+}
+
+// base
+func (this *Dlog) OperateLine(line string) {
+    // do nothing
 }
 

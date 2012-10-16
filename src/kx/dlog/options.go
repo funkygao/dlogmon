@@ -20,14 +20,20 @@ type Options struct {
     debug bool
     mapper string
     reducer string
+    kind string
 }
 
-func (opt *Options) String() string {
-    return fmt.Sprintf("{files: %#v debug:%#v mapper:%s reducer:%s}", opt.files, opt.debug, opt.mapper, opt.reducer)
+func (this *Options) String() string {
+    return fmt.Sprintf("Options{files: %#v debug:%#v mapper:%s reducer:%s}", this.files, this.debug,
+        this.mapper, this.reducer)
 }
 
-func (options *Options) GetFiles() []string {
-    return options.files
+func (this *Options) GetFiles() []string {
+    return this.files
+}
+
+func (this *Options) GetKind() string {
+    return this.kind
 }
 
 // parse CLI options
@@ -37,6 +43,7 @@ func ParseFlags() *Options {
     d := flag.String("D", "", "day of dlog[default today] e,g 121005")
     h := flag.String("H", "10", "hour of dlog[default 10] e,g 9-11")
     f := flag.String("f", "", "specify a single dlog file to analyze")
+    kind := flag.String("k", "amf", "what kind of content to scan in dlog[amf|xxx]")
     debug := flag.Bool("d", false, "debug mode")
     mapper := flag.String("mapper", "", "let a runnable script be the mapper")
     reducer := flag.String("reducer", "", "let a runnable script be the reducer")
@@ -45,6 +52,7 @@ func ParseFlags() *Options {
     options.debug = *debug
     options.mapper = *mapper
     options.reducer = *reducer
+    options.kind = *kind
 
     // day
     dir := *d

@@ -2,20 +2,35 @@
 package dlog
 
 import (
-    "bufio"
     "fmt"
-    "io"
     "log"
-    "os/exec"
     "strings"
     "strconv"
+    "sync"
+    
+    "os/exec"
+    "bufio"
+    "io"
 )
 
-var lineValidatorRegexes = [][]string{{"AMF_SLOW", "100.123", "PHP.CDlog"}, {"Q=DLog.log"}}
+var lineValidatorRegexes = [][]string{
+    {"AMF_SLOW", "100.123", "PHP.CDlog"}, // must exists
+    {"Q=DLog.log"}}                       // must not exists
 
 // AMF_SLOW dlog analyzer
 type AmfDlog struct {
     Dlog
+}
+
+// the constructor
+func NewAmfDlog(filename string, ch chan int, lock *sync.Mutex, options *Options) IDlogExecutor {
+    this := new(AmfDlog)
+    this.filename = filename
+    this.options = options
+    this.chLines = ch
+    this.lock = lock
+
+    return this
 }
 
 // a single line meta info
@@ -27,7 +42,7 @@ type amfRequest struct {
 
 // parse a line into meta info
 // ret -> valid line?
-func (req *amfRequest) ParseLine(line string) {
+func (this *amfRequest) ParseLine(line string) {
     // major parts seperated by space
     parts := strings.Split(line, " ")
 
@@ -36,7 +51,7 @@ func (req *amfRequest) ParseLine(line string) {
     if len(uriInfo) < 3 {
         log.Fatal(line)
     }
-    req.http_method, req.uri, req.rid = uriInfo[0], uriInfo[1], uriInfo[2]
+    this.http_method, this.uri, this.rid = uriInfo[0], uriInfo[1], uriInfo[2]
 
     // class call and args related
     callRaw := strings.Replace(parts[6], "{", "", -1) 
@@ -50,21 +65,22 @@ func (req *amfRequest) ParseLine(line string) {
     if err != nil {
         log.Fatal(line, err)
     }
-    req.time = int16(time)
-    req.class = callInfo[3]
+    this.time = int16(time)
+    this.class = callInfo[3]
     if len(callInfo) > 10 {
-        req.method = callInfo[10]
+        this.method = callInfo[10]
     }
 }
 
 // better printable Request
-func (req *amfRequest) String() string {
-    return fmt.Sprintf("{http:%s uri:%s rid:%s class:%s method:%s time:%d args:%s}",
-        req.http_method, req.uri, req.rid, req.class, req.method, req.time, req.args)
+func (this *amfRequest) String() string {
+    return fmt.Sprintf("amfRequest{http:%s uri:%s rid:%s class:%s method:%s time:%d args:%s}",
+        this.http_method, this.uri, this.rid, this.class, this.method, this.time, this.args)
 }
 
-func (dlog AmfDlog) ReadLines() {
-    run := exec.Command(LZOP_CMD, LZOP_OPTION, dlog.filename)
+// TODO use dynamic base polymorphism
+func (this *AmfDlog) ScanLines() {
+    run := exec.Command(LZOP_CMD, LZOP_OPTION, this.filename)
     out, err := run.StdoutPipe()
     if err != nil {
         log.Fatal(err)
@@ -73,8 +89,12 @@ func (dlog AmfDlog) ReadLines() {
         log.Fatal(err)
     }
 
-    if dlog.options.mapper != "" {
-        //mapper := exec.Command(dlog.options.mapper)
+    if this.options.debug {
+        fmt.Println(this)
+    }
+
+    if this.options.mapper != "" {
+        //mapper := exec.Command(this.options.mapper)
     }
 
     inputReader := bufio.NewReader(out)
@@ -91,22 +111,27 @@ func (dlog AmfDlog) ReadLines() {
 
         lineCount += 1
 
-        if !dlog.IsLineValid(line) {
+        if !this.IsLineValid(line) {
             continue
         }
 
         // extract info from this line
-        dlog.OperateLine(line)
+        this.OperateLine(line)
     }
 
     if err := run.Wait(); err != nil {
         log.Fatal(err)
     }
 
-    dlog.chLines <- lineCount
+    this.chLines <- lineCount
 }
 
-func (dlog AmfDlog) IsLineValid(line string) bool {
+func (this *AmfDlog) IsLineValid(line string) bool {
+    // super
+    if !this.Dlog.IsLineValid(line) {
+        return false
+    }
+
     // must exists
     for _, regex := range lineValidatorRegexes[0] {
         if !strings.Contains(line, regex) {
@@ -125,12 +150,14 @@ func (dlog AmfDlog) IsLineValid(line string) bool {
 }
 
 // operate on a valid dlog line
-func (dlog *AmfDlog) OperateLine(line string) {
+func (this *AmfDlog) OperateLine(line string) {
+    this.Dlog.OperateLine(line) // super
+
     req := new(amfRequest)
     req.ParseLine(line)
 
-    dlog.lock.Lock()
-    defer dlog.lock.Unlock()
+    this.lock.Lock()
+    defer this.lock.Unlock()
     fmt.Printf("%6d%25s %35s   %s\n", req.time, req.class, req.method, req.uri)
 }
 
