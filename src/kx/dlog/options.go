@@ -38,8 +38,6 @@ func (this *Options) GetKind() string {
 
 // parse CLI options
 func ParseFlags() *Options {
-    options := new(Options)
-
     d := flag.String("D", "", "day of dlog[default today] e,g 121005")
     h := flag.String("H", "10", "hour of dlog[default 10] e,g 9-11")
     f := flag.String("f", "", "specify a single dlog file to analyze")
@@ -47,8 +45,13 @@ func ParseFlags() *Options {
     debug := flag.Bool("d", false, "debug mode")
     mapper := flag.String("mapper", "", "let a runnable script be the mapper")
     reducer := flag.String("reducer", "", "let a runnable script be the reducer")
+
     flag.Parse()
 
+    options := new(Options)
+    if *f != "" {
+        options.files = []string{*f}
+    }
     options.debug = *debug
     options.mapper = *mapper
     options.reducer = *reducer
@@ -100,10 +103,6 @@ func ParseFlags() *Options {
         for _, file := range files {
             options.files = append(options.files, file)
         }
-    }
-
-    if *f != "" {
-        options.files = []string{*f}
     }
 
     return options
