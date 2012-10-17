@@ -13,7 +13,10 @@ import (
     "time"
 )
 
-const version = "1.0.5r"
+const (
+    version = "1.0.5r"
+    maxprocsenv = "GOMAXPROCS"
+)
 
 func main() {
     defer T.Un(T.Trace("main"))
@@ -26,9 +29,11 @@ func main() {
     }
 
     // parallel level
-    parallel := runtime.NumCPU()/2 + 1
-    runtime.GOMAXPROCS(parallel)
-    fmt.Printf("Parallel CPU: %d / %d\n", parallel, runtime.NumCPU())
+    if os.Getenv(maxprocsenv) == "" {
+        parallel := runtime.NumCPU()/2 + 1
+        runtime.GOMAXPROCS(parallel)
+        fmt.Printf("Parallel CPU: %d / %d\n", parallel, runtime.NumCPU())
+    }
 
     // timing all the jobs up
     start := time.Now()
