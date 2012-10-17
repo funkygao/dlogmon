@@ -33,6 +33,9 @@ func main() {
     chLines := make(chan int, totalFiles)
     lock := new(sync.Mutex)
 
+    chTotalLines := make(chan int)
+    go collectTotalLines(totalFiles, chLines, chTotalLines)
+
     // timing all the jobs up
     start := time.Now()
 
@@ -42,21 +45,26 @@ func main() {
     for _, file := range files {
         executor = kindConstructors[options.Kind()](file, chLines, lock, options)
         executors = append(executors, executor)
-        go executor.ScanLines(executor)
+        go executor.Run(executor)
     }
 
-    // wait for all dlog runner finish
-    lines := 0
-    for i:=0; i<totalFiles; i++ {
-        lines += <- chLines
-        executor.Progress(i)
-    }
+    // wait for all dlog goroutines done
+    totalLines := <- chTotalLines
 
     end := time.Now()
     delta := end.Sub(start)
     fmt.Printf("\nParsed %d lines in %d files within %s [%.1f lines per second]\n",
-        lines,
+        totalLines,
         totalFiles,
-        delta, float64(lines)/delta.Seconds())
+        delta, float64(totalLines)/delta.Seconds())
+}
+
+func collectTotalLines(n int, ch chan int, chT chan int) (total int) {
+    for i:=0; i<n; i++ {
+        total += <- ch
+    }
+
+    chT <- total
+    return
 }
 

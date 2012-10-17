@@ -32,7 +32,7 @@ type Request struct {
 
 // dlog interface
 type IDlogExecutor interface {
-    ScanLines(IDlogExecutor) // IDlogExecutor param for dynamic polymorphism
+    Run(IDlogExecutor) // IDlogExecutor param for dynamic polymorphism
     IsLineValid(string) bool
     OperateLine(string)
     Progresser
@@ -58,8 +58,9 @@ func (this *Dlog) String() string {
     return fmt.Sprintf("Dlog{filename: %s, options: %#v}", this.filename, this.options)
 }
 
-// the main loop
-func (this *Dlog) ScanLines(dlog IDlogExecutor) {
+// Scan each line and apply validator and parser
+// Invoke mapper if neccessary
+func (this *Dlog) Run(dlog IDlogExecutor) {
     this.Println(this.filename, "start scanning...")
 
     if this.options.debug {
