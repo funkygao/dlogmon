@@ -33,16 +33,10 @@ func (this *amfRequest) String() string {
         this.http_method, this.uri, this.rid, this.class, this.method, this.time, this.args)
 }
 
-// the constructor
+// Constructor of AmfDlog
 func NewAmfDlog(filename string, ch chan int, lock *sync.Mutex, options *Options) IDlogExecutor {
-    this := new(AmfDlog)
-    this.filename = filename
-    this.options = options
-    this.chLines = ch
-    this.lock = lock
-    this.logger = log.New(os.Stderr, "",  log.Ldate | log.Llongfile | log.Ltime | log.Lmicroseconds)
-
-    return this
+    logger := log.New(os.Stderr, "",  log.Ldate | log.Llongfile | log.Ltime | log.Lmicroseconds)
+    return &AmfDlog{Dlog{filename, ch, lock, options, logger, nil, nil}}
 }
 
 func (this *amfRequest) parseLine(line string) {

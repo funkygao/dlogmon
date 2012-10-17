@@ -48,7 +48,7 @@ type Dlog struct {
     chLines chan int // lines parsed channel
     lock *sync.Mutex
     options *Options
-    logger *log.Logger
+    *log.Logger
     mapReader *bufio.Reader
     mapWriter *bufio.Writer
 }
@@ -60,7 +60,7 @@ func (this *Dlog) String() string {
 
 // the main loop
 func (this *Dlog) ScanLines(dlog IDlogExecutor) {
-    this.logger.Println(this.filename, "start scanning...")
+    this.Println(this.filename, "start scanning...")
 
     if this.options.debug {
         fmt.Println("\n", this, "\n")
