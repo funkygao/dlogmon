@@ -35,8 +35,15 @@ func (this *amfRequest) String() string {
 
 // Constructor of AmfDlog
 func NewAmfDlog(filename string, ch chan int, lock *sync.Mutex, options *Options) IDlogExecutor {
-    logger := log.New(os.Stderr, "",  log.Ldate | log.Llongfile | log.Ltime | log.Lmicroseconds)
-    return &AmfDlog{Dlog{filename, ch, lock, options, logger, nil, nil}}
+    return &AmfDlog{
+        Dlog{
+            filename,
+            ch,
+            lock,
+            options,
+            log.New(os.Stderr, "",  log.Ldate | log.Llongfile | log.Ltime | log.Lmicroseconds),
+            nil,
+            nil}}
 }
 
 func (this *amfRequest) parseLine(line string) {
