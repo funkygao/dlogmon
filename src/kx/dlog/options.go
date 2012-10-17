@@ -12,7 +12,7 @@ import (
 )
 
 // CLI options object
-type Options struct {
+type Option struct {
     files []string
     debug bool
     trace bool
@@ -24,29 +24,29 @@ type Options struct {
     logfile string
 }
 
-// Printable Options
-func (this *Options) String() string {
-    return fmt.Sprintf("Options{files: %#v debug:%#v mapper:%s reducer:%s}", this.files, this.debug,
+// Printable Option
+func (this *Option) String() string {
+    return fmt.Sprintf("Option{files: %#v debug:%#v mapper:%s reducer:%s}", this.files, this.debug,
         this.mapper, this.reducer)
 }
 
 // Names of the dlog files to be analyzed
-func (this *Options) Files() []string {
+func (this *Option) Files() []string {
     return this.files
 }
 
 // Kind of the current dlog
-func (this *Options) Kind() string {
+func (this *Option) Kind() string {
     return this.kind
 }
 
 // Does CLI ask for dlogmon version info?
-func (this *Options) Version() bool {
+func (this *Option) Version() bool {
     return this.version
 }
 
 // Parse CLI options
-func ParseFlags() *Options {
+func ParseFlags() *Option {
     d := flag.String("D", "", "day of dlog[default today] e,g 121005")
     h := flag.String("H", "10", "hour of dlog[default 10] e,g 9-11")
     f := flag.String("f", "", "specify a single dlog file to analyze")
@@ -61,19 +61,19 @@ func ParseFlags() *Options {
 
     flag.Parse()
 
-    options := new(Options)
+    option := new(Option)
     if *f != "" {
-        options.files = []string{*f}
+        option.files = []string{*f}
     }
-    options.debug = *debug
-    options.mapper = *mapper
-    options.reducer = *reducer
-    options.kind = *kind
-    options.version = *version
-    options.verbose = *verbose
-    options.logfile = *logfile
-    options.trace = *trace
-    if options.trace {
+    option.debug = *debug
+    option.mapper = *mapper
+    option.reducer = *reducer
+    option.kind = *kind
+    option.version = *version
+    option.verbose = *verbose
+    option.logfile = *logfile
+    option.trace = *trace
+    if option.trace {
         T.Enable()
     }
 
@@ -121,10 +121,10 @@ func ParseFlags() *Options {
         }
 
         for _, file := range files {
-            options.files = append(options.files, file)
+            option.files = append(option.files, file)
         }
     }
 
-    return options
+    return option
 }
 

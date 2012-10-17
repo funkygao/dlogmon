@@ -41,10 +41,10 @@ func NewAmfDlog(manager *Manager, filename string) IDlogExecutor {
     this.manager = manager
 
     var logWriter io.Writer
-    if this.manager.options.logfile == "" {
+    if this.manager.option.logfile == "" {
         logWriter = os.Stderr
     } else {
-        f, e := os.OpenFile(this.manager.options.logfile, os.O_APPEND | os.O_CREATE, 0666)
+        f, e := os.OpenFile(this.manager.option.logfile, os.O_APPEND | os.O_CREATE, 0666)
         if e != nil {
             panic(e)
         }
@@ -59,7 +59,7 @@ func NewAmfDlog(manager *Manager, filename string) IDlogExecutor {
             filename,
             ch,
             lock,
-            options,
+            option,
             log.New(os.Stderr, "",  log.Ldate | log.Llongfile | log.Ltime | log.Lmicroseconds),
             nil, nil}}
             */
@@ -122,7 +122,7 @@ func (this *AmfDlog) IsLineValid(line string) bool {
 // Extract meta info related to amf from a valid line
 func (this *AmfDlog) ExtractLineInfo(line string) Any {
     if x := this.Dlog.ExtractLineInfo(line); x != nil {
-        if this.manager.options.debug {
+        if this.manager.option.debug {
             this.Println(line)
         }
         return x
@@ -135,7 +135,7 @@ func (this *AmfDlog) ExtractLineInfo(line string) Any {
     defer this.manager.lock.Unlock()
 
     line = fmt.Sprintf("%d %s %s", req.time, req.class + "." + req.method, req.uri)
-    if this.manager.options.debug {
+    if this.manager.option.debug {
         this.Println(line)
     }
 

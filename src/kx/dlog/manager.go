@@ -10,7 +10,7 @@ import (
 // Manager(coordinator) of all the dlog goroutines
 type Manager struct {
     rawLines, validLines int
-    options *Options
+    option *Option
     chFileScanResult chan ScanResult // each dlog goroutine will report to this
     chTotalScanResult chan ScanResult // total scan line collector use this to sync
     lock *sync.Mutex
@@ -24,11 +24,11 @@ var (
 )
 
 // Manager constructor
-func NewManager(options *Options) *Manager {
+func NewManager(option *Option) *Manager {
     defer T.Un(T.Trace("NewManager"))
 
     this := new(Manager)
-    this.options = options
+    this.option = option
     this.lock = new(sync.Mutex)
     this.chFileScanResult, this.chTotalScanResult = make(chan ScanResult), make(chan ScanResult)
 
@@ -37,7 +37,7 @@ func NewManager(options *Options) *Manager {
 
 // Printable Manager
 func (this *Manager) String() string {
-    return fmt.Sprintf("Manager{%#v}", this.options)
+    return fmt.Sprintf("Manager{%#v}", this.option)
 }
 
 func (this *Manager) executorsCount() int {
@@ -57,7 +57,7 @@ func (this *Manager) DlogsDone() bool {
 
 // How many dlog files are analyzed
 func (this *Manager) FilesCount() int {
-    return len(this.options.files)
+    return len(this.option.files)
 }
 
 // Altogether how many raw lines parsed
@@ -83,8 +83,8 @@ func (this *Manager) StartAll() {
     // run each dlog in a goroutine
     var executor IDlogExecutor
     this.executors = make([]IDlogExecutor, 0)
-    for _, file := range this.options.files {
-        executor = constructors[this.options.Kind()](this, file)
+    for _, file := range this.option.files {
+        executor = constructors[this.option.Kind()](this, file)
         this.executors = append(this.executors, executor)
         go executor.Run(executor)
     }

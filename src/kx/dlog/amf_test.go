@@ -6,8 +6,8 @@ import (
 )
 
 func newDlog() IDlogExecutor {
-    options := new(Options)
-    return NewAmfDlog("", make(chan int), new(sync.Mutex), options)
+    option := new(Option)
+    return NewAmfDlog("", make(chan int), new(sync.Mutex), option)
 }
 
 func TestIsLineValid(t *testing.T) {

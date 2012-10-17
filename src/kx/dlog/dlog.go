@@ -1,5 +1,5 @@
 /*
-Options is the CLI options object.
+Option is the CLI options object.
 
 Dlog stands for a single dlog file executor.
 Each Dlog will run in it's own goroutine.
@@ -75,7 +75,7 @@ type ScanResult struct {
 
 // Printable Dlog
 func (this *Dlog) String() string {
-    return fmt.Sprintf("Dlog{filename: %s, options: %#v}", this.filename, this.manager.options)
+    return fmt.Sprintf("Dlog{filename: %s, option: %#v}", this.filename, this.manager.option)
 }
 
 // Is this dlog executor running?
@@ -86,9 +86,9 @@ func (this *Dlog) Running() bool {
 func (this *Dlog) initMapper() *stream.Stream {
     defer T.Un(T.Trace("initMapper"))
 
-    options := this.manager.options
-    if options.mapper != "" {
-        mapper := stream.NewStream(options.mapper)
+    option := this.manager.option
+    if option.mapper != "" {
+        mapper := stream.NewStream(option.mapper)
         mapper.Open()
 
         this.mapReader = mapper.Reader()
@@ -106,7 +106,7 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
 
     this.Println(this.filename, "start scanning...")
 
-    if this.manager.options.debug {
+    if this.manager.option.debug {
         fmt.Println("\n", this, "\n")
     }
 

@@ -19,8 +19,8 @@ func main() {
     defer T.Un(T.Trace("main"))
 
     // cli options
-    options := dlog.ParseFlags()
-    if options.Version() {
+    option := dlog.ParseFlags()
+    if option.Version() {
         fmt.Println("dlogmon", version)
         os.Exit(0)
     }
@@ -33,7 +33,7 @@ func main() {
     // timing all the jobs up
     start := time.Now()
 
-    manager := dlog.NewManager(options)
+    manager := dlog.NewManager(option)
     manager.StartAll()
     manager.CollectAll()
 
