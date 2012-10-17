@@ -40,7 +40,7 @@ func NewAmfDlog(filename string, ch chan int, lock *sync.Mutex, options *Options
     this.options = options
     this.chLines = ch
     this.lock = lock
-    this.logger = log.New(os.Stdout, "",  log.Ldate | log.Llongfile | log.Ltime | log.Lmicroseconds)
+    this.logger = log.New(os.Stderr, "",  log.Ldate | log.Llongfile | log.Ltime | log.Lmicroseconds)
 
     return this
 }

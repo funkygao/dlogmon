@@ -55,6 +55,8 @@ func (this *Dlog) String() string {
 
 // the main loop
 func (this *Dlog) ScanLines(dlog IDlogExecutor) {
+    this.logger.Println(this.filename, "start scanning...")
+
     if this.options.debug {
         fmt.Println("\n", this, "\n")
     }
