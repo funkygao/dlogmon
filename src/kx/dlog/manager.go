@@ -1,6 +1,8 @@
 package dlog
 
 import (
+    "fmt"
+    "log"
     "sync"
 )
 
@@ -8,9 +10,10 @@ import (
 type Manager struct {
     totalLines, validLines int
     options *Options
-    chFileScanResult chan ScanResult // each dlog goroutine will report to this
+    ChFileScanResult chan ScanResult // each dlog goroutine will report to this
     chTotalScanResult chan ScanResult // total scan line collector use this to sync
     lock *sync.Mutex
+    *log.Logger
     executors []IDlogExecutor
 }
 
@@ -19,17 +22,34 @@ var (
         "amf": NewAmfDlog}
 )
 
+// Manager constructor
 func NewManager(options *Options) *Manager {
     this := new(Manager)
     this.options = options
     this.lock = new(sync.Mutex)
-    this.chFileScanResult, this.chTotalScanResult = make(chan ScanResult), make(chan ScanResult)
+    this.ChFileScanResult, this.chTotalScanResult = make(chan ScanResult), make(chan ScanResult)
 
     return this
 }
 
+// Printable Manager
+func (this *Manager) String() string {
+    return fmt.Sprintf("Manager{%#v}", this.options)
+}
+
 func (this *Manager) executorsCount() int {
     return this.FilesCount()
+}
+
+// Are all dlog executors finished?
+func (this *Manager) DlogsDone() bool {
+    for _, dlog := range this.executors {
+        if dlog.Running() {
+            return false
+        }
+    }
+
+    return true
 }
 
 // How many dlog files are analyzed
@@ -37,9 +57,14 @@ func (this *Manager) FilesCount() int {
     return len(this.options.files)
 }
 
-// Altogether how many valid lines parsed
+// Altogether how many raw lines parsed
 func (this Manager) TotalLines() int {
     return this.totalLines
+}
+
+// Global mutex
+func (this Manager) Lock() *sync.Mutex {
+    return this.lock
 }
 
 // Altogether how many valid lines parsed
@@ -56,8 +81,7 @@ func (this *Manager) StartAll() {
     var executor IDlogExecutor
     this.executors = make([]IDlogExecutor, 0)
     for _, file := range this.options.files {
-        executor = constructors[this.options.Kind()](file, this.chFileScanResult, 
-            this.lock, this.options)
+        executor = constructors[this.options.Kind()](this, file)
         this.executors = append(this.executors, executor)
         go executor.Run(executor)
     }
@@ -72,7 +96,7 @@ func (this *Manager) CollectAll() {
 func (this *Manager) collectTotalLines() {
     var total, valid int
     for i:=0; i<this.executorsCount(); i++ {
-        r := <- this.chFileScanResult
+        r := <- this.ChFileScanResult
 
         total += r.TotalLines
         valid += r.ValidLines

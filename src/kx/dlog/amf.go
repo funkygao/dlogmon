@@ -1,4 +1,3 @@
-// line reader
 package dlog
 
 import (
@@ -8,14 +7,13 @@ import (
     "os"
     "strings"
     "strconv"
-    "sync"
 )
 
 var lineValidatorRegexes = [...][]string{
     {"AMF_SLOW", "PHP.CDlog"}, // must exists
     {"Q=DLog.log"}} // must not exists
 
-// AMF_SLOW dlog analyzer
+// AMF_SLOW tag analyzer
 type AmfDlog struct {
     Dlog
 }
@@ -27,26 +25,23 @@ type amfRequest struct {
     time int16
 }
 
-// parse a line into meta info
-// better printable Request
+// Printable amfRequest 
 func (this *amfRequest) String() string {
     return fmt.Sprintf("amfRequest{http:%s uri:%s rid:%s class:%s method:%s time:%d args:%s}",
         this.http_method, this.uri, this.rid, this.class, this.method, this.time, this.args)
 }
 
 // Constructor of AmfDlog
-func NewAmfDlog(filename string, chScan chan ScanResult, lock *sync.Mutex, options *Options) IDlogExecutor {
+func NewAmfDlog(manager *Manager, filename string) IDlogExecutor {
     this := new(AmfDlog)
     this.filename = filename
-    this.chScan = chScan
-    this.lock = lock
-    this.options = options
+    this.manager = manager
 
     var logWriter io.Writer
-    if options.logfile == "" {
+    if this.manager.options.logfile == "" {
         logWriter = os.Stderr
     } else {
-        f, e := os.OpenFile(options.logfile, os.O_APPEND | os.O_CREATE, 0666)
+        f, e := os.OpenFile(this.manager.options.logfile, os.O_APPEND | os.O_CREATE, 0666)
         if e != nil {
             panic(e)
         }
@@ -97,6 +92,7 @@ func (this *amfRequest) parseLine(line string) {
     }
 }
 
+// Does a log line contain 'AMF_SLOW'?
 func (this *AmfDlog) IsLineValid(line string) bool {
     // super
     if !this.Dlog.IsLineValid(line) {
@@ -120,10 +116,10 @@ func (this *AmfDlog) IsLineValid(line string) bool {
     return true
 }
 
-// operate on a valid dlog line
+// Extract meta info related to amf from a valid line
 func (this *AmfDlog) ExtractLineInfo(line string) Any {
     if x := this.Dlog.ExtractLineInfo(line); x != nil {
-        if this.options.debug {
+        if this.manager.options.debug {
             this.Println(line)
         }
         return x
@@ -132,11 +128,11 @@ func (this *AmfDlog) ExtractLineInfo(line string) Any {
     req := new(amfRequest)
     req.parseLine(line)
 
-    this.lock.Lock()
-    defer this.lock.Unlock()
+    this.manager.lock.Lock()
+    defer this.manager.lock.Unlock()
 
     line = fmt.Sprintf("%d %s %s", req.time, req.class + "." + req.method, req.uri)
-    if this.options.debug {
+    if this.manager.options.debug {
         this.Println(line)
     }
 

@@ -10,10 +10,6 @@ import (
     "time"
 )
 
-const (
-    SPAN_SEP = "-"
-)
-
 // CLI options object
 type Options struct {
     files []string
@@ -26,24 +22,28 @@ type Options struct {
     logfile string
 }
 
+// Printable Options
 func (this *Options) String() string {
     return fmt.Sprintf("Options{files: %#v debug:%#v mapper:%s reducer:%s}", this.files, this.debug,
         this.mapper, this.reducer)
 }
 
+// Names of the dlog files to be analyzed
 func (this *Options) Files() []string {
     return this.files
 }
 
+// Kind of the current dlog
 func (this *Options) Kind() string {
     return this.kind
 }
 
+// Does CLI ask for dlogmon version info?
 func (this *Options) Version() bool {
     return this.version
 }
 
-// parse CLI options
+// Parse CLI options
 func ParseFlags() *Options {
     d := flag.String("D", "", "day of dlog[default today] e,g 121005")
     h := flag.String("H", "10", "hour of dlog[default 10] e,g 9-11")
@@ -84,8 +84,8 @@ func ParseFlags() *Options {
     var h1, h2 int
     var err error
     var hp []string // hour parts
-    if strings.Contains(*h, SPAN_SEP) {
-        hp = strings.SplitN(*h, SPAN_SEP, 2)
+    if strings.Contains(*h, FLAG_TIMESPAN_SEP) {
+        hp = strings.SplitN(*h, FLAG_TIMESPAN_SEP, 2)
     } else {
         hp = []string{*h, *h}
     }

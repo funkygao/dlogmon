@@ -1,5 +1,22 @@
 /*
-Dlog base
+Options is the CLI options object.
+
+Dlog stands for a single dlog file executor.
+Each Dlog will run in it's own goroutine.
+
+Dlog analyzer has many kinds(such as amf), which is only interested in 
+some specific kind of info. 
+So Dlog has many sub structs, which should implement
+'IsLineValid' and [map/reduct | ExtractLineInfo].
+
+Attention:
+    For performance issue, IsLineValid must be implemented in main go program, while
+    map/reduce can be any runnable script file, e.g python/php/ruby/nodejs, etc.
+
+Manager is the manager of all dlog goroutines.
+There will be a single manager in runtime.
+
+amf is a kind of Dlog, which just parse 'AMF_SLOW' related log lines.
 */
 package dlog
 
@@ -10,7 +27,6 @@ import (
     "io"
     "log"
     "strings"
-    "sync"
 )
 
 const (
@@ -19,18 +35,31 @@ const (
     EOL = '\n'
     DLOG_BASE_DIR = "/kx/dlog/"
     SAMPLER_HOST = "100.123"
+    FLAG_TIMESPAN_SEP = "-"
 )
 
+// Any kind of things
 type Any interface {}
 
-type DlogConstructor func(string, chan ScanResult, *sync.Mutex, *Options) IDlogExecutor
+// An executor for 1 dlog file
+type Dlog struct {
+    running bool
+    filename string // dlog filename
+    mapReader *bufio.Reader
+    mapWriter *bufio.Writer
+    *log.Logger
+    manager *Manager
+}
 
-// request object for a line
+// Dlog constructor signature
+type DlogConstructor func(*Manager, string) IDlogExecutor
+
+// Request object for a line
 type Request struct {
     http_method, uri, rid string
 }
 
-// dlog interface
+// Dlog struct method signatures
 type IDlogExecutor interface {
     Run(IDlogExecutor) // IDlogExecutor param for dynamic polymorphism
     IsLineValid(string) bool
@@ -43,24 +72,14 @@ type Progresser interface {
     Progress(int)
 }
 
+// Scan result of raw lines and valid lines
 type ScanResult struct {
     TotalLines, ValidLines int
 }
 
-// an executor for 1 dlog file
-type Dlog struct {
-    running bool
-    filename string // dlog filename
-    chScan chan ScanResult // lines parsed channel
-    lock *sync.Mutex
-    options *Options
-    *log.Logger
-    mapReader *bufio.Reader
-    mapWriter *bufio.Writer
-}
-
+// Printable Dlog
 func (this *Dlog) String() string {
-    return fmt.Sprintf("Dlog{filename: %s, options: %#v}", this.filename, this.options)
+    return fmt.Sprintf("Dlog{filename: %s, options: %#v}", this.filename, this.manager.options)
 }
 
 // Is this dlog executor running?
@@ -69,8 +88,9 @@ func (this *Dlog) Running() bool {
 }
 
 func (this *Dlog) initMapper() *stream.Stream {
-    if this.options.mapper != "" {
-        mapper := stream.NewStream(this.options.mapper)
+    options := this.manager.options
+    if options.mapper != "" {
+        mapper := stream.NewStream(options.mapper)
         mapper.Open()
 
         this.mapReader = mapper.Reader()
@@ -81,12 +101,12 @@ func (this *Dlog) initMapper() *stream.Stream {
     return nil
 }
 
-// Scan each line and apply validator and parser
+// Scan each line of a dlog file and apply validator and parser.
 // Invoke mapper if neccessary
 func (this *Dlog) Run(dlog IDlogExecutor) {
     this.Println(this.filename, "start scanning...")
 
-    if this.options.debug {
+    if this.manager.options.debug {
         fmt.Println("\n", this, "\n")
     }
 
@@ -125,11 +145,12 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
         }
     }
 
-    this.chScan <- ScanResult{totalLines, validLines}
+    this.manager.ChFileScanResult <- ScanResult{totalLines, validLines}
     this.running = false
 }
 
 // Is a line valid?
+// Only when log is from sampler host will it reuturn true
 func (this *Dlog) IsLineValid(line string) bool {
     if !strings.Contains(line, SAMPLER_HOST) {
         return false
@@ -137,7 +158,8 @@ func (this *Dlog) IsLineValid(line string) bool {
     return true
 }
 
-// Extract meta info from a valid line string
+// Base to extract meta info from a valid line string.
+// If mapper specified, return the mapper output, else return nil
 func (this *Dlog) ExtractLineInfo(line string) Any {
     if this.mapReader == nil || this.mapWriter == nil {
         return nil
@@ -155,11 +177,10 @@ func (this *Dlog) ExtractLineInfo(line string) Any {
     return mapperLine
 }
 
-// Mark this dlog executor done
 func (this Dlog) Progress(finished int) {
     const BAR = "."
 
-    total := len(this.options.files)
+    total := len(this.manager.options.files)
     fmt.Printf("[%*s%*s]\n", finished, BAR, total - finished, " ")
 }
 
