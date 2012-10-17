@@ -18,6 +18,8 @@ const (
 type Options struct {
     files []string
     debug bool
+    verbose bool
+    version bool
     mapper string
     reducer string
     kind string
@@ -36,11 +38,17 @@ func (this *Options) Kind() string {
     return this.kind
 }
 
+func (this *Options) Version() bool {
+    return this.version
+}
+
 // parse CLI options
 func ParseFlags() *Options {
     d := flag.String("D", "", "day of dlog[default today] e,g 121005")
     h := flag.String("H", "10", "hour of dlog[default 10] e,g 9-11")
     f := flag.String("f", "", "specify a single dlog file to analyze")
+    verbose := flag.Bool("v", false, "verbose")
+    version := flag.Bool("V", false, "show version")
     kind := flag.String("k", "amf", "what kind of content to scan in dlog[amf|xxx]")
     debug := flag.Bool("d", false, "debug mode")
     mapper := flag.String("mapper", "", "let a runnable script be the mapper")
@@ -56,6 +64,8 @@ func ParseFlags() *Options {
     options.mapper = *mapper
     options.reducer = *reducer
     options.kind = *kind
+    options.version = *version
+    options.verbose = *verbose
 
     // day
     dir := *d

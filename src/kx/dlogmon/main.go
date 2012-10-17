@@ -4,23 +4,30 @@ package main
 import (
     "fmt"
     "kx/dlog"
+    "os"
     "runtime"
     "sync"
     "time"
 )
 
+const version = "1.0.5r"
+
 var kindMapping = map[string] dlog.DlogConstructor {
     "amf": dlog.NewAmfDlog}
 
 func main() {
+    // cli options
+    options := dlog.ParseFlags()
+    if options.Version() {
+        fmt.Println("dlogmon", version)
+        os.Exit(0)
+    }
+    files := options.Files()
+
     // parallel level
     parallel := runtime.NumCPU()/2 + 1
     runtime.GOMAXPROCS(parallel)
     fmt.Printf("Parallel CPU: %d / %d\n", parallel, runtime.NumCPU())
-
-    // cli options
-    options := dlog.ParseFlags()
-    files := options.Files()
 
     chLines := make(chan int, len(files))
     lock := new(sync.Mutex)
