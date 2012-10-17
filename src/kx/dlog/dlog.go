@@ -34,7 +34,7 @@ type Request struct {
 type IDlogExecutor interface {
     Run(IDlogExecutor) // IDlogExecutor param for dynamic polymorphism
     IsLineValid(string) bool
-    OperateLine(string) Any
+    ExtractLineInfo(string) Any
     Running() bool
     Progresser
 }
@@ -111,15 +111,16 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
             continue
         }
 
-        // extract info from this line
-        dlog.OperateLine(line)
+        // extract parsed info from this line
+        if x := dlog.ExtractLineInfo(line); x != nil {
+        }
     }
 
     this.chLines <- lineCount
     this.running = false
 }
 
-// base
+// Is a line valid?
 func (this *Dlog) IsLineValid(line string) bool {
     if !strings.Contains(line, SAMPLER_HOST) {
         return false
@@ -127,8 +128,8 @@ func (this *Dlog) IsLineValid(line string) bool {
     return true
 }
 
-// base of valid line handler
-func (this *Dlog) OperateLine(line string) Any {
+// Extract meta info from a valid line string
+func (this *Dlog) ExtractLineInfo(line string) Any {
     if this.mapReader == nil || this.mapWriter == nil {
         return nil
     }
@@ -152,3 +153,4 @@ func (this Dlog) Progress(finished int) {
     total := len(this.options.files)
     fmt.Printf("[%*s%*s]\n", finished, BAR, total - finished, " ")
 }
+

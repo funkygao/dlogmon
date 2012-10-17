@@ -121,8 +121,8 @@ func (this *AmfDlog) IsLineValid(line string) bool {
 }
 
 // operate on a valid dlog line
-func (this *AmfDlog) OperateLine(line string) Any {
-    if x := this.Dlog.OperateLine(line); x != nil {
+func (this *AmfDlog) ExtractLineInfo(line string) Any {
+    if x := this.Dlog.ExtractLineInfo(line); x != nil {
         if this.options.debug {
             this.Println(line)
         }
