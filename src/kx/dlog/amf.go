@@ -3,6 +3,7 @@ package dlog
 
 import (
     "fmt"
+    "io"
     "log"
     "os"
     "strings"
@@ -35,6 +36,26 @@ func (this *amfRequest) String() string {
 
 // Constructor of AmfDlog
 func NewAmfDlog(filename string, ch chan int, lock *sync.Mutex, options *Options) IDlogExecutor {
+    this := new(AmfDlog)
+    this.filename = filename
+    this.chLines = ch
+    this.lock = lock
+    this.options = options
+
+    var logWriter io.Writer
+    if options.logfile == "" {
+        logWriter = os.Stderr
+    } else {
+        f, e := os.OpenFile(options.logfile, os.O_APPEND | os.O_CREATE, 0666)
+        if e != nil {
+            panic(e)
+        }
+        logWriter = f
+    }
+    // notice how to access embedded types
+    this.Logger = log.New(logWriter, "",  log.Ldate | log.Lshortfile | log.Ltime | log.Lmicroseconds)
+    return this
+    /*
     return &AmfDlog{
         Dlog{
             filename,
@@ -42,8 +63,8 @@ func NewAmfDlog(filename string, ch chan int, lock *sync.Mutex, options *Options
             lock,
             options,
             log.New(os.Stderr, "",  log.Ldate | log.Llongfile | log.Ltime | log.Lmicroseconds),
-            nil,
-            nil}}
+            nil, nil}}
+            */
 }
 
 func (this *amfRequest) parseLine(line string) {

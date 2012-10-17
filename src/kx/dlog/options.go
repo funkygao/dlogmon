@@ -23,6 +23,7 @@ type Options struct {
     mapper string
     reducer string
     kind string
+    logfile string
 }
 
 func (this *Options) String() string {
@@ -53,6 +54,7 @@ func ParseFlags() *Options {
     debug := flag.Bool("d", false, "debug mode")
     mapper := flag.String("mapper", "", "let a runnable script be the mapper")
     reducer := flag.String("reducer", "", "let a runnable script be the reducer")
+    logfile := flag.String("l", "", "log file path, default stderr")
 
     flag.Parse()
 
@@ -66,6 +68,7 @@ func ParseFlags() *Options {
     options.kind = *kind
     options.version = *version
     options.verbose = *verbose
+    options.logfile = *logfile
 
     // day
     dir := *d
