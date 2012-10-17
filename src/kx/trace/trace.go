@@ -15,12 +15,30 @@ package trace
 
 import "fmt"
 
+var enabled bool = true
+
+// Entering into a func
 func Trace(s string) string {
-    fmt.Println("Entering:", s)
+    if enabled {
+        fmt.Println("Entering:", s)
+    }
     return s
 }
 
+// Leaving from a func
 func Un(s string) {
-    fmt.Println("Leaving:", s)
+    if enabled {
+        fmt.Println("Leaving:", s)
+    }
+}
+
+// Enable the trace output
+func Enable() {
+    enabled = true
+}
+
+// Disable the trace output
+func Disable() {
+    enabled = false
 }
 
