@@ -10,7 +10,7 @@ import (
 type Manager struct {
     rawLines, validLines int
     options *Options
-    ChFileScanResult chan ScanResult // each dlog goroutine will report to this
+    chFileScanResult chan ScanResult // each dlog goroutine will report to this
     chTotalScanResult chan ScanResult // total scan line collector use this to sync
     lock *sync.Mutex
     *log.Logger
@@ -27,7 +27,7 @@ func NewManager(options *Options) *Manager {
     this := new(Manager)
     this.options = options
     this.lock = new(sync.Mutex)
-    this.ChFileScanResult, this.chTotalScanResult = make(chan ScanResult), make(chan ScanResult)
+    this.chFileScanResult, this.chTotalScanResult = make(chan ScanResult), make(chan ScanResult)
 
     return this
 }
@@ -96,7 +96,7 @@ func (this *Manager) CollectAll() {
 func (this *Manager) collectLinesCount() {
     var total, valid int
     for i:=0; i<this.executorsCount(); i++ {
-        r := <- this.ChFileScanResult
+        r := <- this.chFileScanResult
 
         total += r.RawLines
         valid += r.ValidLines
