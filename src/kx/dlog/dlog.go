@@ -68,27 +68,31 @@ func (this *Dlog) Running() bool {
     return this.running
 }
 
-func (this *Dlog) init() {
+func (this *Dlog) initMapper() *stream.Stream {
+    if this.options.mapper != "" {
+        mapper := stream.NewStream(this.options.mapper)
+        mapper.Open()
+
+        this.mapReader = mapper.Reader()
+        this.mapWriter = mapper.Writer()
+        return mapper
+    } 
+
+    return nil
+}
+
+// Scan each line and apply validator and parser
+// Invoke mapper if neccessary
+func (this *Dlog) Run(dlog IDlogExecutor) {
     this.Println(this.filename, "start scanning...")
 
     if this.options.debug {
         fmt.Println("\n", this, "\n")
     }
 
-    if this.options.mapper != "" {
-        mapper := stream.NewStream(this.options.mapper)
-        mapper.Open()
+    if mapper := this.initMapper(); mapper != nil {
         defer mapper.Close()
-
-        this.mapReader = mapper.Reader()
-        this.mapWriter = mapper.Writer()
     }
-}
-
-// Scan each line and apply validator and parser
-// Invoke mapper if neccessary
-func (this *Dlog) Run(dlog IDlogExecutor) {
-    this.init()
 
     this.running = true
 
