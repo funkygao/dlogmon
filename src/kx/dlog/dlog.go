@@ -69,12 +69,14 @@ func (this *Dlog) ScanLines(dlog IDlogExecutor) {
     if this.options.mapper != "" {
         mapper := stream.NewStream(this.options.mapper)
         mapper.Open()
+        defer mapper.Close()
         this.mapReader = mapper.Reader()
         this.mapWriter = mapper.Writer()
     }
 
     stream := stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
     stream.Open()
+    defer stream.Close()
 
     inputReader := stream.Reader()
     lineCount := 0
@@ -97,9 +99,6 @@ func (this *Dlog) ScanLines(dlog IDlogExecutor) {
         // extract info from this line
         dlog.OperateLine(line)
     }
-
-    // done for this stream
-    stream.Close()
 
     this.chLines <- lineCount
 }
