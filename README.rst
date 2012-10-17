@@ -33,14 +33,14 @@ compile
 Todo
 ====
 
-- stream
-
-  integrate with python, php
-
 - profiler
-
-- ReadLines should be move to dlog.go
 
 - why first strings.Contains(100.123) will be slower to 280000 per sec
 
+  enhance performance of strings.Contains
+
 - godoc enhancement
+
+  done
+
+- progress bar
