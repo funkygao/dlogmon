@@ -1,4 +1,6 @@
-// dlog base
+/*
+Dlog base
+*/
 package dlog
 
 import (
@@ -19,6 +21,8 @@ const (
     SAMPLER_HOST = "100.123"
 )
 
+type Any interface {}
+
 // request object for a line
 type Request struct {
     http_method, uri, rid string
@@ -33,10 +37,11 @@ type IDlogExecutor interface {
 
 // an executor for 1 dlog file
 type Dlog struct {
-    options *Options
     filename string // dlog filename
     chLines chan int // lines parsed channel
     lock *sync.Mutex
+    options *Options
+    logger *log.Logger
     mapReader *bufio.Reader
     mapWriter *bufio.Writer
 }
