@@ -17,8 +17,7 @@ type Stream struct {
 
 // constructor
 func NewStream(name string, arg ...string) *Stream {
-    this := &Stream{name: name, arg: arg}
-    return this
+    return &Stream{name: name, arg: arg}
 }
 
 // open stream
