@@ -18,11 +18,11 @@ func TestEmptyOptionsString(t *testing.T) {
     }
 }
 
-func TestOptionsGetFiles(t *testing.T) {
+func TestOptionsFiles(t *testing.T) {
     options := newOptions()
     var files = []string{"a", "c", "cd"}
     options.files = files
-    if len(options.GetFiles()) != len(options.files) {
+    if len(options.Files()) != len(options.files) {
         t.Error("Options.files wrong!")
     }
 

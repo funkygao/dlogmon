@@ -47,12 +47,12 @@ func (this *Stream) Open() {
 }
 
 // get reader to read from the pipe output
-func (this Stream) GetReader() *bufio.Reader {
+func (this Stream) Reader() *bufio.Reader {
     return this.reader
 }
 
 // get writer to write to the pipe input
-func (this Stream) GetWriter() *bufio.Writer {
+func (this Stream) Writer() *bufio.Writer {
     return this.writer
 }
 

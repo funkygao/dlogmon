@@ -20,7 +20,7 @@ func main() {
 
     // cli options
     options := dlog.ParseFlags()
-    files := options.GetFiles()
+    files := options.Files()
 
     chLines := make(chan int, len(files))
     lock := new(sync.Mutex)
@@ -31,7 +31,7 @@ func main() {
     // each dlog file is a goroutine
     for _, file := range files {
         var executor dlog.IDlogExecutor
-        executor = kindMapping[options.GetKind()](file, chLines, lock, options)
+        executor = kindMapping[options.Kind()](file, chLines, lock, options)
         go executor.ScanLines(executor)
     }
 

@@ -28,11 +28,11 @@ func (this *Options) String() string {
         this.mapper, this.reducer)
 }
 
-func (this *Options) GetFiles() []string {
+func (this *Options) Files() []string {
     return this.files
 }
 
-func (this *Options) GetKind() string {
+func (this *Options) Kind() string {
     return this.kind
 }
 
