@@ -34,7 +34,7 @@ type Request struct {
 type IDlogExecutor interface {
     Run(IDlogExecutor) // IDlogExecutor param for dynamic polymorphism
     IsLineValid(string) bool
-    OperateLine(string)
+    OperateLine(string) Any
     Progresser
 }
 
@@ -113,9 +113,9 @@ func (this *Dlog) IsLineValid(line string) bool {
 }
 
 // base of valid line handler
-func (this *Dlog) OperateLine(line string) {
+func (this *Dlog) OperateLine(line string) Any {
     if this.mapReader == nil || this.mapWriter == nil {
-        return
+        return nil
     }
 
     _, err := this.mapWriter.WriteString(line)
@@ -127,9 +127,7 @@ func (this *Dlog) OperateLine(line string) {
     }
 
     mapperLine, _ := this.mapReader.ReadString(EOL)
-    if this.options.debug {
-        println("<<==", mapperLine)
-    }
+    return mapperLine
 }
 
 // Mark this dlog executor done

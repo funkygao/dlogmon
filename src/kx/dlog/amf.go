@@ -121,14 +121,25 @@ func (this *AmfDlog) IsLineValid(line string) bool {
 }
 
 // operate on a valid dlog line
-func (this *AmfDlog) OperateLine(line string) {
-    this.Dlog.OperateLine(line) // super
+func (this *AmfDlog) OperateLine(line string) Any {
+    if x := this.Dlog.OperateLine(line); x != nil {
+        if this.options.debug {
+            this.Println(line)
+        }
+        return x
+    }
 
     req := new(amfRequest)
     req.parseLine(line)
 
     this.lock.Lock()
     defer this.lock.Unlock()
-    fmt.Printf("%6d%58s   %s\n", req.time, req.class + "." + req.method, req.uri)
+
+    line = fmt.Sprintf("%d %s %s", req.time, req.class + "." + req.method, req.uri)
+    if this.options.debug {
+        this.Println(line)
+    }
+
+    return line
 }
 
