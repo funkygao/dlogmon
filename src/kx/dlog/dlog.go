@@ -65,11 +65,6 @@ type IDlogExecutor interface {
     IsLineValid(string) bool
     ExtractLineInfo(string) Any
     Running() bool
-    Progresser
-}
-
-type Progresser interface {
-    Progress(int)
 }
 
 // Scan result of raw lines and valid lines
@@ -175,12 +170,5 @@ func (this *Dlog) ExtractLineInfo(line string) Any {
 
     mapperLine, _ := this.mapReader.ReadString(EOL)
     return mapperLine
-}
-
-func (this Dlog) Progress(finished int) {
-    const BAR = "."
-
-    total := len(this.manager.options.files)
-    fmt.Printf("[%*s%*s]\n", finished, BAR, total - finished, " ")
 }
 
