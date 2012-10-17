@@ -1,4 +1,7 @@
-// main entry
+/*
+Scan each specified dlog files concurrently and merge parsed meta
+info from each dlog file and render the final calculated report
+*/
 package main
 
 import (
@@ -29,10 +32,9 @@ func main() {
 
     manager := dlog.NewManager(options)
     manager.StartAll()
-
     manager.CollectAll()
 
-    totalLines, validLines := manager.TotalLines, manager.ValidLines
+    totalLines, validLines := manager.TotalLines(), manager.ValidLines()
 
     end := time.Now()
     delta := end.Sub(start)
