@@ -23,6 +23,8 @@ const (
 
 type Any interface {}
 
+type DlogConstructor func(string, chan int, *sync.Mutex, *Options) IDlogExecutor
+
 // request object for a line
 type Request struct {
     http_method, uri, rid string

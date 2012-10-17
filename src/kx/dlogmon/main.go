@@ -9,7 +9,7 @@ import (
     "time"
 )
 
-var kindMapping = map[string] func(string, chan int, *sync.Mutex, *dlog.Options) dlog.IDlogExecutor {
+var kindMapping = map[string] dlog.DlogConstructor {
     "amf": dlog.NewAmfDlog}
 
 func main() {
