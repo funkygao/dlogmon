@@ -4,13 +4,14 @@ import (
     "sync"
 )
 
+// Manager(coordinator) of all the dlog goroutines
 type Manager struct {
+    TotalLines, ValidLines int
     options *Options
     chFileScanResult chan ScanResult // each dlog goroutine will report to this
     chTotalScanResult chan ScanResult // total scan line collector use this to sync
     lock *sync.Mutex
     executors []IDlogExecutor
-    TotalLines, ValidLines int
 }
 
 var (
@@ -40,16 +41,18 @@ func (this *Manager) StartAll() {
     // wait to collect after all dlog executors done
     go this.collectTotalLines()
 
-    // each dlog file is a goroutine
+    // run each dlog in a goroutine
     var executor IDlogExecutor
     this.executors = make([]IDlogExecutor, 0)
     for _, file := range this.options.files {
-        executor = constructors[this.options.Kind()](file, this.chFileScanResult, this.lock, this.options)
+        executor = constructors[this.options.Kind()](file, this.chFileScanResult, 
+            this.lock, this.options)
         this.executors = append(this.executors, executor)
         go executor.Run(executor)
     }
 }
 
+// Wait for all the dlog goroutines finish and collect final result
 func (this *Manager) CollectAll() {
     r := <- this.chTotalScanResult
     this.TotalLines, this.ValidLines = r.TotalLines, r.ValidLines
