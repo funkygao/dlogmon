@@ -35,6 +35,7 @@ type IDlogExecutor interface {
     Run(IDlogExecutor) // IDlogExecutor param for dynamic polymorphism
     IsLineValid(string) bool
     OperateLine(string) Any
+    Running() bool
     Progresser
 }
 
@@ -44,6 +45,7 @@ type Progresser interface {
 
 // an executor for 1 dlog file
 type Dlog struct {
+    running bool
     filename string // dlog filename
     chLines chan int // lines parsed channel
     lock *sync.Mutex
@@ -58,9 +60,12 @@ func (this *Dlog) String() string {
     return fmt.Sprintf("Dlog{filename: %s, options: %#v}", this.filename, this.options)
 }
 
-// Scan each line and apply validator and parser
-// Invoke mapper if neccessary
-func (this *Dlog) Run(dlog IDlogExecutor) {
+// Is this dlog executor running?
+func (this *Dlog) Running() bool {
+    return this.running
+}
+
+func (this *Dlog) init() {
     this.Println(this.filename, "start scanning...")
 
     if this.options.debug {
@@ -71,15 +76,24 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
         mapper := stream.NewStream(this.options.mapper)
         mapper.Open()
         defer mapper.Close()
+
         this.mapReader = mapper.Reader()
         this.mapWriter = mapper.Writer()
     }
+}
 
-    stream := stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
-    stream.Open()
-    defer stream.Close()
+// Scan each line and apply validator and parser
+// Invoke mapper if neccessary
+func (this *Dlog) Run(dlog IDlogExecutor) {
+    this.init()
 
-    inputReader := stream.Reader()
+    this.running = true
+
+    input := stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
+    input.Open()
+    defer input.Close()
+
+    inputReader := input.Reader()
     lineCount := 0
     for {
         line, err := inputReader.ReadString(EOL)
@@ -102,6 +116,7 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
     }
 
     this.chLines <- lineCount
+    this.running = false
 }
 
 // base
