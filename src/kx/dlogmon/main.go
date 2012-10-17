@@ -12,7 +12,7 @@ import (
 
 const version = "1.0.5r"
 
-var kindMapping = map[string] dlog.DlogConstructor {
+var kindConstructors = map[string] dlog.DlogConstructor {
     "amf": dlog.NewAmfDlog}
 
 func main() {
@@ -38,7 +38,7 @@ func main() {
     // each dlog file is a goroutine
     var executor dlog.IDlogExecutor
     for _, file := range files {
-        executor = kindMapping[options.Kind()](file, chLines, lock, options)
+        executor = kindConstructors[options.Kind()](file, chLines, lock, options)
         go executor.ScanLines(executor)
     }
 
