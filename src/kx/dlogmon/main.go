@@ -23,13 +23,14 @@ func main() {
         os.Exit(0)
     }
     files := options.Files()
+    totalFiles := len(files)
 
     // parallel level
     parallel := runtime.NumCPU()/2 + 1
     runtime.GOMAXPROCS(parallel)
     fmt.Printf("Parallel CPU: %d / %d\n", parallel, runtime.NumCPU())
 
-    chLines := make(chan int, len(files))
+    chLines := make(chan int, totalFiles)
     lock := new(sync.Mutex)
 
     // timing all the jobs up
@@ -37,14 +38,16 @@ func main() {
 
     // each dlog file is a goroutine
     var executor dlog.IDlogExecutor
+    executors := make([]dlog.IDlogExecutor, totalFiles)
     for _, file := range files {
         executor = kindConstructors[options.Kind()](file, chLines, lock, options)
+        executors = append(executors, executor)
         go executor.ScanLines(executor)
     }
 
     // wait for all dlog runner finish
     lines := 0
-    for i:=0; i<len(files); i++ {
+    for i:=0; i<totalFiles; i++ {
         lines += <- chLines
         executor.Progress(i)
     }
@@ -53,7 +56,7 @@ func main() {
     delta := end.Sub(start)
     fmt.Printf("\nParsed %d lines in %d files within %s [%.1f lines per second]\n",
         lines,
-        len(files),
+        totalFiles,
         delta, float64(lines)/delta.Seconds())
 }
 
