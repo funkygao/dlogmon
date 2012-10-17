@@ -22,7 +22,7 @@ func TestNewManager(t *testing.T) {
 
 func TestString(t *testing.T) {
     m := mockManager()
-    expected := "shit"
+    expected := `Manager{&dlog.Option{files:[]string(nil), debug:false, trace:false, verbose:false, version:false, mapper:"", reducer:"", kind:"", logfile:""}}`
     str := fmt.Sprintf("%s", m)
     if expected != str {
         t.Error("expected:", expected, "real:", str)
