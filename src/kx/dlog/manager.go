@@ -8,7 +8,7 @@ import (
 
 // Manager(coordinator) of all the dlog goroutines
 type Manager struct {
-    totalLines, validLines int
+    rawLines, validLines int
     options *Options
     ChFileScanResult chan ScanResult // each dlog goroutine will report to this
     chTotalScanResult chan ScanResult // total scan line collector use this to sync
@@ -58,8 +58,8 @@ func (this *Manager) FilesCount() int {
 }
 
 // Altogether how many raw lines parsed
-func (this Manager) TotalLines() int {
-    return this.totalLines
+func (this Manager) RawLines() int {
+    return this.rawLines
 }
 
 // Global mutex
@@ -75,7 +75,7 @@ func (this Manager) ValidLines() int {
 // Start and manage all the dlog executors
 func (this *Manager) StartAll() {
     // wait to collect after all dlog executors done
-    go this.collectTotalLines()
+    go this.collectLinesCount()
 
     // run each dlog in a goroutine
     var executor IDlogExecutor
@@ -90,15 +90,15 @@ func (this *Manager) StartAll() {
 // Wait for all the dlog goroutines finish and collect final result
 func (this *Manager) CollectAll() {
     r := <- this.chTotalScanResult
-    this.totalLines, this.validLines = r.TotalLines, r.ValidLines
+    this.rawLines, this.validLines = r.RawLines, r.ValidLines
 }
 
-func (this *Manager) collectTotalLines() {
+func (this *Manager) collectLinesCount() {
     var total, valid int
     for i:=0; i<this.executorsCount(); i++ {
         r := <- this.ChFileScanResult
 
-        total += r.TotalLines
+        total += r.RawLines
         valid += r.ValidLines
     }
 

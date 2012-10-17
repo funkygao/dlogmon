@@ -34,14 +34,14 @@ func main() {
     manager.StartAll()
     manager.CollectAll()
 
-    totalLines, validLines := manager.TotalLines(), manager.ValidLines()
+    rawLines, validLines := manager.RawLines(), manager.ValidLines()
 
     end := time.Now()
     delta := end.Sub(start)
     fmt.Printf("\nParsed %d/%d lines in %d files within %s [%.1f lines per second]\n",
         validLines,
-        totalLines,
+        rawLines,
         manager.FilesCount(),
-        delta, float64(totalLines)/delta.Seconds())
+        delta, float64(rawLines)/delta.Seconds())
 }
 

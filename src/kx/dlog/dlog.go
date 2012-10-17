@@ -74,7 +74,7 @@ type Progresser interface {
 
 // Scan result of raw lines and valid lines
 type ScanResult struct {
-    TotalLines, ValidLines int
+    RawLines, ValidLines int
 }
 
 // Printable Dlog
@@ -121,7 +121,7 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
     defer input.Close()
 
     inputReader := input.Reader()
-    var totalLines, validLines int
+    var rawLines, validLines int
     for {
         line, err := inputReader.ReadString(EOL)
         if err != nil {
@@ -132,7 +132,7 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
             break
         }
 
-        totalLines ++
+        rawLines ++
 
         if !dlog.IsLineValid(line) {
             continue
@@ -145,7 +145,7 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
         }
     }
 
-    this.manager.ChFileScanResult <- ScanResult{totalLines, validLines}
+    this.manager.ChFileScanResult <- ScanResult{rawLines, validLines}
     this.running = false
 }
 
