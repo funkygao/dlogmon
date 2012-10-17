@@ -3,6 +3,7 @@ install:
 	go install kx/dlogmon
 	go install kx/stream
 	go install kx/trace
+	go install kx/progress
 	@strip bin/dlogmon 2> /dev/null
 
 test:install
