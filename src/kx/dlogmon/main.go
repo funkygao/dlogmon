@@ -36,8 +36,8 @@ func main() {
     start := time.Now()
 
     // each dlog file is a goroutine
+    var executor dlog.IDlogExecutor
     for _, file := range files {
-        var executor dlog.IDlogExecutor
         executor = kindMapping[options.Kind()](file, chLines, lock, options)
         go executor.ScanLines(executor)
     }
@@ -46,6 +46,7 @@ func main() {
     lines := 0
     for i:=0; i<len(files); i++ {
         lines += <- chLines
+        executor.Progress(i)
     }
 
     end := time.Now()

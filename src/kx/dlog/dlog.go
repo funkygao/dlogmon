@@ -35,6 +35,11 @@ type IDlogExecutor interface {
     ScanLines(IDlogExecutor) // IDlogExecutor param for dynamic polymorphism
     IsLineValid(string) bool
     OperateLine(string)
+    Progresser
+}
+
+type Progresser interface {
+    Progress(int)
 }
 
 // an executor for 1 dlog file
@@ -127,3 +132,10 @@ func (this *Dlog) OperateLine(line string) {
     }
 }
 
+// Mark this dlog executor done
+func (this Dlog) Progress(finished int) {
+    const BAR = "."
+
+    total := len(this.options.files)
+    fmt.Printf("[%*s%*s]\n", finished, BAR, total - finished, " ")
+}
