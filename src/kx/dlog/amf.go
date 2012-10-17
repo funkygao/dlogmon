@@ -35,10 +35,10 @@ func (this *amfRequest) String() string {
 }
 
 // Constructor of AmfDlog
-func NewAmfDlog(filename string, ch chan int, lock *sync.Mutex, options *Options) IDlogExecutor {
+func NewAmfDlog(filename string, chScan chan ScanResult, lock *sync.Mutex, options *Options) IDlogExecutor {
     this := new(AmfDlog)
     this.filename = filename
-    this.chLines = ch
+    this.chScan = chScan
     this.lock = lock
     this.options = options
 

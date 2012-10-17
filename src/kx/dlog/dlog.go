@@ -23,7 +23,7 @@ const (
 
 type Any interface {}
 
-type DlogConstructor func(string, chan int, *sync.Mutex, *Options) IDlogExecutor
+type DlogConstructor func(string, chan ScanResult, *sync.Mutex, *Options) IDlogExecutor
 
 // request object for a line
 type Request struct {
@@ -43,11 +43,15 @@ type Progresser interface {
     Progress(int)
 }
 
+type ScanResult struct {
+    TotalLines, ValidLines int
+}
+
 // an executor for 1 dlog file
 type Dlog struct {
     running bool
     filename string // dlog filename
-    chLines chan int // lines parsed channel
+    chScan chan ScanResult // lines parsed channel
     lock *sync.Mutex
     options *Options
     *log.Logger
@@ -55,7 +59,6 @@ type Dlog struct {
     mapWriter *bufio.Writer
 }
 
-// java's toString()
 func (this *Dlog) String() string {
     return fmt.Sprintf("Dlog{filename: %s, options: %#v}", this.filename, this.options)
 }
@@ -94,7 +97,7 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
     defer input.Close()
 
     inputReader := input.Reader()
-    lineCount := 0
+    var totalLines, validLines int
     for {
         line, err := inputReader.ReadString(EOL)
         if err != nil {
@@ -105,18 +108,20 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
             break
         }
 
-        lineCount += 1
+        totalLines ++
 
         if !dlog.IsLineValid(line) {
             continue
         }
+
+        validLines ++
 
         // extract parsed info from this line
         if x := dlog.ExtractLineInfo(line); x != nil {
         }
     }
 
-    this.chLines <- lineCount
+    this.chScan <- ScanResult{totalLines, validLines}
     this.running = false
 }
 
