@@ -16,6 +16,9 @@ clean:
 run:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410
 
+T:install
+	./bin/dlogmon -f test/fixture/lz.121015-104410 -t -d
+
 mr:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -mapper ./mr/amfMapper.py
 

@@ -4,6 +4,7 @@ import (
     "fmt"
     "log"
     "sync"
+    T "kx/trace"
 )
 
 // Manager(coordinator) of all the dlog goroutines
@@ -24,6 +25,8 @@ var (
 
 // Manager constructor
 func NewManager(options *Options) *Manager {
+    defer T.Un(T.Trace("NewManager"))
+
     this := new(Manager)
     this.options = options
     this.lock = new(sync.Mutex)

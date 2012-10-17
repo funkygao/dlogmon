@@ -15,7 +15,7 @@ package trace
 
 import "fmt"
 
-var enabled bool = true
+var enabled bool
 
 // Entering into a func
 func Trace(s string) string {

@@ -2,6 +2,7 @@ package dlog
 
 import (
     "fmt"
+    t "kx/trace"
     "io"
     "log"
     "os"
@@ -33,6 +34,8 @@ func (this *amfRequest) String() string {
 
 // Constructor of AmfDlog
 func NewAmfDlog(manager *Manager, filename string) IDlogExecutor {
+    defer t.Un(t.Trace("NewAmfDlog"))
+
     this := new(AmfDlog)
     this.filename = filename
     this.manager = manager

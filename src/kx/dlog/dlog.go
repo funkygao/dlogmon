@@ -24,6 +24,7 @@ import (
     "bufio"
     "fmt"
     "kx/stream"
+    T "kx/trace"
     "io"
     "log"
     "strings"
@@ -83,6 +84,8 @@ func (this *Dlog) Running() bool {
 }
 
 func (this *Dlog) initMapper() *stream.Stream {
+    defer T.Un(T.Trace("initMapper"))
+
     options := this.manager.options
     if options.mapper != "" {
         mapper := stream.NewStream(options.mapper)
@@ -99,6 +102,8 @@ func (this *Dlog) initMapper() *stream.Stream {
 // Scan each line of a dlog file and apply validator and parser.
 // Invoke mapper if neccessary
 func (this *Dlog) Run(dlog IDlogExecutor) {
+    defer T.Un(T.Trace("Run"))
+
     this.Println(this.filename, "start scanning...")
 
     if this.manager.options.debug {

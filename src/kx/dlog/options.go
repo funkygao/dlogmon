@@ -3,6 +3,7 @@ package dlog
 import (
     "flag"
     "fmt"
+    T "kx/trace"
     "os"
     "path/filepath"
     "strconv"
@@ -14,6 +15,7 @@ import (
 type Options struct {
     files []string
     debug bool
+    trace bool
     verbose bool
     version bool
     mapper string
@@ -55,6 +57,7 @@ func ParseFlags() *Options {
     mapper := flag.String("mapper", "", "let a runnable script be the mapper")
     reducer := flag.String("reducer", "", "let a runnable script be the reducer")
     logfile := flag.String("l", "", "log file path, default stderr")
+    trace := flag.Bool("t", false, "trace each func call")
 
     flag.Parse()
 
@@ -69,6 +72,10 @@ func ParseFlags() *Options {
     options.version = *version
     options.verbose = *verbose
     options.logfile = *logfile
+    options.trace = *trace
+    if options.trace {
+        T.Enable()
+    }
 
     // day
     dir := *d

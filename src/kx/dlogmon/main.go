@@ -7,6 +7,7 @@ package main
 import (
     "fmt"
     "kx/dlog"
+    T "kx/trace"
     "os"
     "runtime"
     "time"
@@ -15,6 +16,8 @@ import (
 const version = "1.0.5r"
 
 func main() {
+    defer T.Un(T.Trace("main"))
+
     // cli options
     options := dlog.ParseFlags()
     if options.Version() {
