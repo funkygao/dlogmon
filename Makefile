@@ -9,7 +9,8 @@ install:mkvar
 	@strip bin/dlogmon 2> /dev/null
 
 linux:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dlogmon_linux kx/dlogmon
+	@echo 'cd /usr/local/go/src; CGO_ENABLED=0 GOOS=linux GOARCH=amd64 ./make.bash --no-clean'
+	@echo 'cd ~/github/dlogmon;  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dlogmon_linux kx/dlogmon'
 
 test:install
 	go test ${PKGS}
