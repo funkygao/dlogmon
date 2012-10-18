@@ -3,11 +3,13 @@ package db
 import (
     "database/sql"
     _ "github.com/mattn/go-sqlite3"
+    "os"
 )
 
 const (
+    vardir = "var"
     engine = "sqlite3"
-    dbfile = "var/dlogmon.db"
+    dbfile = vardir + "dlogmon.db"
 )
 
 var (
@@ -24,8 +26,14 @@ func New() *DbAgent {
         return agent
     }
 
-    agent = new(DbAgent)
     var err error
+    var dir *os.File
+    if dir, err = os.Open(vardir); err != nil {
+        panic("must run on top dir")
+    }
+    dir.Close()
+
+    agent = new(DbAgent)
     if agent.DB, err = sql.Open(engine, dbfile); err != nil {
         panic(err)
     }
