@@ -8,6 +8,9 @@ install:mkvar
 	go install ${PKGS}
 	@strip bin/dlogmon 2> /dev/null
 
+linux:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dlogmon_linux kx/dlogmon
+
 test:install
 	go test ${PKGS}
 
