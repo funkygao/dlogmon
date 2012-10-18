@@ -1,4 +1,5 @@
 install:
+	mkdir -p var
 	go install kx/dlog
 	go install kx/dlogmon
 	go install kx/stream
