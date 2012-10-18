@@ -24,7 +24,7 @@ mr:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -mapper ./mr/amfMapper.py
 
 loc:
-	@find . -name '*.go' | xargs wc -l | tail -1
+	@find src/kx -name '*.go' | xargs wc -l | tail -1
 
 help:
 	@echo 'make [install | test | fmt | clean | run | mr | loc]'
