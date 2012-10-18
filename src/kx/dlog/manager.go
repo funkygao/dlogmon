@@ -45,7 +45,7 @@ func (this *Manager) executorsCount() int {
 }
 
 // Are all dlog executors finished?
-func (this *Manager) DlogsDone() bool {
+func (this *Manager) ExecutorsAllDone() bool {
     for _, dlog := range this.executors {
         if dlog.Running() {
             return false

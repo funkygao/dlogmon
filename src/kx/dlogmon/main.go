@@ -39,7 +39,7 @@ func main() {
     start := time.Now()
 
     manager := dlog.NewManager(option)
-    manager.StartAll()
+    go manager.StartAll()
     manager.CollectAll()
 
     rawLines, validLines := manager.RawLines(), manager.ValidLines()
