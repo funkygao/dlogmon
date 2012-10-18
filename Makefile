@@ -1,21 +1,18 @@
-install:
-	mkdir -p var
-	go install kx/dlog
-	go install kx/dlogmon
-	go install kx/stream
-	go install kx/trace
-	go install kx/progress
+PKGS = kx/dlogmon kx/dlog kx/stream kx/sb kx/stream kx/progress
+SRC = src
+
+install:mkvar
+	go install ${PKGS}
 	@strip bin/dlogmon 2> /dev/null
 
 test:install
-	go test -v kx/dlog
+	go test ${PKGS}
 
 fmt:
-	gofmt -s -tabs=false -tabwidth=4 -w=true src
+	gofmt -s -tabs=false -tabwidth=4 -w=true ${SRC}
 
 clean:
-	rm -rf bin/
-	rm -rf pkg/
+	rm -rf bin/ pkg/
 
 run:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410
@@ -31,3 +28,7 @@ loc:
 
 help:
 	@echo 'make [install | test | fmt | clean | run | mr | loc]'
+
+mkvar:
+	@mkdir -p var
+
