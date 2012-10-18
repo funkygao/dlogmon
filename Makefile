@@ -11,7 +11,7 @@ test:install
 	go test -v kx/dlog
 
 fmt:
-	gofmt -s -spaces=true -tabindent=false -tabwidth=4
+	gofmt -s -tabs=false -tabwidth=4 -w=true src
 
 clean:
 	rm -rf bin/

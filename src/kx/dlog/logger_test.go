@@ -4,4 +4,3 @@ import "testing"
 
 func TestNewLogger(t *testing.T) {
 }
-

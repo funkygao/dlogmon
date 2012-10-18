@@ -14,7 +14,7 @@ import (
 )
 
 const (
-    version = "1.0.5r"
+    version     = "1.0.5r"
     maxprocsenv = "GOMAXPROCS"
 )
 
@@ -52,4 +52,3 @@ func main() {
         manager.FilesCount(),
         delta, float64(rawLines)/delta.Seconds())
 }
-

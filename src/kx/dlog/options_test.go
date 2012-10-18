@@ -1,8 +1,8 @@
 package dlog
 
 import (
-    "testing"
     "fmt"
+    "testing"
 )
 
 func newOption() *Option {
@@ -32,4 +32,3 @@ func TestOptionFiles(t *testing.T) {
         }
     }
 }
-

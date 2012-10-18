@@ -13,14 +13,14 @@ import (
 
 // CLI options object
 type Option struct {
-    files []string
-    debug bool
-    trace bool
+    files   []string
+    debug   bool
+    trace   bool
     verbose bool
     version bool
-    mapper string
+    mapper  string
     reducer string
-    kind string
+    kind    string
     logfile string
 }
 
@@ -110,7 +110,7 @@ func ParseFlags() *Option {
         os.Exit(1)
     }
     globs := make([]string, 0)
-    for i:=h1; i<=h2; i++ {
+    for i := h1; i <= h2; i++ {
         globs = append(globs, fmt.Sprintf("%s%s/*.%s-%02d*", DLOG_BASE_DIR, dir, dir, i))
     }
 
@@ -127,4 +127,3 @@ func ParseFlags() *Option {
 
     return option
 }
-

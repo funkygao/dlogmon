@@ -3,13 +3,13 @@ package dlog
 import (
     "fmt"
     t "kx/trace"
-    "strings"
     "strconv"
+    "strings"
 )
 
 var lineValidatorRegexes = [...][]string{
     {"AMF_SLOW", "PHP.CDlog"}, // must exists
-    {"Q=DLog.log"}} // must not exists
+    {"Q=DLog.log"}}            // must not exists
 
 // AMF_SLOW tag analyzer
 type AmfDlog struct {
@@ -20,7 +20,7 @@ type AmfDlog struct {
 type amfRequest struct {
     Request
     class, method, args string
-    time int16
+    time                int16
 }
 
 // Printable amfRequest 
@@ -40,18 +40,18 @@ func NewAmfDlog(manager *Manager, filename string) IDlogExecutor {
     // notice how to access embedded types
     this.Logger = newLogger(this.manager.option)
     return this
-    
+
     /*
-    return &AmfDlog{
-        Dlog{
-            filename,
-            ch,
-            lock,
-            option,
-            newLogger(this.manager.option),
-            nil, 
-            nil}}
-            */
+       return &AmfDlog{
+           Dlog{
+               filename,
+               ch,
+               lock,
+               option,
+               newLogger(this.manager.option),
+               nil, 
+               nil}}
+    */
 }
 
 func (this *amfRequest) parseLine(line string) {
@@ -66,12 +66,12 @@ func (this *amfRequest) parseLine(line string) {
     this.http_method, this.uri, this.rid = uriInfo[0], uriInfo[1], uriInfo[2]
 
     // class call and args related
-    callRaw := strings.Replace(parts[6], "{", "", -1) 
-    callRaw = strings.Replace(callRaw, "}", "", -1) 
-    callRaw = strings.Replace(callRaw, "\"", "", -1) 
-    callRaw = strings.Replace(callRaw, "[", "", -1) 
-    callRaw = strings.Replace(callRaw, "]", "", -1) 
-    callRaw = strings.Replace(callRaw, ",", ":", -1) 
+    callRaw := strings.Replace(parts[6], "{", "", -1)
+    callRaw = strings.Replace(callRaw, "}", "", -1)
+    callRaw = strings.Replace(callRaw, "\"", "", -1)
+    callRaw = strings.Replace(callRaw, "[", "", -1)
+    callRaw = strings.Replace(callRaw, "]", "", -1)
+    callRaw = strings.Replace(callRaw, ",", ":", -1)
     callInfo := strings.Split(callRaw, ":")
     time, err := strconv.Atoi(callInfo[1])
     if err != nil {
@@ -124,11 +124,10 @@ func (this *AmfDlog) ExtractLineInfo(line string) Any {
     this.manager.lock.Lock()
     defer this.manager.lock.Unlock()
 
-    line = fmt.Sprintf("%d %s %s", req.time, req.class + "." + req.method, req.uri)
+    line = fmt.Sprintf("%d %s %s", req.time, req.class+"."+req.method, req.uri)
     if this.manager.option.debug {
         this.Println(line)
     }
 
     return line
 }
-

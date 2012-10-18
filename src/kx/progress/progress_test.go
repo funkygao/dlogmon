@@ -10,4 +10,3 @@ func TestProgress(t *testing.T) {
         t.Error("expected:", expected, " current:", bar)
     }
 }
-

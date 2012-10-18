@@ -23,29 +23,29 @@ package dlog
 import (
     "bufio"
     "fmt"
+    "io"
     "kx/stream"
     T "kx/trace"
-    "io"
     "log"
     "strings"
 )
 
 const (
-    LZOP_CMD = "lzop"
-    LZOP_OPTION = "-dcf"
-    EOL = '\n'
-    DLOG_BASE_DIR = "/kx/dlog/"
-    SAMPLER_HOST = "100.123"
+    LZOP_CMD          = "lzop"
+    LZOP_OPTION       = "-dcf"
+    EOL               = '\n'
+    DLOG_BASE_DIR     = "/kx/dlog/"
+    SAMPLER_HOST      = "100.123"
     FLAG_TIMESPAN_SEP = "-"
 )
 
 // Any kind of things
-type Any interface {}
+type Any interface{}
 
 // An executor for 1 dlog file
 type Dlog struct {
-    running bool
-    filename string // dlog filename
+    running   bool
+    filename  string // dlog filename
     mapReader *bufio.Reader
     mapWriter *bufio.Writer
     *log.Logger
@@ -94,7 +94,7 @@ func (this *Dlog) initMapper() *stream.Stream {
         this.mapReader = mapper.Reader()
         this.mapWriter = mapper.Writer()
         return mapper
-    } 
+    }
 
     return nil
 }
@@ -132,13 +132,13 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
             break
         }
 
-        rawLines ++
+        rawLines++
 
         if !dlog.IsLineValid(line) {
             continue
         }
 
-        validLines ++
+        validLines++
 
         // extract parsed info from this line and report to manager
         if x := dlog.ExtractLineInfo(line); x != nil {
@@ -177,4 +177,3 @@ func (this *Dlog) ExtractLineInfo(line string) Any {
     mapperLine, _ := this.mapReader.ReadString(EOL)
     return mapperLine
 }
-

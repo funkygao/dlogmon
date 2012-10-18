@@ -11,10 +11,10 @@ func newDlog() IDlogExecutor {
 }
 
 func TestIsLineValid(t *testing.T) {
-    expected := map[string] bool{
+    expected := map[string]bool{
         "we are here": false,
-        "amf_slow": false,
-        "AMF_SLOW": false,
+        "amf_slow":    false,
+        "AMF_SLOW":    false,
         `>121015-180201 192.168.100.123 10282 KP:PHP.CDlog AMF_SLOW POST+www.kaixin001.com/city/gateway.php+30600bfc {'calltime':2043,'classname':'CCityConfig','method':'callfunc','args':['47116815_1226_47116815_1350293555_9af3436e3a716f7afc298bb77ece48fe','16616590',"CCityConfig.callfunc","getConfig","68680510"]}`: true,
     }
     amf := newDlog()
@@ -25,4 +25,3 @@ func TestIsLineValid(t *testing.T) {
         }
     }
 }
-

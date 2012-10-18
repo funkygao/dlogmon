@@ -8,9 +8,9 @@ import (
 
 // Stream data
 type Stream struct {
-    name string // command name
-    arg []string // command arguments
-    cmd *exec.Cmd
+    name   string   // command name
+    arg    []string // command arguments
+    cmd    *exec.Cmd
     reader *bufio.Reader
     writer *bufio.Writer
 }
@@ -62,4 +62,3 @@ func (this *Stream) Close() {
         panic(err)
     }
 }
-

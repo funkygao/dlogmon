@@ -41,4 +41,3 @@ func Enable() {
 func Disable() {
     enabled = false
 }
-

@@ -1,8 +1,8 @@
 package dlog
 
 import (
-    "testing"
     "fmt"
+    "testing"
 )
 
 func mockOption() *Option {
@@ -27,6 +27,5 @@ func TestString(t *testing.T) {
     if expected != str {
         t.Error("expected:", expected, "real:", str)
     }
-    
-}
 
+}

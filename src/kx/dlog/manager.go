@@ -2,27 +2,27 @@ package dlog
 
 import (
     "fmt"
+    T "kx/trace"
     "log"
     "runtime"
     "sync"
-    T "kx/trace"
 )
 
 // Manager(coordinator) of all the dlog goroutines
 type Manager struct {
-    executorsStarted bool
+    executorsStarted     bool
     rawLines, validLines int
-    option *Option
-    chFileScanResult chan ScanResult // each dlog goroutine will report to this
-    chTotalScanResult chan ScanResult // total scan line collector use this to sync
-    chLine chan Any
-    lock *sync.Mutex
+    option               *Option
+    chFileScanResult     chan ScanResult // each dlog goroutine will report to this
+    chTotalScanResult    chan ScanResult // total scan line collector use this to sync
+    chLine               chan Any
+    lock                 *sync.Mutex
     *log.Logger
     executors []IDlogExecutor
 }
 
 var (
-    constructors = map[string] DlogConstructor {
+    constructors = map[string]DlogConstructor{
         "amf": NewAmfDlog}
 )
 
@@ -109,14 +109,13 @@ func (this *Manager) collectExecutorSummary(rawLines, validLines int) {
     this.chFileScanResult <- ScanResult{rawLines, validLines}
 }
 
-
 func (this *Manager) collectLineMeta(meta Any) {
     this.chLine <- meta
 }
 
 // Wait for all the dlog goroutines finish and collect final result
 func (this *Manager) CollectAll() {
-    r := <- this.chTotalScanResult
+    r := <-this.chTotalScanResult
     this.rawLines, this.validLines = r.RawLines, r.ValidLines
 
     close(this.chFileScanResult)
@@ -135,14 +134,14 @@ func (this *Manager) collectLinesCount() {
         }
 
         select {
-        case r, ok := <- this.chFileScanResult:
+        case r, ok := <-this.chFileScanResult:
             if !ok {
                 this.Println("chFileScanResult closed")
             }
             rawLines += r.RawLines
             validLines += r.ValidLines
 
-        case r, ok := <- this.chLine:
+        case r, ok := <-this.chLine:
             if !ok {
                 this.Println("chLine closed")
             }
@@ -154,4 +153,3 @@ func (this *Manager) collectLinesCount() {
 
     this.chTotalScanResult <- ScanResult{rawLines, validLines}
 }
-

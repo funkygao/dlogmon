@@ -12,13 +12,12 @@ func newLogger(option *Option) *log.Logger {
     if option.logfile == "" {
         logWriter = os.Stderr
     } else {
-        f, e := os.OpenFile(option.logfile, os.O_APPEND | os.O_CREATE, 0666)
+        f, e := os.OpenFile(option.logfile, os.O_APPEND|os.O_CREATE, 0666)
         if e != nil {
             panic(e)
         }
         logWriter = f
     }
 
-    return log.New(logWriter, "",  log.Ldate | log.Lshortfile | log.Ltime | log.Lmicroseconds)
+    return log.New(logWriter, "", log.Ldate|log.Lshortfile|log.Ltime|log.Lmicroseconds)
 }
-
