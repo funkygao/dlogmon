@@ -10,6 +10,9 @@ install:
 test:install
 	go test -v kx/dlog
 
+fmt:
+	gofmt -s -spaces=true -tabindent=false -tabwidth=4
+
 clean:
 	rm -rf bin/
 	rm -rf pkg/
@@ -27,4 +30,4 @@ loc:
 	@find . -name '*.go' | xargs wc -l | tail -1
 
 help:
-	@echo 'make [install | test | clean | run | mr | loc]'
+	@echo 'make [install | test | fmt | clean | run | mr | loc]'
