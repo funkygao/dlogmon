@@ -135,10 +135,17 @@ func (this *Manager) collectLinesCount() {
         }
 
         select {
-        case r := <- this.chFileScanResult:
+        case r, ok := <- this.chFileScanResult:
+            if !ok {
+                this.Println("chFileScanResult closed")
+            }
             rawLines += r.RawLines
             validLines += r.ValidLines
-        case r := <- this.chLine:
+
+        case r, ok := <- this.chLine:
+            if !ok {
+                this.Println("chLine closed")
+            }
             fmt.Println("reducer: ", r)
         }
 
