@@ -3,6 +3,7 @@ package dlog
 import (
     "fmt"
     "log"
+    "runtime"
     "sync"
     T "kx/trace"
 )
@@ -90,6 +91,10 @@ func (this *Manager) StartAll() {
     }
 }
 
+func (this *Manager) collectExecutorSummary(rawLines, validLines int) {
+    this.chFileScanResult <- ScanResult{rawLines, validLines}
+}
+
 // Wait for all the dlog goroutines finish and collect final result
 func (this *Manager) CollectAll() {
     r := <- this.chTotalScanResult
@@ -97,14 +102,22 @@ func (this *Manager) CollectAll() {
 }
 
 func (this *Manager) collectLinesCount() {
-    var total, valid int
-    for i:=0; i<this.executorsCount(); i++ {
-        r := <- this.chFileScanResult
+    var rawLines, validLines int
+    i := 0
+    for {
+        i ++
+        if i > this.executorsCount() {
+            break
+        }
+        select {
+        case r := <- this.chFileScanResult:
+            rawLines += r.RawLines
+            validLines += r.ValidLines
+        }
 
-        total += r.RawLines
-        valid += r.ValidLines
+        runtime.Gosched()
     }
 
-    this.chTotalScanResult <- ScanResult{total, valid}
+    this.chTotalScanResult <- ScanResult{rawLines, validLines}
 }
 

@@ -145,7 +145,7 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
         }
     }
 
-    this.manager.chFileScanResult <- ScanResult{rawLines, validLines}
+    this.manager.collectExecutorSummary(rawLines, validLines)
     this.running = false
 }
 
