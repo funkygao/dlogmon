@@ -1,5 +1,8 @@
-PKGS = kx/dlogmon kx/dlog kx/stream kx/sb kx/stream kx/progress kx/db
+PKGS = kx/dlogmon kx/db kx/dlog kx/progress kx/sb kx/stream kx/trace
 SRC = src
+BIN = bin
+PKG = pkg
+VAR = var
 
 install:mkvar
 	go install ${PKGS}
@@ -12,7 +15,7 @@ fmt:
 	gofmt -s -tabs=false -tabwidth=4 -w=true ${SRC}
 
 clean:
-	rm -rf bin/ pkg/ var/
+	rm -rf ${BIN} ${PKG} ${VAR}
 
 run:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410
@@ -30,5 +33,5 @@ help:
 	@echo 'make [install | test | fmt | clean | run | mr | loc]'
 
 mkvar:
-	@mkdir -p var
+	@mkdir -p ${VAR}
 
