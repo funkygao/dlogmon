@@ -1,4 +1,4 @@
-PKGS = kx/dlogmon kx/dlog kx/stream kx/sb kx/stream kx/progress
+PKGS = kx/dlogmon kx/dlog kx/stream kx/sb kx/stream kx/progress kx/db
 SRC = src
 
 install:mkvar
