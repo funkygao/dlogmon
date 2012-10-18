@@ -140,8 +140,9 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
 
         validLines ++
 
-        // extract parsed info from this line
+        // extract parsed info from this line and report to manager
         if x := dlog.ExtractLineInfo(line); x != nil {
+            this.manager.collectLineMeta(x)
         }
     }
 

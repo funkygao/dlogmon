@@ -3,9 +3,6 @@ package dlog
 import (
     "fmt"
     t "kx/trace"
-    "io"
-    "log"
-    "os"
     "strings"
     "strconv"
 )
@@ -40,19 +37,10 @@ func NewAmfDlog(manager *Manager, filename string) IDlogExecutor {
     this.filename = filename
     this.manager = manager
 
-    var logWriter io.Writer
-    if this.manager.option.logfile == "" {
-        logWriter = os.Stderr
-    } else {
-        f, e := os.OpenFile(this.manager.option.logfile, os.O_APPEND | os.O_CREATE, 0666)
-        if e != nil {
-            panic(e)
-        }
-        logWriter = f
-    }
     // notice how to access embedded types
-    this.Logger = log.New(logWriter, "",  log.Ldate | log.Lshortfile | log.Ltime | log.Lmicroseconds)
+    this.Logger = newLogger(this.manager.option)
     return this
+    
     /*
     return &AmfDlog{
         Dlog{
@@ -60,8 +48,9 @@ func NewAmfDlog(manager *Manager, filename string) IDlogExecutor {
             ch,
             lock,
             option,
-            log.New(os.Stderr, "",  log.Ldate | log.Llongfile | log.Ltime | log.Lmicroseconds),
-            nil, nil}}
+            newLogger(this.manager.option),
+            nil, 
+            nil}}
             */
 }
 
@@ -72,7 +61,7 @@ func (this *amfRequest) parseLine(line string) {
     // uri related
     uriInfo := strings.Split(parts[5], "+")
     if len(uriInfo) < 3 {
-        log.Fatal(line)
+        panic(uriInfo)
     }
     this.http_method, this.uri, this.rid = uriInfo[0], uriInfo[1], uriInfo[2]
 
@@ -86,7 +75,8 @@ func (this *amfRequest) parseLine(line string) {
     callInfo := strings.Split(callRaw, ":")
     time, err := strconv.Atoi(callInfo[1])
     if err != nil {
-        log.Fatal(line, err)
+        println(line)
+        panic(err)
     }
     this.time = int16(time)
     this.class = callInfo[3]
