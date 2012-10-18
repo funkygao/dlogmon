@@ -12,7 +12,7 @@ fmt:
 	gofmt -s -tabs=false -tabwidth=4 -w=true ${SRC}
 
 clean:
-	rm -rf bin/ pkg/
+	rm -rf bin/ pkg/ var/
 
 run:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410
