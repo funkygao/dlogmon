@@ -1,21 +1,27 @@
 package trace
 
-import "fmt"
+import (
+    "fmt"
+    "time"
+)
+
+// TODO how about any return values?
+type AnyFunc func(args ...interface{})
 
 var enabled bool
 
 // Entering into a func
-func Trace(s string) string {
+func Trace(fn string) string {
     if enabled {
-        fmt.Println("Entering:", s)
+        fmt.Println("Entering:", fn)
     }
-    return s
+    return fn
 }
 
 // Leaving from a func
-func Un(s string) {
+func Un(fn string) {
     if enabled {
-        fmt.Println("Leaving:", s)
+        fmt.Println("Leaving:", fn)
     }
 }
 
@@ -27,4 +33,15 @@ func Enable() {
 // Disable the trace output
 func Disable() {
     enabled = false
+}
+
+// Measure how long it takes to run a func
+func Timeit(f AnyFunc, args ...interface{}) time.Duration {
+    start := time.Now()
+
+    f(args...) // call the func
+
+    end := time.Now()
+    delta := end.Sub(start)
+    return delta
 }
