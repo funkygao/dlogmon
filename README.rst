@@ -44,3 +44,9 @@ Todo
   done
 
 - progress bar
+
+- distributed
+
+- check dlog content
+
+- chunk size
