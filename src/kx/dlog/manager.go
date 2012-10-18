@@ -90,6 +90,8 @@ func (this *Manager) StartAll() {
     // wait to collect after all dlog executors done
     go this.collectLinesCount()
 
+    this.Println("starting all executors...")
+
     // run each dlog in a goroutine
     var executor IDlogExecutor
     this.executors = make([]IDlogExecutor, 0)
@@ -99,6 +101,7 @@ func (this *Manager) StartAll() {
         go executor.Run(executor)
     }
 
+    this.Println("all executors started.")
     this.executorsStarted = true
 }
 
@@ -115,35 +118,32 @@ func (this *Manager) collectLineMeta(meta Any) {
 func (this *Manager) CollectAll() {
     r := <- this.chTotalScanResult
     this.rawLines, this.validLines = r.RawLines, r.ValidLines
+
+    close(this.chFileScanResult)
+    close(this.chLine)
 }
 
 func (this *Manager) collectLinesCount() {
+    defer T.Un(T.Trace("collectExecutors"))
+
+    this.Println("collector started")
+
     var rawLines, validLines int
-    //i := 0
     for {
-        /*
-        i ++
-        if i > this.executorsCount() {
+        if this.ExecutorsAllDone() {
             break
-        }*/
+        }
+
         select {
         case r := <- this.chFileScanResult:
             rawLines += r.RawLines
             validLines += r.ValidLines
         case r := <- this.chLine:
-            fmt.Println("shit", r)
-            /*
-        default:
-
-            if this.ExecutorsAllDone() {
-                goto endloop
-            }*/
+            fmt.Println("reducer: ", r)
         }
 
         runtime.Gosched()
     }
-
-    //endloop:
 
     this.chTotalScanResult <- ScanResult{rawLines, validLines}
 }
