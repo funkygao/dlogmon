@@ -22,7 +22,7 @@ clean:
 	rm -rf ${BIN} ${PKG} ${VAR}
 
 run:install
-	./bin/dlogmon -f test/fixture/lz.121015-104410
+	./bin/dlogmon -f test/fixture/lz.121015-104410 -d
 
 T:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -t -d
