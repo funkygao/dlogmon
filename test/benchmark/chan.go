@@ -26,8 +26,7 @@ func timeit(f func(param), p param) time.Duration {
 }
 
 func bench(p param) {
-    c := make(chan []byte, p.chbuf)
-    data := make([]byte, p.datasize)
+    c, data := make(chan []byte, p.chbuf), make([]byte, p.datasize)
 
     go func() {
         for i:=0; i<LOOPS; i++ {
@@ -42,7 +41,6 @@ func bench(p param) {
             break
         }
     }
-
 }
 
 func main() {
