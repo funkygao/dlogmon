@@ -12,10 +12,22 @@ import (
 
 const BAR = "="
 
+var TIOCGWINSZ int
+
 type Progress struct {
     terminalWidth, total int
     bar                  string
     lock                 *sync.Mutex
+}
+
+func init() {
+    if runtime.GOOS == "darwin" {
+        TIOCGWINSZ = 1074295912
+    } else if runtime.GOOS == "linux" {
+        TIOCGWINSZ = 0x5413
+    } else {
+        panic("Not supported platform")
+    }
 }
 
 // Progress constructor
@@ -71,15 +83,6 @@ type winsize struct {
 
 func getWinsize() *winsize {
     ws := new(winsize)
-
-    var TIOCGWINSZ int
-    if runtime.GOOS == "darwin" {
-        TIOCGWINSZ = 1074295912
-    } else if runtime.GOOS == "linux" {
-        TIOCGWINSZ = 0x5413
-    } else {
-        panic("Not supported platform")
-    }
 
     syscall.Syscall(syscall.SYS_IOCTL,
         uintptr(syscall.Stdin),
