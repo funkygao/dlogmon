@@ -2,6 +2,7 @@ package trace
 
 import (
     "fmt"
+    "runtime"
     "time"
 )
 
@@ -12,6 +13,11 @@ var enabled bool
 
 // Entering into a func
 func Trace(fn string) string {
+    if fn == "" {
+        pc, _, _, _ := runtime.Caller(1)
+        f := runtime.FuncForPC(pc)
+        fn = f.Name() // the caller func name
+    }
     if enabled {
         fmt.Println("Entering:", fn)
     }
