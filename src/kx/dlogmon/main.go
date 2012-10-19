@@ -9,8 +9,9 @@ import (
     "time"
 )
 
+const VERSION = "1.0.6r"
+
 const (
-    version     = "1.0.5r"
     maxprocsenv = "GOMAXPROCS"
 )
 
@@ -20,7 +21,7 @@ func main() {
     // cli options
     option := dlog.ParseFlags()
     if option.Version() {
-        fmt.Println("dlogmon", version)
+        fmt.Println("dlogmon", VERSION)
         os.Exit(0)
     }
 
