@@ -21,7 +21,7 @@ func main() {
     // cli options
     option := dlog.ParseFlags()
     if option.Version() {
-        fmt.Println("dlogmon", VERSION)
+        fmt.Fprintf(os.Stderr, "%s %s\n", "dlogmon", VERSION)
         os.Exit(0)
     }
 
@@ -43,7 +43,7 @@ func main() {
 
     end := time.Now()
     delta := end.Sub(start)
-    fmt.Printf("\nParsed %d/%d lines in %d files within %s [%.1f lines per second]\n",
+    manager.Printf("Parsed %d/%d lines in %d files within %s [%.1f lines per second]\n",
         validLines,
         rawLines,
         manager.FilesCount(),

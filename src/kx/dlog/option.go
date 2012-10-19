@@ -6,6 +6,7 @@ import (
     T "kx/trace"
     "os"
     "path/filepath"
+    "github.com/kless/goconfig/config"
     "strconv"
     "strings"
     "time"
@@ -21,7 +22,7 @@ type Option struct {
     mapper  string
     reducer string
     kind    string
-    logfile string
+    conf    *config.Config
 }
 
 // Printable Option
@@ -56,7 +57,7 @@ func ParseFlags() *Option {
     debug := flag.Bool("d", false, "debug mode")
     mapper := flag.String("mapper", "", "let a runnable script be the mapper")
     reducer := flag.String("reducer", "", "let a runnable script be the reducer")
-    logfile := flag.String("l", "", "log file path, default stderr")
+    conf := flag.String("conf", "conf/dlogmon.ini", "conf file path")
     trace := flag.Bool("t", false, "trace each func call")
 
     flag.Parse()
@@ -71,7 +72,7 @@ func ParseFlags() *Option {
     option.kind = *kind
     option.version = *version
     option.verbose = *verbose
-    option.logfile = *logfile
+    option.conf, _ = loadConf(*conf)
     option.trace = *trace
     if option.trace {
         T.Enable()
