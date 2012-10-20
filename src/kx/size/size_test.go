@@ -6,16 +6,43 @@ import (
 )
 
 func TestByteSize(t *testing.T) {
-    var b ByteSize = 12121212212
-    s := fmt.Sprintf("%s", b)
-    expected := "11.29GB"
-    if s != expected {
-        t.Error(expected, b)
+    type testCase struct {
+        b ByteSize
+        expected string
+    }
+
+    cases := []testCase{
+        testCase{638048, "623.09KB"},
+        testCase{12121212212, "11.29GB"}}
+    for _, b := range cases {
+        s := fmt.Sprintf("%s", b.b)
+        if s != b.expected {
+            t.Error("exptected:", b.expected, " real:", s)
+        }
     }
 }
 
 func TestConsts(t *testing.T) {
     if MB / KB != 1024 {
         t.Error("MB/KB != 1024")
+    }
+
+    if KB != 1024 {
+        t.Error("KB")
+    }
+    if MB != 1024*KB {
+        t.Error("MB", int64(MB))
+    }
+    if GB != 1024*MB {
+        t.Error("GB", int64(GB))
+    }
+    if TB != 1024*GB {
+        t.Error("TB", int64(TB))
+    }
+    if PB != 1024*TB {
+        t.Error("PB", int64(PB))
+    }
+    if EB != 1024*PB {
+        t.Error("EB", int64(EB))
     }
 }

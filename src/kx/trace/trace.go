@@ -64,5 +64,5 @@ func Timeit(f AnyFunc, args ...interface{}) time.Duration {
 func MemAlloced() size.ByteSize {
     ms := &runtime.MemStats{}
     runtime.ReadMemStats(ms)
-    return size.ByteSize(ms.TotalAlloc)
+    return size.ByteSize(ms.Alloc)
 }
