@@ -11,12 +11,17 @@ type AnyFunc func(args ...interface{})
 
 var enabled bool
 
+// Caller func name with skip as the call stack level
+func CallerFuncName(skip int) string {
+    pc, _, _, _ := runtime.Caller(skip)
+    f := runtime.FuncForPC(pc)
+    return f.Name() // the caller func name
+}
+
 // Entering into a func
 func Trace(fn string) string {
     if fn == "" {
-        pc, _, _, _ := runtime.Caller(1)
-        f := runtime.FuncForPC(pc)
-        fn = f.Name() // the caller func name
+        fn = CallerFuncName(2)
     }
     if enabled {
         fmt.Println("Entering:", fn)
@@ -26,6 +31,9 @@ func Trace(fn string) string {
 
 // Leaving from a func
 func Un(fn string) {
+    if fn == "" {
+        fn = CallerFuncName(2)
+    }
     if enabled {
         fmt.Println("Leaving:", fn)
     }
