@@ -14,6 +14,7 @@ linux:
 
 test:install
 	go test ${PKGS}
+	go test -test.bench=".*" -test.benchtime 5 kx/dlog
 
 fmt:
 	gofmt -s -tabs=false -tabwidth=4 -w=true ${SRC}
