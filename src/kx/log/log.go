@@ -1,3 +1,4 @@
+// TODO vitess/relog
 package log
 
 import (
