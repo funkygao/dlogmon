@@ -18,7 +18,7 @@ func newLogger(option *Option) *log.Logger {
     if option.conf != nil {
         logfile, err := option.conf.String("default", "logfile")
         if err == nil {
-            logWriter, err = os.OpenFile(logfile, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+            logWriter, err = os.OpenFile(logfile, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
             if err != nil {
                 panic(err)
             }
