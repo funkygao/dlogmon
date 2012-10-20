@@ -92,7 +92,17 @@ func (this Manager) ValidLines() int {
 }
 
 // Start and manage all the dlog executors
-func (this *Manager) StartAll() {
+func (this *Manager) StartAll() (err error) {
+    // collection the panic's
+    defer func() {
+        if r := recover(); r != nil {
+            var ok bool
+            if err, ok = r.(error); !ok {
+                err = fmt.Errorf("manager: %v", r)
+            }
+        }
+    }()
+
     if this.ticker != nil {
         go this.runTicker()
     }
@@ -121,6 +131,7 @@ func (this *Manager) StartAll() {
 
     this.Println("all executors started.")
     this.executorsStarted = true
+    return
 }
 
 func (this *Manager) collectExecutorSummary(rawLines, validLines int) {
