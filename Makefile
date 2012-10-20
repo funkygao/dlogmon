@@ -14,6 +14,8 @@ linux:
 
 test:install
 	go test ${PKGS}
+
+bench:
 	go test -test.bench=".*" -test.benchtime 5 kx/dlog
 
 fmt:
@@ -35,9 +37,9 @@ loc:
 	@echo `find src/kx -name '*.go' | xargs wc -l | tail -1` lines
 	@echo `find src/kx -name '*.go' | wc -l | tail -1` files
 
-help:
-	@echo 'make [install | test | fmt | clean | run | mr | loc]'
-
 mkvar:
 	@mkdir -p ${VAR}
+
+help:
+	@echo 'make [install | test | bench | fmt | clean | run | mr | loc]'
 
