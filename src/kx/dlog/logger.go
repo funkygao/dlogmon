@@ -14,15 +14,14 @@ const (
 )
 
 func newLogger(option *Option) *log.Logger {
-    var logWriter io.Writer
-    logfile, err := option.conf.String("default", "logfile")
-    if err != nil {
-        logWriter = os.Stderr
-    } else {
-        var err error
-        logWriter, err = os.OpenFile(logfile, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
-        if err != nil {
-            panic(err)
+    var logWriter io.Writer = os.Stderr
+    if option.conf != nil {
+        logfile, err := option.conf.String("default", "logfile")
+        if err == nil {
+            logWriter, err = os.OpenFile(logfile, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+            if err != nil {
+                panic(err)
+            }
         }
     }
 
