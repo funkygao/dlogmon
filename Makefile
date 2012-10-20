@@ -28,7 +28,7 @@ run:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 300 -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
 prof:run
-	gopprof ./bin/dlogmon var/cpu.prof
+	go tool pprof ./bin/dlogmon var/cpu.prof
 
 trace:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -t -d
