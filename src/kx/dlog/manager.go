@@ -4,6 +4,7 @@ import (
     "fmt"
     T "kx/trace"
     "log"
+    . "os"
     "runtime"
     "sync"
     "time"
@@ -107,7 +108,15 @@ func (this *Manager) StartAll() {
     for _, file := range this.option.files {
         executor = constructors[this.option.Kind()](this, file)
         this.executors = append(this.executors, executor)
-        go executor.Run(executor)
+
+        // type assertion
+        if e, ok := executor.(IDlogExecutor); ok {
+            if this.option.debug {
+                fmt.Fprintf(Stderr, "executor type: %T\n", e)
+            }
+
+            go e.Run(e)
+        }
     }
 
     this.Println("all executors started.")
