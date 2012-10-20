@@ -1,4 +1,4 @@
-PKGS = kx/dlogmon kx/db kx/dlog kx/progress kx/sb kx/stream kx/trace
+PKGS = kx/dlogmon kx/db kx/dlog kx/progress kx/sb kx/size kx/stream kx/trace
 SRC = src
 BIN = bin
 PKG = pkg
