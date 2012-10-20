@@ -6,6 +6,7 @@ import (
     T "kx/trace"
     "os"
     "runtime"
+    "runtime/pprof"
     "time"
 )
 
@@ -34,6 +35,17 @@ func main() {
 
     // timing all the jobs up
     start := time.Now()
+
+    if option.Cpuprofile() != "" {
+        f, err := os.Create(option.Cpuprofile())
+        if err != nil {
+            panic(err)
+        }
+
+        pprof.StartCPUProfile(f)
+
+        defer pprof.StopCPUProfile()
+    }
 
     manager := dlog.NewManager(option)
     go manager.StartAll()

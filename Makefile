@@ -25,7 +25,7 @@ clean:
 	rm -rf ${BIN} ${PKG} ${VAR}
 
 run:install
-	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 300
+	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 300 -cpuprofile var/cpu.out -memprofile var/mem.out
 
 T:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -t -d

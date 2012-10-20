@@ -20,6 +20,7 @@ type Option struct {
     verbose bool
     version bool
     tick    int  // in ms
+    cpuprofile, memprofile string
     mapper  string
     reducer string
     kind    string
@@ -42,6 +43,16 @@ func (this *Option) Kind() string {
     return this.kind
 }
 
+// Cpuprofile name
+func (this *Option) Cpuprofile() string {
+    return this.cpuprofile
+}
+
+// Memprofile name
+func (this *Option) Memprofile() string {
+    return this.memprofile
+}
+
 // Does CLI ask for dlogmon version info?
 func (this *Option) Version() bool {
     return this.version
@@ -55,6 +66,8 @@ func ParseFlags() *Option {
     verbose := flag.Bool("v", false, "verbose")
     version := flag.Bool("V", false, "show version")
     kind := flag.String("k", "amf", "what kind of content to scan in dlog[amf|xxx]")
+    cpuprofile := flag.String("cpuprofile", "", "write cpu profile to a file for pprof")
+    memprofile := flag.String("memprofile", "", "write cpu profile to a file for pprof")
     debug := flag.Bool("d", false, "debug mode")
     mapper := flag.String("mapper", "", "let a runnable script be the mapper")
     reducer := flag.String("reducer", "", "let a runnable script be the reducer")
@@ -71,6 +84,8 @@ func ParseFlags() *Option {
     option.debug = *debug
     option.mapper = *mapper
     option.reducer = *reducer
+    option.cpuprofile = *cpuprofile
+    option.memprofile = *memprofile
     option.kind = *kind
     option.version = *version
     option.tick = *tick
