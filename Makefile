@@ -25,9 +25,12 @@ clean:
 	rm -rf ${BIN} ${PKG} ${VAR}
 
 run:install
-	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 300 -cpuprofile var/cpu.out -memprofile var/mem.out
+	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 300 -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
-T:install
+prof:run
+	gopprof ./bin/dlogmon var/cpu.prof
+
+trace:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -t -d
 
 mr:install
@@ -41,5 +44,5 @@ mkvar:
 	@mkdir -p ${VAR}
 
 help:
-	@echo 'make [install | test | bench | fmt | clean | run | mr | loc]'
+	@echo 'make [install | test | bench | fmt | clean | run | prof | trace | mr | loc]'
 
