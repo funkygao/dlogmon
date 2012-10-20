@@ -36,6 +36,7 @@ func main() {
     // timing all the jobs up
     start := time.Now()
 
+    // cpu profile
     if option.Cpuprofile() != "" {
         f, err := os.Create(option.Cpuprofile())
         if err != nil {
@@ -49,8 +50,10 @@ func main() {
 
     manager := dlog.NewManager(option)
     go manager.StartAll()
-    manager.CollectAll()
 
+    dumpMemProfile(option.Memprofile())
+
+    manager.CollectAll()
     rawLines, validLines := manager.RawLines(), manager.ValidLines()
 
     end := time.Now()
@@ -60,4 +63,17 @@ func main() {
         rawLines,
         manager.FilesCount(),
         delta, float64(rawLines)/delta.Seconds())
+}
+
+// mem profile
+func dumpMemProfile(pf string) {
+    if pf != "" {
+        f, err := os.Create(pf)
+        if err != nil {
+            panic(err)
+        }
+
+        pprof.WriteHeapProfile(f)
+        f.Close()
+    }
 }
