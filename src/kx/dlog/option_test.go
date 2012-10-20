@@ -39,7 +39,6 @@ func native_fnv1() {
     Native_HashVal ^= 0xff
 }
 
-// gotest -test.bench=".*" -test.benchtime=5
 func BenchmarkNative(b *testing.B) {
     b.StopTimer()
     b.StartTimer()
