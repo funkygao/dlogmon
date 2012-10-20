@@ -19,6 +19,7 @@ type Option struct {
     trace   bool
     verbose bool
     version bool
+    tick    int  // in ms
     mapper  string
     reducer string
     kind    string
@@ -58,6 +59,7 @@ func ParseFlags() *Option {
     mapper := flag.String("mapper", "", "let a runnable script be the mapper")
     reducer := flag.String("reducer", "", "let a runnable script be the reducer")
     conf := flag.String("conf", "conf/dlogmon.ini", "conf file path")
+    tick := flag.Int("tick", 0, "tick in ms")
     trace := flag.Bool("t", false, "trace each func call")
 
     flag.Parse()
@@ -71,6 +73,7 @@ func ParseFlags() *Option {
     option.reducer = *reducer
     option.kind = *kind
     option.version = *version
+    option.tick = *tick
     option.verbose = *verbose
     option.conf, _ = loadConf(*conf)
     option.trace = *trace

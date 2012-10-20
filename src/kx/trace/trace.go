@@ -3,6 +3,7 @@ package trace
 import (
     "fmt"
     "runtime"
+    "kx/size"
     "time"
 )
 
@@ -58,4 +59,10 @@ func Timeit(f AnyFunc, args ...interface{}) time.Duration {
     end := time.Now()
     delta := end.Sub(start)
     return delta
+}
+
+func MemAlloced() size.ByteSize {
+    ms := &runtime.MemStats{}
+    runtime.ReadMemStats(ms)
+    return size.ByteSize(ms.TotalAlloc)
 }

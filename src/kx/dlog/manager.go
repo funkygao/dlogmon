@@ -6,6 +6,7 @@ import (
     "log"
     "runtime"
     "sync"
+    "time"
 )
 
 // Manager(coordinator) of all the dlog goroutines
@@ -17,6 +18,7 @@ type Manager struct {
     chTotalScanResult    chan ScanResult // total scan line collector use this to sync
     chLine               chan Any
     lock                 *sync.Mutex
+    ticker *time.Ticker
     *log.Logger
     executors []IDlogExecutor
 }
@@ -32,6 +34,9 @@ func NewManager(option *Option) *Manager {
 
     this := new(Manager)
     this.executorsStarted = false
+    if option.tick > 0 {
+        this.ticker = time.NewTicker(time.Millisecond * time.Duration(option.tick))
+    }
     this.Logger = newLogger(option)
     this.option = option
     this.lock = new(sync.Mutex)
@@ -87,6 +92,10 @@ func (this Manager) ValidLines() int {
 
 // Start and manage all the dlog executors
 func (this *Manager) StartAll() {
+    if this.ticker != nil {
+        go this.runTicker()
+    }
+
     // wait to collect after all dlog executors done
     go this.collectLinesCount()
 
@@ -152,4 +161,10 @@ func (this *Manager) collectLinesCount() {
     }
 
     this.chTotalScanResult <- ScanResult{rawLines, validLines}
+}
+
+func (this Manager) runTicker() {
+    for _ = range this.ticker.C {
+        this.Println("mem:", T.MemAlloced())
+    }
 }
