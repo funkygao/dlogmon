@@ -5,7 +5,9 @@ import (
     T "kx/trace"
     "log"
     . "os"
+    "os/signal"
     "runtime"
+    "syscall"
     "sync"
     "time"
 )
@@ -103,6 +105,8 @@ func (this *Manager) StartAll() (err error) {
         }
     }()
 
+    go this.trapSignal()
+
     if this.ticker != nil {
         go this.runTicker()
     }
@@ -187,4 +191,19 @@ func (this Manager) runTicker() {
     for _ = range this.ticker.C {
         this.Println("mem:", T.MemAlloced())
     }
+}
+
+func (this Manager) Shutdown() {
+    Exit(0)
+}
+
+func (this Manager) trapSignal() {
+    sch := make(chan Signal, 10)
+    signal.Notify(sch, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGINT,
+        syscall.SIGHUP, syscall.SIGSTOP, syscall.SIGQUIT)
+    go func(ch <- chan Signal) {
+        sig := <- ch
+        fmt.Fprintln(Stderr, "signal received...", sig)
+        this.Shutdown()
+    }(sch)
 }
