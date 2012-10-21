@@ -22,7 +22,7 @@ func TestByteSize(t *testing.T) {
     }
 }
 
-func TestConsts(t *testing.T) {
+func TestByteSizeConsts(t *testing.T) {
     if MB/KB != 1024 {
         t.Error("MB/KB != 1024")
     }

@@ -13,7 +13,7 @@ linux:
 	@echo 'cd ~/github/dlogmon;  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dlogmon_linux kx/dlogmon'
 
 test:install
-	go test ${PKGS}
+	go test -v ${PKGS}
 
 bench:
 	go test -test.bench=".*" -test.benchtime 5 kx/dlog
