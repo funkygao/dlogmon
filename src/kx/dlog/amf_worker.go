@@ -121,8 +121,8 @@ func (this *AmfWorker) ExtractLineInfo(line string) Any {
     req := new(amfRequest)
     req.parseLine(line)
 
-    this.manager.lock.Lock()
-    defer this.manager.lock.Unlock()
+    this.manager.Lock()
+    defer this.manager.Unlock()
 
     line = fmt.Sprintf("%d %s %s", req.time, req.class+"."+req.method, req.uri)
     if this.manager.option.debug {

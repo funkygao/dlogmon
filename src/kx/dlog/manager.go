@@ -83,9 +83,14 @@ func (this Manager) RawLines() int {
     return this.rawLines
 }
 
-// Global mutex
-func (this Manager) Lock() *sync.Mutex {
-    return this.lock
+// Uock the global mutex
+func (this Manager) Lock() {
+    this.lock.Lock()
+}
+
+// Unlock the global mutex
+func (this Manager) Unlock() {
+    this.lock.Unlock()
 }
 
 // Altogether how many valid lines parsed
