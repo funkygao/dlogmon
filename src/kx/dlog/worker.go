@@ -30,7 +30,7 @@ type IWorker interface {
     Running() bool
 }
 
-// An executor for 1 dlog file
+// For 1 dlog file worker
 type Worker struct {
     running   bool
     filename  string // dlog filename
@@ -58,7 +58,7 @@ func (this *Worker) String() string {
     return fmt.Sprintf("Worker{filename: %s, option: %#v}", this.filename, this.manager.option)
 }
 
-// Is this dlog executor running?
+// Is this dlog worker running?
 func (this *Worker) Running() bool {
     return this.running
 }
@@ -84,6 +84,13 @@ func (this *Worker) initMapper() *stream.Stream {
 func (this *Worker) SafeRun(worker IWorker) {
     defer T.Un(T.Trace(""))
 
+    // recover to make this worker safe for other workers
+    defer func() {
+        if err := recover(); err != nil {
+            this.manager.Println(err)
+        }
+    }()
+
     this.Println(this.filename, "start scanning...")
 
     if this.manager.option.debug {
@@ -94,18 +101,10 @@ func (this *Worker) SafeRun(worker IWorker) {
         defer mapper.Close()
     }
 
-    // recover to make this worker safe for other workers
-    defer func() {
-        if err := recover(); err != nil {
-            this.manager.Println(err)
-        }
-    }()
-
     this.run(worker)
 }
 
 func (this *Worker) run(worker IWorker) {
-
     this.running = true
 
     input := stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
@@ -138,7 +137,7 @@ func (this *Worker) run(worker IWorker) {
         }
     }
 
-    this.manager.collectExecutorSummary(rawLines, validLines)
+    this.manager.collectWorkerSummary(rawLines, validLines)
     this.running = false
 }
 

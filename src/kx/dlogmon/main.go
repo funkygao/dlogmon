@@ -17,7 +17,7 @@ const (
 )
 
 func main() {
-    defer T.Un(T.Trace("main"))
+    defer T.Un(T.Trace(""))
 
     // cli options
     option := dlog.ParseFlags()

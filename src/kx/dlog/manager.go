@@ -14,7 +14,7 @@ import (
 
 // Manager(coordinator) of all the dlog goroutines
 type Manager struct {
-    executorsStarted     bool
+    workersStarted     bool // all workers started?
     rawLines, validLines int
     option               *Option
     chFileScanResult     chan ScanResult // each dlog goroutine will report to this
@@ -23,7 +23,7 @@ type Manager struct {
     lock                 *sync.Mutex
     ticker *time.Ticker
     *log.Logger
-    executors []IWorker
+    workers []IWorker
 }
 
 var (
@@ -36,7 +36,7 @@ func NewManager(option *Option) *Manager {
     defer T.Un(T.Trace(""))
 
     this := new(Manager)
-    this.executorsStarted = false
+    this.workersStarted = false
     if option.tick > 0 {
         this.ticker = time.NewTicker(time.Millisecond * time.Duration(option.tick))
     }
@@ -54,18 +54,18 @@ func (this *Manager) String() string {
     return fmt.Sprintf("Manager{%#v}", this.option)
 }
 
-func (this *Manager) executorsCount() int {
+func (this *Manager) workersCount() int {
     return this.FilesCount()
 }
 
-// Are all dlog executors finished?
-func (this *Manager) ExecutorsAllDone() bool {
-    if !this.executorsStarted {
+// Are all dlog workers finished?
+func (this *Manager) WorkersAllDone() bool {
+    if !this.workersStarted {
         return false
     }
 
-    for _, dlog := range this.executors {
-        if dlog.Running() {
+    for _, w := range this.workers {
+        if w.Running() {
             return false
         }
     }
@@ -93,7 +93,7 @@ func (this Manager) ValidLines() int {
     return this.validLines
 }
 
-// Start and manage all the dlog executors
+// Start and manage all the workers
 func (this *Manager) StartAll() (err error) {
     // collection the panic's
     defer func() {
@@ -111,34 +111,34 @@ func (this *Manager) StartAll() (err error) {
         go this.runTicker()
     }
 
-    // wait to collect after all dlog executors done
+    // wait to collect after all dlog workers done
     go this.collectLinesCount()
 
-    this.Println("starting all executors...")
+    this.Println("starting all workers...")
 
     // run each dlog in a goroutine
-    var executor IWorker
-    this.executors = make([]IWorker, 0)
+    var worker IWorker
+    this.workers = make([]IWorker, 0)
     for _, file := range this.option.files {
-        executor = constructors[this.option.Kind()](this, file)
-        this.executors = append(this.executors, executor)
+        worker = constructors[this.option.Kind()](this, file)
+        this.workers = append(this.workers, worker)
 
         // type assertion
-        if e, ok := executor.(IWorker); ok {
+        if e, ok := worker.(IWorker); ok {
             if this.option.debug {
-                fmt.Fprintf(Stderr, "executor type: %T\n", e)
+                fmt.Fprintf(Stderr, "worker type: %T\n", e)
             }
 
             go e.SafeRun(e)
         }
     }
 
-    this.Println("all executors started.")
-    this.executorsStarted = true
+    this.Println("all workers started.")
+    this.workersStarted = true
     return
 }
 
-func (this *Manager) collectExecutorSummary(rawLines, validLines int) {
+func (this *Manager) collectWorkerSummary(rawLines, validLines int) {
     this.chFileScanResult <- ScanResult{rawLines, validLines}
 }
 
@@ -162,7 +162,7 @@ func (this *Manager) collectLinesCount() {
 
     var rawLines, validLines int
     for {
-        if this.ExecutorsAllDone() {
+        if this.WorkersAllDone() {
             break
         }
 
