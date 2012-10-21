@@ -129,12 +129,12 @@ func (this *Manager) StartAll() (err error) {
         this.workers = append(this.workers, worker)
 
         // type assertion
-        if e, ok := worker.(IWorker); ok {
+        if w, ok := worker.(IWorker); ok {
             if this.option.debug {
-                fmt.Fprintf(Stderr, "worker type: %T\n", e)
+                fmt.Fprintf(Stderr, "worker type: %T\n", w)
             }
 
-            go e.SafeRun(e)
+            go w.SafeRun(w)
         }
     }
 
