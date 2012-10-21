@@ -23,12 +23,12 @@ type Manager struct {
     lock                 *sync.Mutex
     ticker *time.Ticker
     *log.Logger
-    executors []IDlogExecutor
+    executors []IWorker
 }
 
 var (
-    constructors = map[string]DlogConstructor{
-        "amf": NewAmfDlog}
+    constructors = map[string]WorkerConstructor{
+        "amf": NewAmfWorker}
 )
 
 // Manager constructor
@@ -117,14 +117,14 @@ func (this *Manager) StartAll() (err error) {
     this.Println("starting all executors...")
 
     // run each dlog in a goroutine
-    var executor IDlogExecutor
-    this.executors = make([]IDlogExecutor, 0)
+    var executor IWorker
+    this.executors = make([]IWorker, 0)
     for _, file := range this.option.files {
         executor = constructors[this.option.Kind()](this, file)
         this.executors = append(this.executors, executor)
 
         // type assertion
-        if e, ok := executor.(IDlogExecutor); ok {
+        if e, ok := executor.(IWorker); ok {
             if this.option.debug {
                 fmt.Fprintf(Stderr, "executor type: %T\n", e)
             }

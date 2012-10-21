@@ -22,8 +22,16 @@ const (
 // Any kind of things
 type Any interface{}
 
+// Worker struct method signatures
+type IWorker interface {
+    Run(IWorker) // IWorker param for dynamic polymorphism
+    IsLineValid(string) bool
+    ExtractLineInfo(string) Any
+    Running() bool
+}
+
 // An executor for 1 dlog file
-type Dlog struct {
+type Worker struct {
     running   bool
     filename  string // dlog filename
     mapReader *bufio.Reader
@@ -32,20 +40,12 @@ type Dlog struct {
     manager *Manager
 }
 
-// Dlog constructor signature
-type DlogConstructor func(*Manager, string) IDlogExecutor
+// Worker constructor signature
+type WorkerConstructor func(*Manager, string) IWorker
 
 // Request object for a line
 type Request struct {
     http_method, uri, rid string
-}
-
-// Dlog struct method signatures
-type IDlogExecutor interface {
-    Run(IDlogExecutor) // IDlogExecutor param for dynamic polymorphism
-    IsLineValid(string) bool
-    ExtractLineInfo(string) Any
-    Running() bool
 }
 
 // Scan result of raw lines and valid lines
@@ -53,17 +53,17 @@ type ScanResult struct {
     RawLines, ValidLines int
 }
 
-// Printable Dlog
-func (this *Dlog) String() string {
-    return fmt.Sprintf("Dlog{filename: %s, option: %#v}", this.filename, this.manager.option)
+// Printable Worker
+func (this *Worker) String() string {
+    return fmt.Sprintf("Worker{filename: %s, option: %#v}", this.filename, this.manager.option)
 }
 
 // Is this dlog executor running?
-func (this *Dlog) Running() bool {
+func (this *Worker) Running() bool {
     return this.running
 }
 
-func (this *Dlog) initMapper() *stream.Stream {
+func (this *Worker) initMapper() *stream.Stream {
     defer T.Un(T.Trace("initMapper"))
 
     option := this.manager.option
@@ -81,7 +81,7 @@ func (this *Dlog) initMapper() *stream.Stream {
 
 // Scan each line of a dlog file and apply validator and parser.
 // Invoke mapper if neccessary
-func (this *Dlog) Run(dlog IDlogExecutor) {
+func (this *Worker) Run(dlog IWorker) {
     defer T.Un(T.Trace("Run"))
 
     this.Println(this.filename, "start scanning...")
@@ -132,7 +132,7 @@ func (this *Dlog) Run(dlog IDlogExecutor) {
 
 // Is a line valid?
 // Only when log is from sampler host will it reuturn true
-func (this *Dlog) IsLineValid(line string) bool {
+func (this *Worker) IsLineValid(line string) bool {
     if !strings.Contains(line, SAMPLER_HOST) {
         return false
     }
@@ -141,7 +141,7 @@ func (this *Dlog) IsLineValid(line string) bool {
 
 // Base to extract meta info from a valid line string.
 // If mapper specified, return the mapper output, else return nil
-func (this *Dlog) ExtractLineInfo(line string) Any {
+func (this *Worker) ExtractLineInfo(line string) Any {
     if this.mapReader == nil || this.mapWriter == nil {
         return nil
     }

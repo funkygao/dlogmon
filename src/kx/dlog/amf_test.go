@@ -4,10 +4,10 @@ import (
     "testing"
 )
 
-func newDlog() IDlogExecutor {
+func newWorker() IWorker {
     option := new(Option)
     m := NewManager(option)
-    return NewAmfDlog(m, "")
+    return NewAmfWorker(m, "")
 }
 
 func TestIsLineValid(t *testing.T) {
@@ -17,7 +17,7 @@ func TestIsLineValid(t *testing.T) {
         "AMF_SLOW":    false,
         `>121015-180201 192.168.100.123 10282 KP:PHP.CDlog AMF_SLOW POST+www.kaixin001.com/city/gateway.php+30600bfc {'calltime':2043,'classname':'CCityConfig','method':'callfunc','args':['47116815_1226_47116815_1350293555_9af3436e3a716f7afc298bb77ece48fe','16616590',"CCityConfig.callfunc","getConfig","68680510"]}`: true,
     }
-    amf := newDlog()
+    amf := newWorker()
 
     for k := range expected {
         if amf.IsLineValid(k) != expected[k] {

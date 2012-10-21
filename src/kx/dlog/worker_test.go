@@ -2,7 +2,7 @@ package dlog
 
 import "testing"
 
-func TestDlogConst(t *testing.T) {
+func TestWorkerConst(t *testing.T) {
     if LZOP_CMD != "lzop" {
         t.Error(LZOP_CMD)
     }

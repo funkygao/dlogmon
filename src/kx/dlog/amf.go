@@ -12,8 +12,8 @@ var lineValidatorRegexes = [...][]string{
     {"Q=DLog.log"}}            // must not exists
 
 // AMF_SLOW tag analyzer
-type AmfDlog struct {
-    Dlog
+type AmfWorker struct {
+    Worker
 }
 
 // a single line meta info
@@ -29,11 +29,11 @@ func (this *amfRequest) String() string {
         this.http_method, this.uri, this.rid, this.class, this.method, this.time, this.args)
 }
 
-// Constructor of AmfDlog
-func NewAmfDlog(manager *Manager, filename string) IDlogExecutor {
-    defer t.Un(t.Trace("NewAmfDlog"))
+// Constructor of AmfWorker
+func NewAmfWorker(manager *Manager, filename string) IWorker {
+    defer t.Un(t.Trace(""))
 
-    this := new(AmfDlog)
+    this := new(AmfWorker)
     this.filename = filename
     this.manager = manager
 
@@ -42,8 +42,8 @@ func NewAmfDlog(manager *Manager, filename string) IDlogExecutor {
     return this
 
     /*
-       return &AmfDlog{
-           Dlog{
+       return &AmfWorker{
+           Worker{
                filename,
                ch,
                lock,
@@ -86,9 +86,9 @@ func (this *amfRequest) parseLine(line string) {
 }
 
 // Does a log line contain 'AMF_SLOW'?
-func (this *AmfDlog) IsLineValid(line string) bool {
+func (this *AmfWorker) IsLineValid(line string) bool {
     // super
-    if !this.Dlog.IsLineValid(line) {
+    if !this.Worker.IsLineValid(line) {
         return false
     }
 
@@ -110,8 +110,8 @@ func (this *AmfDlog) IsLineValid(line string) bool {
 }
 
 // Extract meta info related to amf from a valid line
-func (this *AmfDlog) ExtractLineInfo(line string) Any {
-    if x := this.Dlog.ExtractLineInfo(line); x != nil {
+func (this *AmfWorker) ExtractLineInfo(line string) Any {
+    if x := this.Worker.ExtractLineInfo(line); x != nil {
         if this.manager.option.debug {
             this.Println(line)
         }
