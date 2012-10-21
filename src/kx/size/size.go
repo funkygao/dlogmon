@@ -24,8 +24,8 @@ func (b ByteSize) String() string {
 }
 
 const (
-    _ = iota
-    KB ByteSize = 1 << (10 * iota)
+    _            = iota
+    KB  ByteSize = 1 << (10 * iota)
     MB
     GB
     TB

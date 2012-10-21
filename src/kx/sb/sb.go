@@ -13,4 +13,3 @@ func NewStringBuilder(s string) *StringBuilder {
 func (this *StringBuilder) Append(s string) {
     this.WriteString(s)
 }
-

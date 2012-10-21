@@ -7,14 +7,14 @@ type Recoverable interface {
 }
 
 type cryForHelpMsg struct {
-    r Recoverable
-    i Any
+    r   Recoverable
+    i   Any
 }
 
 // The supervisor itself.
 type Supervisor struct {
     supervisor *Supervisor
-    chHelp chan *cryForHelpMsg
+    chHelp     chan *cryForHelpMsg
 }
 
 func NewSupervisor(s *Supervisor) *Supervisor {
@@ -33,7 +33,7 @@ func (this *Supervisor) Recover(r Recoverable, err Any) {
 
 func (this *Supervisor) backend() {
     defer func() {
-        if i:= recover(); i != nil {
+        if i := recover(); i != nil {
             if this.supervisor != nil {
                 this.supervisor.Help(this, i)
             }

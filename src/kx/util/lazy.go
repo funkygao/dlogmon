@@ -6,7 +6,7 @@ type EvalFunc func(Any) (Any, Any)
 
 func BuildLazyEvaluator(evalFunc EvalFunc, initVal Any) func() Any {
     retValChan := make(chan Any)
-    
+
     loopFuc := func() {
         var nextVal Any = initVal
         var retVal Any
@@ -18,7 +18,7 @@ func BuildLazyEvaluator(evalFunc EvalFunc, initVal Any) func() Any {
     }
 
     retFunc := func() Any {
-        return <- retValChan
+        return <-retValChan
     }
 
     go loopFuc()

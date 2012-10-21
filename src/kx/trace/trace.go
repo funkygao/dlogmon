@@ -2,8 +2,8 @@ package trace
 
 import (
     "fmt"
-    "runtime"
     "kx/size"
+    "runtime"
     "time"
 )
 

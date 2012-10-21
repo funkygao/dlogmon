@@ -7,13 +7,13 @@ import (
 
 func TestByteSize(t *testing.T) {
     type testCase struct {
-        b ByteSize
+        b        ByteSize
         expected string
     }
 
     cases := []testCase{
-        testCase{638048, "623.09KB"},
-        testCase{12121212212, "11.29GB"}}
+        {638048, "623.09KB"},
+        {12121212212, "11.29GB"}}
     for _, b := range cases {
         s := fmt.Sprintf("%s", b.b)
         if s != b.expected {
@@ -23,7 +23,7 @@ func TestByteSize(t *testing.T) {
 }
 
 func TestConsts(t *testing.T) {
-    if MB / KB != 1024 {
+    if MB/KB != 1024 {
         t.Error("MB/KB != 1024")
     }
 

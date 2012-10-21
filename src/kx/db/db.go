@@ -40,4 +40,3 @@ func New() *DbAgent {
 
     return agent
 }
-

@@ -3,10 +3,10 @@ package dlog
 import (
     "flag"
     "fmt"
+    "github.com/kless/goconfig/config"
     T "kx/trace"
     "os"
     "path/filepath"
-    "github.com/kless/goconfig/config"
     "strconv"
     "strings"
     "time"
@@ -14,17 +14,17 @@ import (
 
 // CLI options object
 type Option struct {
-    files   []string
-    debug   bool
-    trace   bool
-    verbose bool
-    version bool
-    tick    int  // in ms
+    files                  []string
+    debug                  bool
+    trace                  bool
+    verbose                bool
+    version                bool
+    tick                   int // in ms
     cpuprofile, memprofile string
-    mapper  string
-    reducer string
-    kind    string
-    conf    *config.Config
+    mapper                 string
+    reducer                string
+    kind                   string
+    conf                   *config.Config
 }
 
 // Printable Option

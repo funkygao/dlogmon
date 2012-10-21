@@ -6,19 +6,19 @@ import (
 )
 
 const (
-    SIG_STOP = true
+    SIG_STOP    = true
     SIG_RESTART = false
 )
 
 type RetrievalFunc func() (interface{}, error)
 
 type CachedValue struct {
-    value interface{}
+    value         interface{}
     retrievalFunc RetrievalFunc
-    ttl int64
-    mutex sync.Mutex
-    ticker *time.Ticker
-    chSignal chan bool
+    ttl           int64
+    mutex         sync.Mutex
+    ticker        *time.Ticker
+    chSignal      chan bool
 }
 
 func NewCachedValue(r RetrievalFunc, ttl int64) *CachedValue {
@@ -78,10 +78,10 @@ func (this *CachedValue) Stop() {
 func (this *CachedValue) houseKeep() {
     for {
         select {
-        case <- this.ticker.C:
+        case <-this.ticker.C:
             // ttl expired
             this.Clear()
-        case stop:= <- this.chSignal:
+        case stop := <-this.chSignal:
             if stop {
                 // leave the endless loop
                 return

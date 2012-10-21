@@ -7,21 +7,21 @@ import (
     . "os"
     "os/signal"
     "runtime"
-    "syscall"
     "sync"
+    "syscall"
     "time"
 )
 
 // Manager(coordinator) of all the dlog goroutines
 type Manager struct {
-    workersStarted     bool // all workers started?
+    workersStarted       bool // all workers started?
     rawLines, validLines int
     option               *Option
     chFileScanResult     chan ScanResult // each dlog goroutine will report to this
     chTotalScanResult    chan ScanResult // total scan line collector use this to sync
     chLine               chan Any
     lock                 *sync.Mutex
-    ticker *time.Ticker
+    ticker               *time.Ticker
     *log.Logger
     workers []IWorker
 }
@@ -206,8 +206,8 @@ func (this Manager) trapSignal() {
     sch := make(chan Signal, 10)
     signal.Notify(sch, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGINT,
         syscall.SIGHUP, syscall.SIGSTOP, syscall.SIGQUIT)
-    go func(ch <- chan Signal) {
-        sig := <- ch
+    go func(ch <-chan Signal) {
+        sig := <-ch
         fmt.Fprintln(Stderr, "signal received...", sig)
         this.Shutdown()
     }(sch)
