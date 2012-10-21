@@ -17,3 +17,9 @@ const (
     LOG_PREFIX_DEBUG  = "debug "
     LOG_PREFIX        = ""
 )
+
+const (
+    availableMemory = 24 << 30 // 24 GB
+    avgMemoryPerWorker = 800 << 10 // 800 KB
+    MAX_CONCURRENT_WORKERS = availableMemory / avgMemoryPerWorker
+)
