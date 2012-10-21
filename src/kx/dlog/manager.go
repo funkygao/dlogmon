@@ -6,8 +6,8 @@ import (
     . "os"
     "os/signal"
     "runtime"
+    "strings"
     "sync"
-    "syscall"
     "time"
 )
 
@@ -183,12 +183,23 @@ func (this Manager) Shutdown() {
 }
 
 func (this Manager) trapSignal() {
-    sch := make(chan Signal, 10)
-    signal.Notify(sch, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGINT,
-        syscall.SIGHUP, syscall.SIGSTOP, syscall.SIGQUIT)
-    go func(ch <-chan Signal) {
+    ch := make(chan Signal, 10)
+
+    // register the given channel to receive notifications of the specified signals
+    signal.Notify(ch, caredSignals...)
+
+    go func() {
         sig := <-ch
-        fmt.Fprintln(Stderr, "signal received...", sig)
+        fmt.Fprintf(Stderr, "%s signal received...\n", strings.ToUpper(sig.String()))
+        for _, skip := range skippedSignals {
+            if skip == sig {
+                this.Printf("%s signal ignored\n", strings.ToUpper(sig.String()))
+                return
+            }
+        }
+
+        // not skipped
+        fmt.Fprintf(Stderr, "prepare to shutdown...")
         this.Shutdown()
-    }(sch)
+    }()
 }

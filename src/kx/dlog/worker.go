@@ -43,7 +43,7 @@ func (this *Worker) SafeRun(worker IWorker) {
     // recover to make this worker safe for other workers
     defer func() {
         if err := recover(); err != nil {
-            this.manager.Println(err)
+            this.manager.Println("panic recovered:", err)
         }
     }()
 
