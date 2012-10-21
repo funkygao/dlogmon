@@ -33,7 +33,7 @@ var (
 
 // Manager constructor
 func NewManager(option *Option) *Manager {
-    defer T.Un(T.Trace("NewManager"))
+    defer T.Un(T.Trace(""))
 
     this := new(Manager)
     this.executorsStarted = false
@@ -129,7 +129,7 @@ func (this *Manager) StartAll() (err error) {
                 fmt.Fprintf(Stderr, "executor type: %T\n", e)
             }
 
-            go e.Run(e)
+            go e.SafeRun(e)
         }
     }
 
@@ -156,7 +156,7 @@ func (this *Manager) CollectAll() {
 }
 
 func (this *Manager) collectLinesCount() {
-    defer T.Un(T.Trace("collectExecutors"))
+    defer T.Un(T.Trace(""))
 
     this.Println("collector started")
 

@@ -24,7 +24,7 @@ type Any interface{}
 
 // Worker struct method signatures
 type IWorker interface {
-    Run(IWorker) // IWorker param for dynamic polymorphism
+    SafeRun(IWorker) // IWorker param for dynamic polymorphism
     IsLineValid(string) bool
     ExtractLineInfo(string) Any
     Running() bool
@@ -64,7 +64,7 @@ func (this *Worker) Running() bool {
 }
 
 func (this *Worker) initMapper() *stream.Stream {
-    defer T.Un(T.Trace("initMapper"))
+    defer T.Un(T.Trace(""))
 
     option := this.manager.option
     if option.mapper != "" {
@@ -81,8 +81,8 @@ func (this *Worker) initMapper() *stream.Stream {
 
 // Scan each line of a dlog file and apply validator and parser.
 // Invoke mapper if neccessary
-func (this *Worker) Run(dlog IWorker) {
-    defer T.Un(T.Trace("Run"))
+func (this *Worker) SafeRun(worker IWorker) {
+    defer T.Un(T.Trace(""))
 
     this.Println(this.filename, "start scanning...")
 
@@ -93,6 +93,18 @@ func (this *Worker) Run(dlog IWorker) {
     if mapper := this.initMapper(); mapper != nil {
         defer mapper.Close()
     }
+
+    // recover to make this worker safe for other workers
+    defer func() {
+        if err := recover(); err != nil {
+            this.manager.Println(err)
+        }
+    }()
+
+    this.run(worker)
+}
+
+func (this *Worker) run(worker IWorker) {
 
     this.running = true
 
@@ -114,14 +126,14 @@ func (this *Worker) Run(dlog IWorker) {
 
         rawLines++
 
-        if !dlog.IsLineValid(line) {
+        if !worker.IsLineValid(line) {
             continue
         }
 
         validLines++
 
         // extract parsed info from this line and report to manager
-        if x := dlog.ExtractLineInfo(line); x != nil {
+        if x := worker.ExtractLineInfo(line); x != nil {
             this.manager.collectLineMeta(x)
         }
     }
