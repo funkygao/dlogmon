@@ -19,6 +19,7 @@ type Option struct {
     trace                  bool
     verbose                bool
     version                bool
+    Nworkers               int // how many concurrent workers(goroutines) permitted
     tick                   int // in ms
     cpuprofile, memprofile string
     mapper                 string
@@ -68,6 +69,7 @@ func ParseFlags() *Option {
     kind := flag.String("k", "amf", "what kind of content to scan in dlog[amf|xxx]")
     cpuprofile := flag.String("cpuprofile", "", "write cpu profile to a file for pprof")
     memprofile := flag.String("memprofile", "", "write cpu profile to a file for pprof")
+    nworkers := flag.Int("n", 0, "how many concurrent workers permitted")
     debug := flag.Bool("d", false, "debug mode")
     mapper := flag.String("mapper", "", "let a runnable script be the mapper")
     reducer := flag.String("reducer", "", "let a runnable script be the reducer")
@@ -89,6 +91,7 @@ func ParseFlags() *Option {
     option.kind = *kind
     option.version = *version
     option.tick = *tick
+    option.Nworkers = *nworkers
     option.verbose = *verbose
     option.conf, _ = loadConf(*conf)
     option.trace = *trace
