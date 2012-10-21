@@ -5,7 +5,7 @@ PKG = pkg
 VAR = var
 
 install:mkvar
-	go install ${PKGS}
+	@go install ${PKGS}
 	@strip bin/dlogmon 2> /dev/null
 
 linux:
@@ -13,13 +13,13 @@ linux:
 	@echo 'cd ~/github/dlogmon;  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dlogmon_linux kx/dlogmon'
 
 test:install
-	go test -v ${PKGS}
+	@go test ${PKGS}
 
 bench:
 	go test -test.bench=".*" -test.benchtime 5 kx/dlog
 
 fmt:
-	gofmt -s -tabs=false -tabwidth=4 -w=true ${SRC}
+	@gofmt -s -tabs=false -tabwidth=4 -w=true ${SRC}
 
 clean:
 	rm -rf ${BIN} ${PKG} ${VAR}
@@ -28,7 +28,7 @@ run:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 300 -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
 prof:run
-	go tool pprof ./bin/dlogmon var/cpu.prof
+	@go tool pprof ./bin/dlogmon var/cpu.prof
 
 trace:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -t -d

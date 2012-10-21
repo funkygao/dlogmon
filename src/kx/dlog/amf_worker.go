@@ -7,22 +7,6 @@ import (
     "strings"
 )
 
-var lineValidatorRegexes = [...][]string{
-    {"AMF_SLOW", "PHP.CDlog"}, // must exists
-    {"Q=DLog.log"}}            // must not exists
-
-// AMF_SLOW tag analyzer
-type AmfWorker struct {
-    Worker
-}
-
-// a single line meta info
-type amfRequest struct {
-    Request
-    class, method, args string
-    time                int16
-}
-
 // Printable amfRequest 
 func (this *amfRequest) String() string {
     return fmt.Sprintf("amfRequest{http:%s uri:%s rid:%s class:%s method:%s time:%d args:%s}",
@@ -93,14 +77,14 @@ func (this *AmfWorker) IsLineValid(line string) bool {
     }
 
     // must exists
-    for _, regex := range lineValidatorRegexes[0] {
+    for _, regex := range amfLineValidatorRegexes[0] {
         if !strings.Contains(line, regex) {
             return false
         }
     }
 
     // must not exists
-    for _, regex := range lineValidatorRegexes[1] {
+    for _, regex := range amfLineValidatorRegexes[1] {
         if strings.Contains(line, regex) {
             return false
         }

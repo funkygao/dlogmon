@@ -1,7 +1,6 @@
 package dlog
 
 import (
-    "bufio"
     "fmt"
     "io"
     "kx/stream"
@@ -9,40 +8,6 @@ import (
     "log"
     "strings"
 )
-
-// Any kind of things
-type Any interface{}
-
-// Worker struct method signatures
-type IWorker interface {
-    SafeRun(IWorker) // IWorker param for dynamic polymorphism
-    IsLineValid(string) bool
-    ExtractLineInfo(string) Any
-    Running() bool
-}
-
-// For 1 dlog file worker
-type Worker struct {
-    running   bool
-    filename  string // dlog filename
-    mapReader *bufio.Reader
-    mapWriter *bufio.Writer
-    *log.Logger
-    manager *Manager
-}
-
-// Worker constructor signature
-type WorkerConstructor func(*Manager, string) IWorker
-
-// Request object for a line
-type Request struct {
-    http_method, uri, rid string
-}
-
-// Scan result of raw lines and valid lines
-type ScanResult struct {
-    RawLines, ValidLines int
-}
 
 // Printable Worker
 func (this *Worker) String() string {

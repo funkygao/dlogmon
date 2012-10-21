@@ -1,5 +1,5 @@
 // TODO not finished yet
-package dlog
+package util
 
 // The interface for recoverable types.
 type Recoverable interface {

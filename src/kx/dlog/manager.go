@@ -3,32 +3,12 @@ package dlog
 import (
     "fmt"
     T "kx/trace"
-    "log"
     . "os"
     "os/signal"
     "runtime"
     "sync"
     "syscall"
     "time"
-)
-
-// Manager(coordinator) of all the dlog goroutines
-type Manager struct {
-    workersStarted       bool // all workers started?
-    rawLines, validLines int
-    option               *Option
-    chFileScanResult     chan ScanResult // each dlog goroutine will report to this
-    chTotalScanResult    chan ScanResult // total scan line collector use this to sync
-    chLine               chan Any
-    lock                 *sync.Mutex
-    ticker               *time.Ticker
-    *log.Logger
-    workers []IWorker
-}
-
-var (
-    constructors = map[string]WorkerConstructor{
-        "amf": NewAmfWorker}
 )
 
 // Manager constructor
@@ -125,7 +105,7 @@ func (this *Manager) StartAll() (err error) {
     var worker IWorker
     this.workers = make([]IWorker, 0)
     for _, file := range this.option.files {
-        worker = constructors[this.option.Kind()](this, file)
+        worker = workerConstructors[this.option.Kind()](this, file)
         this.workers = append(this.workers, worker)
 
         // type assertion

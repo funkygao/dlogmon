@@ -3,7 +3,6 @@ package dlog
 import (
     "flag"
     "fmt"
-    "github.com/kless/goconfig/config"
     T "kx/trace"
     "os"
     "path/filepath"
@@ -11,22 +10,6 @@ import (
     "strings"
     "time"
 )
-
-// CLI options object
-type Option struct {
-    files                  []string
-    debug                  bool
-    trace                  bool
-    verbose                bool
-    version                bool
-    Nworkers               int // how many concurrent workers(goroutines) permitted
-    tick                   int // in ms
-    cpuprofile, memprofile string
-    mapper                 string
-    reducer                string
-    kind                   string
-    conf                   *config.Config
-}
 
 // Printable Option
 func (this *Option) String() string {
