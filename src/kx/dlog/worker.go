@@ -10,15 +10,6 @@ import (
     "strings"
 )
 
-const (
-    LZOP_CMD          = "lzop"
-    LZOP_OPTION       = "-dcf"
-    EOL               = '\n'
-    DLOG_BASE_DIR     = "/kx/dlog/"
-    SAMPLER_HOST      = "100.123"
-    FLAG_TIMESPAN_SEP = "-"
-)
-
 // Any kind of things
 type Any interface{}
 
