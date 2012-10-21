@@ -6,16 +6,16 @@ import (
 )
 
 func main() {
-    evalFunc := func(x util.Any) (util.Any, util.Any) {
+    evalFunc := func(x util.Any) (retVal, nextVal util.Any) {
         v := x.(int)
-        return v, v + 1
+        return v, v + 2
     }
 
-    lf := util.BuildLazyIntEvaluator(evalFunc, 0)
+    f := util.BuildLazyIntEvaluator(evalFunc, 0)
 
     for {
-        println(lf())
-        time.Sleep(1e8)
+        println(f())
+        time.Sleep(1e6)
     }
 
 }

@@ -4,14 +4,14 @@ type Any interface{}
 
 type EvalFunc func(Any) (Any, Any)
 
-func BuildLazyEvaluator(evalFunc EvalFunc, initState Any) func() Any {
+func BuildLazyEvaluator(evalFunc EvalFunc, initVal Any) func() Any {
     retValChan := make(chan Any)
     
     loopFuc := func() {
-        var actState Any = initState
+        var nextVal Any = initVal
         var retVal Any
         for {
-            retVal, actState = evalFunc(actState)
+            retVal, nextVal = evalFunc(nextVal)
 
             retValChan <- retVal
         }
