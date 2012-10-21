@@ -50,3 +50,7 @@ Todo
 - check dlog content
 
 - chunk size
+
+- map reduce
+
+- signal skipped not work
