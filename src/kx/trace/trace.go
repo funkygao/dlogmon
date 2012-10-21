@@ -12,13 +12,6 @@ type AnyFunc func(args ...interface{})
 
 var enabled bool
 
-// Caller func name with skip as the call stack level
-func CallerFuncName(skip int) string {
-    pc, _, _, _ := runtime.Caller(skip)
-    f := runtime.FuncForPC(pc)
-    return f.Name() // the caller func name
-}
-
 // Entering into a func
 func Trace(fn string) string {
     if fn == "" {
@@ -65,4 +58,11 @@ func MemAlloced() size.ByteSize {
     ms := &runtime.MemStats{}
     runtime.ReadMemStats(ms)
     return size.ByteSize(ms.Alloc)
+}
+
+// Caller func name with skip as the call stack level
+func CallerFuncName(calldepth int) string {
+    pc, _, _, _ := runtime.Caller(calldepth)
+    f := runtime.FuncForPC(pc)
+    return f.Name() // the caller func name
 }
