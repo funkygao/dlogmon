@@ -17,5 +17,7 @@ Manager is the manager of all dlog goroutines.
 There will be a single manager in runtime.
 
 amf is a kind of Worker, which just parse 'AMF_SLOW' related log lines.
+
+Supervisor simulates Erlang/OTP supervisors.
 */
 package dlog
