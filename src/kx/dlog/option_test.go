@@ -2,6 +2,7 @@ package dlog
 
 import (
     "fmt"
+    "sync"
     "testing"
 )
 
@@ -44,5 +45,13 @@ func BenchmarkNative(b *testing.B) {
     b.StartTimer()
     for i:=0; i<b.N; i++ {
         native_fnv1()
+    }
+}
+
+func BenchmarkMutext(b *testing.B) {
+    var lock sync.Mutex
+    for i:=0; i<b.N; i++ {
+        lock.Lock()
+        lock.Unlock()
     }
 }
