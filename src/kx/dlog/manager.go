@@ -166,8 +166,6 @@ func (this *Manager) collectWorkers(chInLine <-chan Any, chInWorker <-chan Worke
             if !ok {
                 this.Println("line chan closed")
             }
-            //println(l.(string))
-            fmt.Println(l)
             for k, v := range l.(MapOut) {
                 reduceIn.Append(k, v)
             }
@@ -176,7 +174,6 @@ func (this *Manager) collectWorkers(chInLine <-chan Any, chInWorker <-chan Worke
         runtime.Gosched()
     }
 
-    fmt.Printf("%#v\n", reduceIn)
     for k, v := range reduceIn {
         fmt.Println(k, v)
     }
