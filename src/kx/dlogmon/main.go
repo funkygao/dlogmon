@@ -21,6 +21,42 @@ func main() {
 
     // cli options
     option := dlog.ParseFlags()
+    setup(option)
+
+    // construct the manager
+    manager := dlog.NewManager(option)
+
+    // cpu profile
+    if option.Cpuprofile() != "" {
+        defer pprof.StopCPUProfile()
+    }
+
+    // timing all the jobs up
+    start := time.Now()
+
+    // start manager
+    go manager.SafeRun()
+
+    // mem profile
+    dumpMemProfile(option.Memprofile())
+
+    // wait for the manager finish up
+    manager.Wait()
+
+    displaySummary(start, manager)
+}
+
+func displaySummary(start time.Time, manager *dlog.Manager) {
+    end := time.Now()
+    delta := end.Sub(start)
+    manager.Printf("Parsed %d/%d lines in %d files within %s [%.1f lines per second]\n",
+        manager.ValidLines(),
+        manager.RawLines(),
+        manager.FilesCount(),
+        delta, float64(manager.RawLines())/delta.Seconds())
+}
+
+func setup(option *dlog.Option) {
     if option.Version() {
         fmt.Fprintf(os.Stderr, "%s %s\n", "dlogmon", VERSION)
         os.Exit(0)
@@ -33,9 +69,6 @@ func main() {
         fmt.Printf("Parallel CPU: %d / %d\n", parallel, runtime.NumCPU())
     }
 
-    // timing all the jobs up
-    start := time.Now()
-
     // cpu profile
     if option.Cpuprofile() != "" {
         f, err := os.Create(option.Cpuprofile())
@@ -44,25 +77,7 @@ func main() {
         }
 
         pprof.StartCPUProfile(f)
-
-        defer pprof.StopCPUProfile()
     }
-
-    manager := dlog.NewManager(option)
-    go manager.StartAll()
-
-    dumpMemProfile(option.Memprofile())
-
-    manager.CollectAll()
-    rawLines, validLines := manager.RawLines(), manager.ValidLines()
-
-    end := time.Now()
-    delta := end.Sub(start)
-    manager.Printf("Parsed %d/%d lines in %d files within %s [%.1f lines per second]\n",
-        validLines,
-        rawLines,
-        manager.FilesCount(),
-        delta, float64(rawLines)/delta.Seconds())
 }
 
 // mem profile

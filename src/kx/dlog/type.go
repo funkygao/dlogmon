@@ -19,7 +19,7 @@ type DlogParser interface {
 
 // Worker struct method signatures
 type IWorker interface {
-    SafeRun(IWorker) // IWorker param for dynamic polymorphism
+    SafeRun(IWorker, chan<- Any, chan<- WorkerResult) // IWorker param for dynamic polymorphism
     Running() bool
     DlogParser
 }
@@ -54,9 +54,14 @@ type amfRequest struct {
     time                int16
 }
 
-// Scan result of raw lines and valid lines
-type ScanResult struct {
+// Result of a worker
+type WorkerResult struct {
     RawLines, ValidLines int
+}
+
+// Result of all workers
+type TotalResult struct {
+    WorkerResult
 }
 
 // Manager(coordinator) of all the dlog goroutines
@@ -64,13 +69,19 @@ type Manager struct {
     workersStarted       bool // all workers started?
     rawLines, validLines int
     option               *Option
-    chFileScanResult     chan ScanResult // each dlog goroutine will report to this
-    chTotalScanResult    chan ScanResult // total scan line collector use this to sync
-    chLine               chan Any
     lock                 *sync.Mutex
     ticker               *time.Ticker
     *log.Logger
     workers []IWorker
+    chTotal              chan TotalResult
+}
+
+// map -> sort -> merge -> reduce
+type Sorter interface {
+}
+
+// map -> sort -> merge -> reduce
+type Merger interface {
 }
 
 // CLI options object

@@ -11,6 +11,11 @@ import (
     "time"
 )
 
+// Construct a TotalResult instance
+func newTotalResult(rawLines, validLines int) TotalResult {
+    return TotalResult{WorkerResult{rawLines, validLines}}
+}
+
 // Manager constructor
 func NewManager(option *Option) *Manager {
     defer T.Un(T.Trace(""))
@@ -23,8 +28,6 @@ func NewManager(option *Option) *Manager {
     this.Logger = newLogger(option)
     this.option = option
     this.lock = new(sync.Mutex)
-    this.chFileScanResult, this.chTotalScanResult = make(chan ScanResult), make(chan ScanResult)
-    this.chLine = make(chan Any, this.FilesCount())
 
     return this
 }
@@ -34,12 +37,13 @@ func (this *Manager) String() string {
     return fmt.Sprintf("Manager{%#v}", this.option)
 }
 
+// How many workers are running
 func (this *Manager) workersCount() int {
     return this.FilesCount()
 }
 
 // Are all dlog workers finished?
-func (this *Manager) WorkersAllDone() bool {
+func (this *Manager) workersAllDone() bool {
     if !this.workersStarted {
         return false
     }
@@ -53,7 +57,7 @@ func (this *Manager) WorkersAllDone() bool {
     return true
 }
 
-// How many dlog files are analyzed
+// How many dlog files are being and to be analyzed
 func (this *Manager) FilesCount() int {
     return len(this.option.files)
 }
@@ -73,14 +77,14 @@ func (this Manager) Unlock() {
     this.lock.Unlock()
 }
 
-// Altogether how many valid lines parsed
+// Altogether how many valid lines were parsed
 func (this Manager) ValidLines() int {
     return this.validLines
 }
 
-// Start and manage all the workers
-func (this *Manager) StartAll() (err error) {
-    // collection the panic's
+// Start and manage all the workers safely
+func (this *Manager) SafeRun() (err error) {
+    // safely: collection the panic's
     defer func() {
         if r := recover(); r != nil {
             var ok bool
@@ -96,8 +100,11 @@ func (this *Manager) StartAll() (err error) {
         go this.runTicker()
     }
 
-    // wait to collect after all dlog workers done
-    go this.collectLinesCount()
+    chLine, chWorker := make(chan Any, CH_LINES_BUFSIZE), make(chan WorkerResult, this.workersCount())
+    this.chTotal = make(chan TotalResult)
+
+    // collect all workers output
+    go this.collectWorkers(chLine, chWorker, this.chTotal)
 
     this.Println("starting all workers...")
 
@@ -114,7 +121,7 @@ func (this *Manager) StartAll() (err error) {
                 fmt.Fprintf(Stderr, "worker type: %T\n", w)
             }
 
-            go w.SafeRun(w)
+            go w.SafeRun(w, chLine, chWorker)
         }
     }
 
@@ -123,53 +130,47 @@ func (this *Manager) StartAll() (err error) {
     return
 }
 
-func (this *Manager) collectWorkerSummary(rawLines, validLines int) {
-    this.chFileScanResult <- ScanResult{rawLines, validLines}
-}
-
-func (this *Manager) collectLineMeta(meta Any) {
-    this.chLine <- meta
-}
-
 // Wait for all the dlog goroutines finish and collect final result
-func (this *Manager) CollectAll() {
-    r := <-this.chTotalScanResult
+func (this *Manager) Wait() {
+    r := <-this.chTotal
     this.rawLines, this.validLines = r.RawLines, r.ValidLines
 
-    close(this.chFileScanResult)
-    close(this.chLine)
+    //close(this.chFileScanResult)
+    //close(this.chLine)
 }
 
-func (this *Manager) collectLinesCount() {
+// Collect worker's output
+// including line meta and worker summary
+func (this *Manager) collectWorkers(chInLine <-chan Any, chInWorker <-chan WorkerResult, chOutTotal chan<- TotalResult) {
     defer T.Un(T.Trace(""))
 
-    this.Println("collector started")
+    this.Println("collectWorkers started")
 
     var rawLines, validLines int
     for {
-        if this.WorkersAllDone() {
+        if this.workersAllDone() {
             break
         }
 
         select {
-        case r, ok := <-this.chFileScanResult:
+        case w, ok := <- chInWorker:
             if !ok {
-                this.Println("chFileScanResult closed")
+                this.Println("worker chan closed")
             }
-            rawLines += r.RawLines
-            validLines += r.ValidLines
+            rawLines += w.RawLines
+            validLines += w.ValidLines
 
-        case r, ok := <-this.chLine:
+        case l, ok := <- chInLine:
             if !ok {
-                this.Println("chLine closed")
+                this.Println("line chan closed")
             }
-            fmt.Println("reducer: ", r)
+            println(l.(string))
         }
 
-        runtime.Gosched()
+        //runtime.Gosched()
     }
 
-    this.chTotalScanResult <- ScanResult{rawLines, validLines}
+    chOutTotal <- newTotalResult(rawLines, validLines)
 }
 
 func (this Manager) runTicker() {
@@ -179,6 +180,7 @@ func (this Manager) runTicker() {
 }
 
 func (this Manager) Shutdown() {
+    this.Println("shutdown now")
     Exit(0)
 }
 

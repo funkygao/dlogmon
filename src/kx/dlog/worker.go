@@ -14,6 +14,10 @@ func (this *Worker) String() string {
     return fmt.Sprintf("Worker{filename: %s, option: %#v}", this.filename, this.manager.option)
 }
 
+func newWorkerResult(rawLines, validLines int) WorkerResult {
+    return WorkerResult{rawLines, validLines}
+}
+
 // Is this dlog worker running?
 func (this *Worker) Running() bool {
     return this.running
@@ -37,7 +41,7 @@ func (this *Worker) initMapper() *stream.Stream {
 
 // Scan each line of a dlog file and apply validator and parser.
 // Invoke mapper if neccessary
-func (this *Worker) SafeRun(worker IWorker) {
+func (this *Worker) SafeRun(worker IWorker, chOutLine chan<- Any, chOutWorker chan<- WorkerResult) {
     defer T.Un(T.Trace(""))
 
     // recover to make this worker safe for other workers
@@ -57,10 +61,10 @@ func (this *Worker) SafeRun(worker IWorker) {
         defer mapper.Close()
     }
 
-    this.run(worker)
+    this.run(worker, chOutLine, chOutWorker)
 }
 
-func (this *Worker) run(worker IWorker) {
+func (this *Worker) run(worker IWorker, chOutLine chan<- Any, chOutWorker chan<- WorkerResult) {
     this.running = true
 
     input := stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
@@ -88,12 +92,13 @@ func (this *Worker) run(worker IWorker) {
         validLines++
 
         // extract parsed info from this line and report to manager
-        if x := worker.ExtractLineInfo(line); x != nil {
-            this.manager.collectLineMeta(x)
+        if lineMeta := worker.ExtractLineInfo(line); lineMeta != nil {
+            chOutLine <- lineMeta
         }
     }
 
-    this.manager.collectWorkerSummary(rawLines, validLines)
+    chOutWorker <- newWorkerResult(rawLines, validLines)
+
     this.running = false
 }
 
