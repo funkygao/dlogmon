@@ -54,7 +54,7 @@ func (this *Worker) SafeRun(worker IWorker, chOutLine chan<- Any, chOutWorker ch
     this.Println(this.filename, "start scanning...")
 
     if this.manager.option.debug {
-        fmt.Println("\n", this, "\n")
+        fmt.Println(this)
     }
 
     if mapper := this.initMapper(); mapper != nil {
