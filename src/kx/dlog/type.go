@@ -13,6 +13,8 @@ type Any interface{}
 
 type KeyType uint8
 
+type CombinerFunc func([]int) int
+
 // Mapper output format
 type MapOut map[string] int
 
@@ -30,6 +32,7 @@ type IWorker interface {
     SafeRun(IWorker, chan<- Any, chan<- WorkerResult) // IWorker param for dynamic polymorphism
     Running() bool
     DlogParser
+    Combiner() CombinerFunc
 }
 
 // For 1 dlog file worker
@@ -40,6 +43,7 @@ type Worker struct {
     mapWriter *bufio.Writer
     *log.Logger
     manager *Manager
+    combiner CombinerFunc
 }
 
 // AMF_SLOW tag analyzer

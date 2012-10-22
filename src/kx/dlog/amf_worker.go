@@ -24,7 +24,14 @@ func NewAmfWorker(manager *Manager, filename string) IWorker {
     // notice how to access embedded types
     this.Logger = this.manager.Logger
 
+    // set the combiner
+    this.combiner = intSum
+
     return this
+}
+
+func (this *AmfWorker) Combiner() CombinerFunc {
+    return this.combiner
 }
 
 func (this *amfRequest) parseLine(line string) {

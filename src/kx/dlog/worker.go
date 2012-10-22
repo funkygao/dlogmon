@@ -129,3 +129,8 @@ func (this *Worker) ExtractLineInfo(line string) Any {
     mapperLine, _ := this.mapReader.ReadString(EOL)
     return mapperLine
 }
+
+// Default worker has no combiner
+func (this *Worker) Combiner() CombinerFunc {
+    return nil
+}

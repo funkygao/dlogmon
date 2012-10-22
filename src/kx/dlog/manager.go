@@ -37,6 +37,10 @@ func (this *Manager) String() string {
     return fmt.Sprintf("Manager{%#v}", this.option)
 }
 
+func (this *Manager) getOneWorker() IWorker {
+    return this.workers[0]
+}
+
 // How many workers are running
 func (this *Manager) workersCount() int {
     return this.FilesCount()
@@ -174,10 +178,25 @@ func (this *Manager) collectWorkers(chInLine <-chan Any, chInWorker <-chan Worke
         runtime.Gosched()
     }
 
-    for k, v := range reduceIn {
-        fmt.Println(k, v)
-    }
+    reduce := make(chan bool)
+    go this.collectReduceIn(reduceIn, reduce)
+    <- reduce
+
     chOutTotal <- newTotalResult(rawLines, validLines)
+}
+
+func (this Manager) collectReduceIn(in ReduceIn, done chan bool) {
+    worker := this.getOneWorker()
+    combinerFunc := worker.Combiner()
+    for k, v := range in {
+        //fmt.Println(k, v)
+        if combinerFunc != nil {
+            x := combinerFunc(v)
+            fmt.Println(k, x)
+        }
+    }
+
+    done <- true
 }
 
 func (this Manager) runTicker() {
