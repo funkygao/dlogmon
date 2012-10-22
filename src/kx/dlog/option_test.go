@@ -1,6 +1,7 @@
 package dlog
 
 import (
+    "github.com/bmizerany/assert"
     "fmt"
     "sync"
     "testing"
@@ -23,9 +24,7 @@ func TestOptionFiles(t *testing.T) {
     option := newOption()
     var files = []string{"a", "c", "cd"}
     option.files = files
-    if len(option.Files()) != len(option.files) {
-        t.Error("Option.files wrong!")
-    }
+    assert.Equal(t, len(option.files), len(option.Files()))
 
     for i, file := range option.files {
         if file != files[i] {

@@ -1,6 +1,7 @@
 package dlog
 
 import (
+    "github.com/bmizerany/assert"
     "testing"
 )
 
@@ -20,8 +21,6 @@ func TestIsLineValid(t *testing.T) {
     amf := newWorker()
 
     for k := range expected {
-        if amf.IsLineValid(k) != expected[k] {
-            t.Error(k)
-        }
+        assert.Equal(t, expected[k], amf.IsLineValid(k))
     }
 }

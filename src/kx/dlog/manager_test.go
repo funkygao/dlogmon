@@ -1,6 +1,7 @@
 package dlog
 
 import (
+    "github.com/bmizerany/assert"
     "fmt"
     "testing"
 )
@@ -23,9 +24,6 @@ func TestNewManager(t *testing.T) {
 func TestString(t *testing.T) {
     m := mockManager()
     expected := `Manager{&dlog.Option{files:[]string(nil), debug:false, trace:false, verbose:false, version:false, Nworkers:0, tick:0, cpuprofile:"", memprofile:"", mapper:"", reducer:"", kind:"", conf:(*config.Config)(nil)}}`
-    str := fmt.Sprintf("%s", m)
-    if expected != str {
-        t.Error("expected:", expected, "real:", str)
-    }
-
+    got := fmt.Sprintf("%s", m)
+    assert.Equal(t, expected, got)
 }
