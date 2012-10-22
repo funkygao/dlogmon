@@ -17,10 +17,11 @@ const (
 )
 
 func main() {
-    defer T.Un(T.Trace(""))
-
     // cli options
     option := dlog.ParseFlags()
+
+    defer T.Un(T.Trace(""))
+
     setup(option)
 
     // construct the manager
@@ -36,15 +37,17 @@ func main() {
 
     go manager.SafeRun()
 
+
     // mem profile
     dumpMemProfile(option.Memprofile())
-
     manager.WaitForCompletion()
 
     displaySummary(start, manager)
 }
 
 func displaySummary(start time.Time, manager *dlog.Manager) {
+    defer T.Un(T.Trace(""))
+
     end := time.Now()
     delta := end.Sub(start)
     manager.Printf("Parsed %d/%d lines in %d files within %s [%.1f lines per second]\n",
@@ -55,6 +58,8 @@ func displaySummary(start time.Time, manager *dlog.Manager) {
 }
 
 func setup(option *dlog.Option) {
+    defer T.Un(T.Trace(""))
+
     if option.Version() {
         fmt.Fprintf(os.Stderr, "%s %s\n", "dlogmon", VERSION)
         os.Exit(0)
@@ -80,6 +85,8 @@ func setup(option *dlog.Option) {
 
 // mem profile
 func dumpMemProfile(pf string) {
+    defer T.Un(T.Trace(""))
+
     if pf != "" {
         f, err := os.Create(pf)
         if err != nil {

@@ -38,6 +38,8 @@ func (this *Manager) String() string {
 }
 
 func (this *Manager) getOneWorker() IWorker {
+    defer T.Un(T.Trace(""))
+
     return this.workers[0]
 }
 
@@ -88,6 +90,8 @@ func (this Manager) ValidLines() int {
 
 // Start and manage all the workers safely
 func (this *Manager) SafeRun() (err error) {
+    defer T.Un(T.Trace(""))
+
     // safely: collection the panic's
     defer func() {
         if r := recover(); r != nil {
@@ -108,7 +112,7 @@ func (this *Manager) SafeRun() (err error) {
     this.chTotal = make(chan TotalResult)
 
     // collect all workers output
-    go this.collectWorkers(chLine, chWorker, this.chTotal)
+    go this.collectWorkers(chLine, chWorker)
 
     this.Println("starting all workers...")
 
@@ -136,21 +140,25 @@ func (this *Manager) SafeRun() (err error) {
 
 // Wait for all the dlog goroutines finish and collect final result
 func (this *Manager) WaitForCompletion() {
-    r := <-this.chTotal
-    this.rawLines, this.validLines = r.RawLines, r.ValidLines
+    defer T.Un(T.Trace(""))
 
-    //close(this.chFileScanResult)
-    //close(this.chLine)
+    select {
+    case r := <-this.chTotal:
+        this.rawLines, this.validLines = r.RawLines, r.ValidLines
+    case <- time.After(time.Hour * 10):
+        // timeout 10 hours? just demo useage of timeout
+        break
+    }
 }
 
 // Collect worker's output
 // including line meta and worker summary
-func (this *Manager) collectWorkers(chInLine <-chan Any, chInWorker <-chan WorkerResult, chOutTotal chan<- TotalResult) {
+func (this *Manager) collectWorkers(chInLine chan Any, chInWorker chan WorkerResult) {
     defer T.Un(T.Trace(""))
 
     reduceIn := newReduceIn()
 
-    this.Println("collectWorkers started")
+    this.Println(T.CallerFuncName(1), "started")
 
     var rawLines, validLines int
     for {
@@ -161,14 +169,18 @@ func (this *Manager) collectWorkers(chInLine <-chan Any, chInWorker <-chan Worke
         select {
         case w, ok := <-chInWorker:
             if !ok {
-                this.Println("worker chan closed")
+                // this can never happens, worker can't close this chan
+                this.Fatal("worker chan closed")
+                break
             }
             rawLines += w.RawLines
             validLines += w.ValidLines
 
         case l, ok := <-chInLine:
             if !ok {
-                this.Println("line chan closed")
+                // this can never happens, worker can't close this chan
+                this.Fatal("line chan closed")
+                break
             }
             for k, v := range l.(MapOut) {
                 reduceIn.Append(k, v)
@@ -178,14 +190,20 @@ func (this *Manager) collectWorkers(chInLine <-chan Any, chInWorker <-chan Worke
         runtime.Gosched()
     }
 
+    // all workers done, so close the channels
+    close(chInLine)
+    close(chInWorker)
+
     reduce := make(chan bool)
     go this.collectReduceIn(reduceIn, reduce)
     <- reduce
 
-    chOutTotal <- newTotalResult(rawLines, validLines)
+    this.chTotal <- newTotalResult(rawLines, validLines)
 }
 
 func (this Manager) collectReduceIn(in ReduceIn, done chan bool) {
+    defer T.Un(T.Trace(""))
+
     worker := this.getOneWorker()
     combinerFunc := worker.Combiner()
     for k, v := range in {
@@ -200,6 +218,8 @@ func (this Manager) collectReduceIn(in ReduceIn, done chan bool) {
 }
 
 func (this Manager) runTicker() {
+    defer T.Un(T.Trace(""))
+
     for _ = range this.ticker.C {
         this.Println("mem:", T.MemAlloced(), "goroutines:", runtime.NumGoroutine())
     }
@@ -211,6 +231,8 @@ func (this Manager) Shutdown() {
 }
 
 func (this Manager) trapSignal() {
+    defer T.Un(T.Trace(""))
+
     ch := make(chan Signal, 10)
 
     // register the given channel to receive notifications of the specified signals

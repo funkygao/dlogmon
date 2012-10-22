@@ -4,6 +4,8 @@ import (
     "fmt"
     "kx/size"
     "runtime"
+    "strings"
+    "sync/atomic"
     "time"
 )
 
@@ -12,25 +14,40 @@ type AnyFunc func(args ...interface{})
 
 var enabled bool
 
+var depth int32
+
+const (
+    DEPTH_CHAR = " "
+    DEPTH_STEP = 4
+)
+
 // Entering into a func
 func Trace(fn string) string {
     if fn == "" {
         fn = CallerFuncName(2)
     }
     if enabled {
-        fmt.Println("Entering:", fn)
+        space := strings.Repeat(DEPTH_CHAR, int(atomic.LoadInt32(&depth)))
+        fmt.Printf("%s %s %s\n", space, "Entering:", fn)
     }
+
+    atomic.AddInt32(&depth, DEPTH_STEP)
+
     return fn
 }
 
 // Leaving from a func
 func Un(fn string) {
+    atomic.AddInt32(&depth, -DEPTH_STEP)
+
     if fn == "" {
         fn = CallerFuncName(2)
     }
     if enabled {
-        fmt.Println("Leaving:", fn)
+        space := strings.Repeat(DEPTH_CHAR, int(atomic.LoadInt32(&depth)))
+        fmt.Printf("%s %s %s\n", space, "Leaving :", fn)
     }
+
 }
 
 // Enable the trace output
