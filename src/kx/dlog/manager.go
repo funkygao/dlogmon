@@ -174,7 +174,7 @@ func (this *Manager) collectLinesCount() {
 
 func (this Manager) runTicker() {
     for _ = range this.ticker.C {
-        this.Println("mem:", T.MemAlloced())
+        this.Println("mem:", T.MemAlloced(), "goroutines:", runtime.NumGoroutine())
     }
 }
 
