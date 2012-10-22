@@ -12,6 +12,9 @@ linux:
 	@echo 'cd /usr/local/go/src; CGO_ENABLED=0 GOOS=linux GOARCH=amd64 ./make.bash --no-clean'
 	@echo 'cd ~/github/dlogmon;  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dlogmon_linux kx/dlogmon'
 
+dep:
+	@find src/kx -name '*.go' | xargs grep -e 'github.com' -e 'code.google.com'
+
 test:install
 	@go test ${PKGS}
 

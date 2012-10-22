@@ -13,6 +13,14 @@ dlog monitor
 Project
 ============
 
+dependency
+----------
+
+::
+
+    make dep
+
+
 compile
 -------
 
