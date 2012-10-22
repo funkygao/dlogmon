@@ -6,5 +6,5 @@
 bin/
 pkg/
 var
-github.com/
-code.google.com/
+src/*.com/
+src/*.org/
