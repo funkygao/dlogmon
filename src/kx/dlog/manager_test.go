@@ -1,8 +1,8 @@
 package dlog
 
 import (
-    "github.com/bmizerany/assert"
     "fmt"
+    "github.com/bmizerany/assert"
     "testing"
 )
 

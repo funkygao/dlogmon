@@ -1,8 +1,8 @@
 package main
 
 import (
-    "secondbit.org/pastry"
     "os"
+    "secondbit.org/pastry"
 )
 
 func main() {
@@ -19,7 +19,6 @@ func main() {
     }()
 
     cluster.Join("2.2.23.3", 8080)
-    select {
-    }
-    
+    select {}
+
 }
