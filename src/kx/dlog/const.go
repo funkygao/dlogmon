@@ -23,5 +23,5 @@ const (
     avgMemoryPerWorker     = 800 << 10 // 800 KB
     MAX_CONCURRENT_WORKERS = availableMemory / avgMemoryPerWorker
 
-    CH_LINES_BUFSIZE      = 2000
+    CH_LINES_BUFSIZE = 2000
 )

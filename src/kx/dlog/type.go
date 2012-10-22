@@ -42,9 +42,9 @@ type AmfWorker struct {
 // Worker constructor signature
 type WorkerConstructor func(*Manager, string) IWorker
 
-// Request object for a line
-type Request struct {
-    http_method, uri, rid string
+// Result of a worker
+type WorkerResult struct {
+    RawLines, ValidLines int
 }
 
 // Result of all workers
@@ -61,7 +61,7 @@ type Manager struct {
     ticker               *time.Ticker
     *log.Logger
     workers []IWorker
-    chTotal              chan TotalResult
+    chTotal chan TotalResult
 }
 
 // map -> sort -> merge -> reduce
@@ -88,14 +88,14 @@ type Option struct {
     conf                   *config.Config
 }
 
+// Request object for a line
+type Request struct {
+    http_method, uri, rid string
+}
+
 // a single line meta info
 type amfRequest struct {
     Request
     class, method, args string
     time                int16
-}
-
-// Result of a worker
-type WorkerResult struct {
-    RawLines, ValidLines int
 }

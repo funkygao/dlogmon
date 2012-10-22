@@ -153,14 +153,14 @@ func (this *Manager) collectWorkers(chInLine <-chan Any, chInWorker <-chan Worke
         }
 
         select {
-        case w, ok := <- chInWorker:
+        case w, ok := <-chInWorker:
             if !ok {
                 this.Println("worker chan closed")
             }
             rawLines += w.RawLines
             validLines += w.ValidLines
 
-        case l, ok := <- chInLine:
+        case l, ok := <-chInLine:
             if !ok {
                 this.Println("line chan closed")
             }
