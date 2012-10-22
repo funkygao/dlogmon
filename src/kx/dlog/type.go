@@ -11,6 +11,14 @@ import (
 // Any kind of things
 type Any interface{}
 
+type KeyType uint8
+
+// Mapper output format
+type MapOut map[string] int
+
+// Reducer input format
+type ReduceIn map[string] []int
+
 // dlog parser interface
 type DlogParser interface {
     IsLineValid(string) bool

@@ -131,7 +131,7 @@ func (this *Manager) SafeRun() (err error) {
 }
 
 // Wait for all the dlog goroutines finish and collect final result
-func (this *Manager) Wait() {
+func (this *Manager) WaitForCompletion() {
     r := <-this.chTotal
     this.rawLines, this.validLines = r.RawLines, r.ValidLines
 
@@ -143,6 +143,8 @@ func (this *Manager) Wait() {
 // including line meta and worker summary
 func (this *Manager) collectWorkers(chInLine <-chan Any, chInWorker <-chan WorkerResult, chOutTotal chan<- TotalResult) {
     defer T.Un(T.Trace(""))
+
+    reduceIn := newReduceIn()
 
     this.Println("collectWorkers started")
 
@@ -164,12 +166,20 @@ func (this *Manager) collectWorkers(chInLine <-chan Any, chInWorker <-chan Worke
             if !ok {
                 this.Println("line chan closed")
             }
-            println(l.(string))
+            //println(l.(string))
+            fmt.Println(l)
+            for k, v := range l.(MapOut) {
+                reduceIn.Append(k, v)
+            }
         }
 
-        //runtime.Gosched()
+        runtime.Gosched()
     }
 
+    fmt.Printf("%#v\n", reduceIn)
+    for k, v := range reduceIn {
+        fmt.Println(k, v)
+    }
     chOutTotal <- newTotalResult(rawLines, validLines)
 }
 

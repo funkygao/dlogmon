@@ -97,10 +97,15 @@ func (this *AmfWorker) ExtractLineInfo(line string) Any {
     this.manager.Lock()
     defer this.manager.Unlock()
 
-    line = fmt.Sprintf("%d %s %s", req.time, req.class+"."+req.method, req.uri)
     if this.manager.option.debug {
+        line = fmt.Sprintf("[%s]%dms %s %s", req.rid, req.time, req.class+"."+req.method, req.uri)
         this.Println(line)
     }
 
-    return line
+    out := newMapOut()
+    out.Set(1, req.class + "." + req.method, 1)
+    out.Set(2, req.uri, 1)
+    out.Set(3, req.rid, 1)
+
+    return out
 }

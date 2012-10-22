@@ -34,14 +34,12 @@ func main() {
     // timing all the jobs up
     start := time.Now()
 
-    // start manager
     go manager.SafeRun()
 
     // mem profile
     dumpMemProfile(option.Memprofile())
 
-    // wait for the manager finish up
-    manager.Wait()
+    manager.WaitForCompletion()
 
     displaySummary(start, manager)
 }

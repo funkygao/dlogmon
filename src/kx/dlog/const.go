@@ -9,6 +9,7 @@ const (
     DLOG_BASE_DIR     = "/kx/dlog/"
     SAMPLER_HOST      = "100.123"
     FLAG_TIMESPAN_SEP = "-"
+    KEYTYPE_SEP       = ":"
 )
 
 const (
