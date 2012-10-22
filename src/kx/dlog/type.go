@@ -11,12 +11,17 @@ import (
 // Any kind of things
 type Any interface{}
 
+// dlog parser interface
+type DlogParser interface {
+    IsLineValid(string) bool
+    ExtractLineInfo(string) Any
+}
+
 // Worker struct method signatures
 type IWorker interface {
     SafeRun(IWorker) // IWorker param for dynamic polymorphism
-    IsLineValid(string) bool
-    ExtractLineInfo(string) Any
     Running() bool
+    DlogParser
 }
 
 // For 1 dlog file worker
