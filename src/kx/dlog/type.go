@@ -47,18 +47,6 @@ type Request struct {
     http_method, uri, rid string
 }
 
-// a single line meta info
-type amfRequest struct {
-    Request
-    class, method, args string
-    time                int16
-}
-
-// Result of a worker
-type WorkerResult struct {
-    RawLines, ValidLines int
-}
-
 // Result of all workers
 type TotalResult struct {
     WorkerResult
@@ -98,4 +86,16 @@ type Option struct {
     reducer                string
     kind                   string
     conf                   *config.Config
+}
+
+// a single line meta info
+type amfRequest struct {
+    Request
+    class, method, args string
+    time                int16
+}
+
+// Result of a worker
+type WorkerResult struct {
+    RawLines, ValidLines int
 }
