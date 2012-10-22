@@ -22,20 +22,9 @@ func NewAmfWorker(manager *Manager, filename string) IWorker {
     this.manager = manager
 
     // notice how to access embedded types
-    this.Logger = newLogger(this.manager.option)
-    return this
+    this.Logger = this.manager.Logger
 
-    /*
-       return &AmfWorker{
-           Worker{
-               filename,
-               ch,
-               lock,
-               option,
-               newLogger(this.manager.option),
-               nil, 
-               nil}}
-    */
+    return this
 }
 
 func (this *amfRequest) parseLine(line string) {
