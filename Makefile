@@ -1,4 +1,4 @@
-PKGS = kx/dlogmon kx/db kx/dlog kx/log kx/progress kx/sb kx/size kx/stream kx/trace kx/cache kx/util
+PKGS = kx/dlogmon kx/db kx/dlog kx/log kx/progress kx/sb kx/size kx/stream kx/trace kx/cache kx/util kx/stats
 SRC = src
 BIN = bin
 PKG = pkg
@@ -28,7 +28,7 @@ clean:
 	rm -rf ${BIN} ${PKG} ${VAR}
 
 run:install
-	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 300 -cpuprofile var/cpu.prof -memprofile var/mem.prof
+	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 500 -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
 prof:run
 	@go tool pprof ./bin/dlogmon var/cpu.prof

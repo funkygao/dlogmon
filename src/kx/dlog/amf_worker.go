@@ -2,6 +2,7 @@ package dlog
 
 import (
     "fmt"
+    "kx/stats"
     t "kx/trace"
     "strconv"
     "strings"
@@ -25,7 +26,7 @@ func NewAmfWorker(manager *Manager, filename string) IWorker {
     this.Logger = this.manager.Logger
 
     // set the combiner
-    this.combiner = intSum
+    this.combiner = stats.StatsSum
 
     return this
 }
@@ -104,7 +105,7 @@ func (this *AmfWorker) ExtractLineInfo(line string) Any {
     this.manager.Lock()
     defer this.manager.Unlock()
 
-    out := newMapOut()
+    out := newMapData()
     out.Set(1, req.class + "." + req.method, 1)
     out.Set(2, req.uri, 1)
     out.Set(3, req.rid, 1)

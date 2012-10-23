@@ -13,13 +13,13 @@ type Any interface{}
 
 type KeyType uint8
 
-type CombinerFunc func([]int) int
+type CombinerFunc func([]float64) float64
 
 // Mapper output format
-type MapOut map[string] int
+type MapData map[string] float64
 
 // Reducer input format
-type ReduceIn map[string] []int
+type ShuffleData map[string] []float64
 
 // dlog parser interface
 type DlogParser interface {

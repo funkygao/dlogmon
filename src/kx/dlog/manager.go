@@ -114,7 +114,7 @@ func (this *Manager) SafeRun() (err error) {
     // collect all workers output
     go this.collectWorkers(chLine, chWorker)
 
-    this.Println("starting all workers...")
+    this.Println("starting workers...")
 
     // run each dlog in a goroutine
     var worker IWorker
@@ -133,7 +133,7 @@ func (this *Manager) SafeRun() (err error) {
         }
     }
 
-    this.Println("all workers started.")
+    this.Println("all workers started")
     this.workersStarted = true
     return
 }
@@ -144,19 +144,20 @@ func (this *Manager) WaitForCompletion() {
 
     select {
     case r := <-this.chTotal:
+        this.Println("got the summary")
         this.rawLines, this.validLines = r.RawLines, r.ValidLines
     case <- time.After(time.Hour * 10):
         // timeout 10 hours? just demo useage of timeout
         break
     }
+
+    this.Println("manager ready to finish")
 }
 
 // Collect worker's output
 // including line meta and worker summary
 func (this *Manager) collectWorkers(chInLine chan Any, chInWorker chan WorkerResult) {
     defer T.Un(T.Trace(""))
-
-    reduceIn := newReduceIn()
 
     this.Println(T.CallerFuncName(1), "started")
 
@@ -182,9 +183,12 @@ func (this *Manager) collectWorkers(chInLine chan Any, chInWorker chan WorkerRes
                 this.Fatal("line chan closed")
                 break
             }
-            for k, v := range l.(MapOut) {
-                reduceIn.Append(k, v)
+            this.Lock()
+            fmt.Println(l)
+            for k, v := range l.(ShuffleData) {
+                fmt.Println(k, v)
             }
+            this.Unlock()
         }
 
         runtime.Gosched()
@@ -194,27 +198,9 @@ func (this *Manager) collectWorkers(chInLine chan Any, chInWorker chan WorkerRes
     close(chInLine)
     close(chInWorker)
 
-    reduce := make(chan bool)
-    go this.collectReduceIn(reduceIn, reduce)
-    <- reduce
-
     this.chTotal <- newTotalResult(rawLines, validLines)
-}
 
-func (this Manager) collectReduceIn(in ReduceIn, done chan bool) {
-    defer T.Un(T.Trace(""))
-
-    worker := this.getOneWorker()
-    combinerFunc := worker.Combiner()
-    for k, v := range in {
-        //fmt.Println(k, v)
-        if combinerFunc != nil {
-            x := combinerFunc(v)
-            fmt.Println(k, x)
-        }
-    }
-
-    done <- true
+    this.Println(T.CallerFuncName(1), "all workers collected")
 }
 
 func (this Manager) runTicker() {

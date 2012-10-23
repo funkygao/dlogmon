@@ -19,5 +19,7 @@ There will be a single manager in runtime.
 amf is a kind of Worker, which just parse 'AMF_SLOW' related log lines.
 
 Supervisor simulates Erlang/OTP supervisors.
+
+combiner实现本地key的聚合，对map输出的key排序，value进行迭代，类似本地的reducer
 */
 package dlog

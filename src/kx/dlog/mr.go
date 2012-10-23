@@ -4,32 +4,32 @@ import (
     "fmt"
 )
 
-func newMapOut() MapOut {
-    return make(MapOut)
+func newMapData() MapData {
+    return make(MapData)
 }
 
-func newReduceIn() ReduceIn {
-    return make(ReduceIn)
+func newShuffleData() ShuffleData {
+    return make(ShuffleData)
 }
 
 func getKey(t KeyType, key string) string {
     return fmt.Sprintf("%d%s%s", t, KEYTYPE_SEP, key)
 }
 
-func (this MapOut) Set(t KeyType, key string, val int) {
+func (this MapData) Set(t KeyType, key string, val float64) {
     key = getKey(t, key)
     this[key] = val
 }
 
-func (this MapOut) Get(key string) (val int, ok bool) {
+func (this MapData) Get(key string) (val float64, ok bool) {
     val, ok= this[key]
     return
 }
 
-func (this ReduceIn) Append(key string, val int) {
+func (this ShuffleData) Append(key string, val float64) {
     _, ok := this[key]
     if !ok {
-        this[key] = make([]int, 1)
+        this[key] = make([]float64, 1)
         this[key][0] = val
     } else {
         this[key] = append(this[key], val)

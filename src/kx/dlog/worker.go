@@ -6,12 +6,18 @@ import (
     "kx/stream"
     T "kx/trace"
     "log"
+    "path"
     "strings"
 )
 
 // Printable Worker
 func (this *Worker) String() string {
-    return fmt.Sprintf("Worker{filename: %s, option: %#v}", this.filename, this.manager.option)
+    return fmt.Sprintf("Worker{filename: %s, option: %#v}", this.BaseName(), this.manager.option)
+}
+
+// Base of my dlog filename
+func (this Worker) BaseName() string {
+    return path.Base(this.filename)
 }
 
 func newWorkerResult(rawLines, validLines int) WorkerResult {
@@ -47,11 +53,11 @@ func (this *Worker) SafeRun(worker IWorker, chOutLine chan<- Any, chOutWorker ch
     // recover to make this worker safe for other workers
     defer func() {
         if err := recover(); err != nil {
-            this.manager.Println("panic recovered:", err)
+            this.Println("panic recovered:", err)
         }
     }()
 
-    this.Println(this.filename, "start scanning...")
+    this.Println(this.BaseName(), "start scanning...")
 
     if this.manager.option.debug {
         fmt.Println(this)
@@ -67,9 +73,15 @@ func (this *Worker) SafeRun(worker IWorker, chOutLine chan<- Any, chOutWorker ch
 func (this *Worker) run(worker IWorker, chOutLine chan<- Any, chOutWorker chan<- WorkerResult) {
     this.running = true
 
+    // invoke shuffle goroutine to shuffle the k=>v into k=>[]v
+    shuffleResult := make(chan ShuffleData)
+    shuffleIn := make(chan Any)
+    go this.shuffle(shuffleIn, shuffleResult)
+
     input := stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
     input.Open()
     defer input.Close()
+    this.Println(this.BaseName(), LZOP_CMD, "exec opened")
 
     inputReader := input.Reader()
     var rawLines, validLines int
@@ -91,15 +103,39 @@ func (this *Worker) run(worker IWorker, chOutLine chan<- Any, chOutWorker chan<-
 
         validLines++
 
-        // extract parsed info from this line and report to manager
+        // extract parsed info from this line
         if lineMeta := worker.ExtractLineInfo(line); lineMeta != nil {
-            chOutLine <- lineMeta
+            shuffleIn <- lineMeta
         }
     }
 
     chOutWorker <- newWorkerResult(rawLines, validLines)
+    this.Printf("%s lines parsed: %d/%d\n", this.BaseName(), validLines, rawLines)
+
+    // shuffle feed done, must close before get data from shuffleResult
+    close(shuffleIn)
+
+    chOutLine <- <- shuffleResult
+
+    this.Println(this.BaseName(), "got shuffle return")
+
+    if worker.Combiner() != nil {
+        // run combiner
+    }
+
 
     this.running = false
+}
+
+func (this *Worker) shuffle(in <-chan Any, out chan<- ShuffleData) {
+    r := newShuffleData()
+    for x := range in {
+        for k, v := range x.(MapData) {
+            r.Append(k, v)
+        }
+    }
+
+    out <- r
 }
 
 // Is a line valid?

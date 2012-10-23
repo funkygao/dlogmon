@@ -37,7 +37,6 @@ func main() {
 
     go manager.SafeRun()
 
-
     // mem profile
     dumpMemProfile(option.Memprofile())
     manager.WaitForCompletion()
