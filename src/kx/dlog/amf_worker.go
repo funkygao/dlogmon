@@ -21,6 +21,7 @@ func NewAmfWorker(manager *Manager, filename string) IWorker {
     this := new(AmfWorker)
     this.filename = filename
     this.manager = manager
+    this.executor = this
 
     // notice how to access embedded types
     this.Logger = this.manager.Logger

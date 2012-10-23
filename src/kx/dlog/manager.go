@@ -108,11 +108,11 @@ func (this *Manager) SafeRun() (err error) {
         go this.runTicker()
     }
 
-    chLine, chWorker := make(chan Any, CH_LINES_BUFSIZE), make(chan WorkerResult, this.workersCount())
+    chMap, chWorker := make(chan Any, this.workersCount()), make(chan WorkerResult, this.workersCount())
     this.chTotal = make(chan TotalResult)
 
     // collect all workers output
-    go this.collectWorkers(chLine, chWorker)
+    go this.collectWorkers(chMap, chWorker)
 
     this.Println("starting workers...")
 
@@ -129,7 +129,7 @@ func (this *Manager) SafeRun() (err error) {
                 fmt.Fprintf(Stderr, "worker type: %T\n", w)
             }
 
-            go w.SafeRun(w, chLine, chWorker)
+            go w.SafeRun(chMap, chWorker)
         }
     }
 
@@ -151,12 +151,14 @@ func (this *Manager) WaitForCompletion() {
         break
     }
 
+    close(this.chTotal)
+
     this.Println("manager ready to finish")
 }
 
 // Collect worker's output
 // including line meta and worker summary
-func (this *Manager) collectWorkers(chInLine chan Any, chInWorker chan WorkerResult) {
+func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResult) {
     defer T.Un(T.Trace(""))
 
     this.Println(T.CallerFuncName(1), "started")
@@ -177,15 +179,15 @@ func (this *Manager) collectWorkers(chInLine chan Any, chInWorker chan WorkerRes
             rawLines += w.RawLines
             validLines += w.ValidLines
 
-        case l, ok := <-chInLine:
+        case m, ok := <-chInMap:
             if !ok {
                 // this can never happens, worker can't close this chan
                 this.Fatal("line chan closed")
                 break
             }
             this.Lock()
-            fmt.Println(l)
-            for k, v := range l.(ShuffleData) {
+            fmt.Println(m)
+            for k, v := range m.(ShuffleData) {
                 fmt.Println(k, v)
             }
             this.Unlock()
@@ -195,7 +197,7 @@ func (this *Manager) collectWorkers(chInLine chan Any, chInWorker chan WorkerRes
     }
 
     // all workers done, so close the channels
-    close(chInLine)
+    close(chInMap)
     close(chInWorker)
 
     this.chTotal <- newTotalResult(rawLines, validLines)

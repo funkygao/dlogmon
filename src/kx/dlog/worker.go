@@ -47,7 +47,7 @@ func (this *Worker) initMapper() *stream.Stream {
 
 // Scan each line of a dlog file and apply validator and parser.
 // Invoke mapper if neccessary
-func (this *Worker) SafeRun(worker IWorker, chOutLine chan<- Any, chOutWorker chan<- WorkerResult) {
+func (this *Worker) SafeRun(chOutMap chan<- Any, chOutWorker chan<- WorkerResult) {
     defer T.Un(T.Trace(""))
 
     // recover to make this worker safe for other workers
@@ -67,10 +67,10 @@ func (this *Worker) SafeRun(worker IWorker, chOutLine chan<- Any, chOutWorker ch
         defer mapper.Close()
     }
 
-    this.run(worker, chOutLine, chOutWorker)
+    this.run(chOutMap, chOutWorker)
 }
 
-func (this *Worker) run(worker IWorker, chOutLine chan<- Any, chOutWorker chan<- WorkerResult) {
+func (this *Worker) run(chOutMap chan<- Any, chOutWorker chan<- WorkerResult) {
     this.running = true
 
     // invoke shuffle goroutine to shuffle the k=>v into k=>[]v
@@ -97,14 +97,14 @@ func (this *Worker) run(worker IWorker, chOutLine chan<- Any, chOutWorker chan<-
 
         rawLines++
 
-        if !worker.IsLineValid(line) {
+        if !this.executor.IsLineValid(line) {
             continue
         }
 
         validLines++
 
         // extract parsed info from this line
-        if lineMeta := worker.ExtractLineInfo(line); lineMeta != nil {
+        if lineMeta := this.executor.ExtractLineInfo(line); lineMeta != nil {
             shuffleIn <- lineMeta
         }
     }
@@ -118,15 +118,15 @@ func (this *Worker) run(worker IWorker, chOutLine chan<- Any, chOutWorker chan<-
     var r ShuffleData = <- shuffleResult
     this.Println(this.BaseName(), "got shuffle return")
 
-    if worker.Combiner() != nil {
+    if this.executor.Combiner() != nil {
         // run combiner
         for k, v := range r {
-            r[k] = []float64{worker.Combiner()(v)}
+            r[k] = []float64{this.executor.Combiner()(v)}
         }
     }
 
     // output the shuffle result
-    chOutLine <- r
+    chOutMap <- r
 
     this.running = false
 }

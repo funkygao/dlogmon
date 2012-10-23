@@ -15,10 +15,10 @@ type KeyType uint8
 
 type CombinerFunc func([]float64) float64
 
-// Mapper output format
+// Mapper raw output format
 type MapData map[string] float64
 
-// Reducer input format
+// 
 type ShuffleData map[string] []float64
 
 // dlog parser interface
@@ -29,7 +29,7 @@ type DlogParser interface {
 
 // Worker struct method signatures
 type IWorker interface {
-    SafeRun(IWorker, chan<- Any, chan<- WorkerResult) // IWorker param for dynamic polymorphism
+    SafeRun(chan<- Any, chan<- WorkerResult) // IWorker param for dynamic polymorphism
     Running() bool
     DlogParser
     Combiner() CombinerFunc
@@ -44,6 +44,7 @@ type Worker struct {
     *log.Logger
     manager *Manager
     combiner CombinerFunc
+    executor IWorker // runtime dispatch
 }
 
 // AMF_SLOW tag analyzer
