@@ -163,8 +163,7 @@ func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResu
 
     this.Println(T.CallerFuncName(1), "started")
 
-    // input for reducer
-    reduceIn := newTransformData()
+    transFromMapper := newTransformData()
 
     var rawLines, validLines int
     for {
@@ -189,19 +188,15 @@ func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResu
                 break
             }
             for k, v := range m.(TransformData) {
-                reduceIn.AppendSlice(k, v)
+                transFromMapper.AppendSlice(k, v)
             }
         }
 
         runtime.Gosched()
     }
 
-    println("")
-    for k, v := range reduceIn {
-        fmt.Println(k, v)
-    }
-
-    // start to sort
+    // reduce the merged and sorted result
+    this.getOneWorker().Reduce(this.mergeAndSort(transFromMapper))
 
     // all workers done, so close the channels
     close(chInMap)
@@ -210,6 +205,23 @@ func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResu
     this.chTotal <- newTotalResult(rawLines, validLines)
 
     this.Println(T.CallerFuncName(1), "all workers collected")
+}
+
+func (this Manager) mergeAndSort(t TransformData) (r ReduceData) {
+    // init the ReduceData
+    keyTypes := t.KeyTypes()
+    r = make(ReduceData, len(keyTypes))
+    for i:=0; i<len(keyTypes); i++ {
+        r[i] = newTransformData()
+    }
+
+    // trans -> reduce
+    for k, v := range t {
+        keyType, key := getKeyType(k)
+        r[keyType-1].AppendSlice(key, v)
+    }
+
+    return
 }
 
 func (this Manager) runTicker() {

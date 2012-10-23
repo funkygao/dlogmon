@@ -73,3 +73,13 @@ func (this *AmfWorker) Map(line string, out chan<- Any) {
 
     out <- d
 }
+
+// Reduce
+func (this *AmfWorker) Reduce(in ReduceData) {
+    for i, d := range in {
+        println("\n", i)
+        for k, v := range d {
+            fmt.Println(k, v)
+        }
+    }
+}

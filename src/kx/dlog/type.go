@@ -23,6 +23,8 @@ type MapData map[string] float64
 // mapper -> TransformData -> reduce
 type TransformData map[string] []float64
 
+type ReduceData []TransformData
+
 // dlog parser interface
 type DlogParser interface {
     IsLineValid(string) bool
@@ -35,6 +37,7 @@ type Mapper interface {
 
 // reduce
 type Reducer interface {
+    Reduce(ReduceData)
 }
 
 // Worker struct method signatures
@@ -44,6 +47,7 @@ type IWorker interface {
     Combiner() CombinerFunc
     DlogParser
     Mapper
+    Reducer
 }
 
 // For 1 dlog file worker
