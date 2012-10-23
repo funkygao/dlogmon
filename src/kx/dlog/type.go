@@ -29,7 +29,7 @@ type DlogParser interface {
 
 // Worker struct method signatures
 type IWorker interface {
-    SafeRun(chan<- Any, chan<- WorkerResult) // IWorker param for dynamic polymorphism
+    SafeRun(chan<- Any, chan<- WorkerResult)
     Running() bool
     DlogParser
     Combiner() CombinerFunc
