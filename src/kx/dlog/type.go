@@ -11,28 +11,35 @@ import (
 // Any kind of things
 type Any interface{}
 
+// TODO tag
 type KeyType uint8
 
+// Local aggregator
 type CombinerFunc func([]float64) float64
 
 // Mapper raw output format
 type MapData map[string] float64
 
-// 
+// TODO rename
 type ShuffleData map[string] []float64
 
 // dlog parser interface
 type DlogParser interface {
     IsLineValid(string) bool
-    ExtractLineInfo(string) Any
+}
+
+// map
+type Mapper interface {
+    Map(string, chan<- Any)
 }
 
 // Worker struct method signatures
 type IWorker interface {
     SafeRun(chan<- Any, chan<- WorkerResult)
     Running() bool
-    DlogParser
     Combiner() CombinerFunc
+    DlogParser
+    Mapper
 }
 
 // For 1 dlog file worker

@@ -32,10 +32,6 @@ func NewAmfWorker(manager *Manager, filename string) IWorker {
     return this
 }
 
-func (this *AmfWorker) Combiner() CombinerFunc {
-    return this.combiner
-}
-
 func (this *amfRequest) parseLine(line string) {
     // major parts seperated by space
     parts := strings.Split(line, " ")
@@ -92,24 +88,20 @@ func (this *AmfWorker) IsLineValid(line string) bool {
 }
 
 // Extract meta info related to amf from a valid line
-func (this *AmfWorker) ExtractLineInfo(line string) Any {
+func (this *AmfWorker) Map(line string, out chan<- Any) {
     if x := this.Worker.ExtractLineInfo(line); x != nil {
         if this.manager.option.debug {
             this.Println(line)
         }
-        return x
     }
 
     req := new(amfRequest)
     req.parseLine(line)
 
-    this.manager.Lock()
-    defer this.manager.Unlock()
+    d := newMapData()
+    d.Set(1, req.class + "." + req.method, 1)
+    d.Set(2, req.uri, 1)
+    d.Set(3, req.rid, 1)
 
-    out := newMapData()
-    out.Set(1, req.class + "." + req.method, 1)
-    out.Set(2, req.uri, 1)
-    out.Set(3, req.rid, 1)
-
-    return out
+    out <- d
 }

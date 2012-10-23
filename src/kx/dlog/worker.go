@@ -103,10 +103,8 @@ func (this *Worker) run(chOutMap chan<- Any, chOutWorker chan<- WorkerResult) {
 
         validLines++
 
-        // extract parsed info from this line
-        if lineMeta := this.executor.ExtractLineInfo(line); lineMeta != nil {
-            shuffleIn <- lineMeta
-        }
+        // run map for this line
+        this.executor.Map(line, shuffleIn)
     }
 
     chOutWorker <- newWorkerResult(rawLines, validLines)
@@ -142,6 +140,11 @@ func (this *Worker) shuffle(in <-chan Any, out chan<- ShuffleData) {
     out <- r
 }
 
+// My combiner func pointer
+func (this *Worker) Combiner() CombinerFunc {
+    return this.combiner
+}
+
 // Is a line valid?
 // Only when log is from sampler host will it reuturn true
 func (this *Worker) IsLineValid(line string) bool {
@@ -168,9 +171,4 @@ func (this *Worker) ExtractLineInfo(line string) Any {
 
     mapperLine, _ := this.mapReader.ReadString(EOL)
     return mapperLine
-}
-
-// Default worker has no combiner
-func (this *Worker) Combiner() CombinerFunc {
-    return nil
 }
