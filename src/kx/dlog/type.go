@@ -20,7 +20,7 @@ type CombinerFunc func([]float64) float64
 // Mapper raw output format
 type MapData map[string] float64
 
-// TODO rename
+// TODO rename TransformData
 type ShuffleData map[string] []float64
 
 // dlog parser interface
@@ -31,6 +31,10 @@ type DlogParser interface {
 // map
 type Mapper interface {
     Map(string, chan<- Any)
+}
+
+// reduce
+type Reducer interface {
 }
 
 // Worker struct method signatures

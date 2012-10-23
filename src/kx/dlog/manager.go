@@ -157,11 +157,14 @@ func (this *Manager) WaitForCompletion() {
 }
 
 // Collect worker's output
-// including line meta and worker summary
+// including map data and worker summary
 func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResult) {
     defer T.Un(T.Trace(""))
 
     this.Println(T.CallerFuncName(1), "started")
+
+    // input for reducer
+    reduceIn := newShuffleData()
 
     var rawLines, validLines int
     for {
@@ -185,16 +188,20 @@ func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResu
                 this.Fatal("line chan closed")
                 break
             }
-            this.Lock()
-            fmt.Println(m)
             for k, v := range m.(ShuffleData) {
-                fmt.Println(k, v)
+                reduceIn.AppendSlice(k, v)
             }
-            this.Unlock()
         }
 
         runtime.Gosched()
     }
+
+    println("")
+    for k, v := range reduceIn {
+        fmt.Println(k, v)
+    }
+
+    // start to sort
 
     // all workers done, so close the channels
     close(chInMap)
