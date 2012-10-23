@@ -3,7 +3,7 @@ package dlog
 import (
     "fmt"
     "kx/stats"
-    t "kx/trace"
+    T "kx/trace"
     "strings"
 )
 
@@ -14,10 +14,11 @@ func (this *amfRequest) String() string {
 }
 
 // Constructor of AmfWorker
-func NewAmfWorker(manager *Manager, filename string) IWorker {
-    defer t.Un(t.Trace(""))
+func NewAmfWorker(manager *Manager, name, filename string) IWorker {
+    defer T.Un(T.Trace(""))
 
     this := new(AmfWorker)
+    this.name = name
     this.filename = filename
     this.manager = manager
     this.executor = this
@@ -26,7 +27,7 @@ func NewAmfWorker(manager *Manager, filename string) IWorker {
     this.Logger = this.manager.Logger
 
     // set the combiner
-    this.combiner = stats.StatsSum
+//    this.combiner = stats.StatsSum
 
     return this
 }
@@ -67,19 +68,27 @@ func (this *AmfWorker) Map(line string, out chan<- Any) {
     req.parseLine(line)
 
     d := newMapData()
-    d.Set(1, req.class + "." + req.method, 1)
-    d.Set(2, req.uri, 1)
-    d.Set(3, req.rid, 1)
+    // keyType must starts with 0
+    d.Set(0, req.class + "." + req.method, 1)
+    d.Set(1, req.uri, 1)
+    d.Set(2, req.rid, 1)
 
     out <- d
 }
 
 // Reduce
-func (this *AmfWorker) Reduce(in ReduceData) {
-    for i, d := range in {
-        println("\n", i)
+func (this *AmfWorker) Reduce(in ReduceData) (r ReduceResult) {
+    defer T.Un(T.Trace(""))
+
+    this.Println(this.name, "reduce")
+
+    r = newReduceResult(len(in))
+    for keyType, d := range in {
         for k, v := range d {
-            fmt.Println(k, v)
+            // sum up
+            r[keyType][k] = stats.StatsSum(v)
         }
     }
+
+    return
 }

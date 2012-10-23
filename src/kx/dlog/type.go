@@ -25,6 +25,8 @@ type TransformData map[string] []float64
 
 type ReduceData []TransformData
 
+type ReduceResult []MapData
+
 // dlog parser interface
 type DlogParser interface {
     IsLineValid(string) bool
@@ -37,11 +39,16 @@ type Mapper interface {
 
 // reduce
 type Reducer interface {
-    Reduce(ReduceData)
+    Reduce(ReduceData) ReduceResult
+}
+
+type Namer interface {
+    Name() string
 }
 
 // Worker struct method signatures
 type IWorker interface {
+    Namer  // each kind of worker has a uniq name
     SafeRun(chan<- Any, chan<- WorkerResult)
     Running() bool
     Combiner() CombinerFunc
@@ -52,13 +59,14 @@ type IWorker interface {
 
 // For 1 dlog file worker
 type Worker struct {
+    name      string
     running   bool
     filename  string // dlog filename
     mapReader *bufio.Reader
     mapWriter *bufio.Writer
     *log.Logger
     manager *Manager
-    combiner CombinerFunc
+    combiner CombinerFunc // can be nil
     executor IWorker // runtime dispatch
 }
 
@@ -68,7 +76,7 @@ type AmfWorker struct {
 }
 
 // Worker constructor signature
-type WorkerConstructor func(*Manager, string) IWorker
+type WorkerConstructor func(*Manager, string, string) IWorker
 
 // Result of a worker
 type WorkerResult struct {

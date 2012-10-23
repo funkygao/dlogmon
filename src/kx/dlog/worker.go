@@ -57,7 +57,7 @@ func (this *Worker) SafeRun(chOutMap chan<- Any, chOutWorker chan<- WorkerResult
         }
     }()
 
-    this.Println(this.BaseName(), "start scanning...")
+    this.Println(this.BaseName(), this.name, "start scanning...")
 
     if this.manager.option.debug {
         fmt.Println(this)
@@ -81,7 +81,8 @@ func (this *Worker) run(chOutMap chan<- Any, chOutWorker chan<- WorkerResult) {
     input := stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
     input.Open()
     defer input.Close()
-    this.Println(this.BaseName(), LZOP_CMD, "exec opened")
+
+    this.Println(this.BaseName(), this.name, LZOP_CMD, "exec opened")
 
     inputReader := input.Reader()
     var rawLines, validLines int
@@ -108,19 +109,21 @@ func (this *Worker) run(chOutMap chan<- Any, chOutWorker chan<- WorkerResult) {
     }
 
     chOutWorker <- newWorkerResult(rawLines, validLines)
-    this.Printf("%s lines parsed: %d/%d\n", this.BaseName(), validLines, rawLines)
+    this.Printf("%s %s lines parsed: %d/%d\n", this.BaseName(), this.name, validLines, rawLines)
 
     // transform feed done, must close before get data from tranResult
     close(tranIn)
 
     var r TransformData = <- tranResult
-    this.Println(this.BaseName(), "transform return")
+    this.Println(this.BaseName(), this.name, "transformed")
 
     if this.executor.Combiner() != nil {
         // run combiner
         for k, v := range r {
             r[k] = []float64{this.executor.Combiner()(v)}
         }
+
+        this.Println(this.BaseName(), this.name, "combined")
     }
 
     // output the transform result
@@ -171,4 +174,8 @@ func (this *Worker) ExtractLineInfo(line string) Any {
 
     mapperLine, _ := this.mapReader.ReadString(EOL)
     return mapperLine
+}
+
+func (this Worker) Name() string {
+    return this.name
 }

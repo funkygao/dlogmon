@@ -120,7 +120,7 @@ func (this *Manager) SafeRun() (err error) {
     var worker IWorker
     this.workers = make([]IWorker, 0)
     for _, file := range this.option.files {
-        worker = workerConstructors[this.option.Kind()](this, file)
+        worker = workerConstructors[this.option.Kind()](this, this.option.Kind(), file)
         this.workers = append(this.workers, worker)
 
         // type assertion
@@ -195,8 +195,10 @@ func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResu
         runtime.Gosched()
     }
 
-    // reduce the merged and sorted result
-    this.getOneWorker().Reduce(this.mergeAndSort(transFromMapper))
+    // reduce the merged result
+    worker := this.getOneWorker()
+    var r ReduceResult = worker.Reduce(this.merge(worker.Name(), transFromMapper))
+    this.exportToDb(worker.Name(), r)
 
     // all workers done, so close the channels
     close(chInMap)
@@ -207,21 +209,33 @@ func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResu
     this.Println(T.CallerFuncName(1), "all workers collected")
 }
 
-func (this Manager) mergeAndSort(t TransformData) (r ReduceData) {
+func (this Manager) merge(name string, t TransformData) (r ReduceData) {
+    defer T.Un(T.Trace(""))
+
+    this.Println(name, "merge")
+
     // init the ReduceData
     keyTypes := t.KeyTypes()
-    r = make(ReduceData, len(keyTypes))
-    for i:=0; i<len(keyTypes); i++ {
-        r[i] = newTransformData()
-    }
+    r = newReduceData(len(keyTypes))
 
     // trans -> reduce
     for k, v := range t {
         keyType, key := getKeyType(k)
-        r[keyType-1].AppendSlice(key, v)
+        r[keyType].AppendSlice(key, v)
     }
 
     return
+}
+
+func (this Manager) exportToDb(name string, r ReduceResult) {
+    defer T.Un(T.Trace(""))
+
+    this.Println(name, "export reduce result to db")
+
+    if this.option.debug {
+        println("worker name:", name)
+        r.Println()
+    }
 }
 
 func (this Manager) runTicker() {
