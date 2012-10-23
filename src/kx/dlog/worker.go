@@ -115,14 +115,18 @@ func (this *Worker) run(worker IWorker, chOutLine chan<- Any, chOutWorker chan<-
     // shuffle feed done, must close before get data from shuffleResult
     close(shuffleIn)
 
-    chOutLine <- <- shuffleResult
-
+    var r ShuffleData = <- shuffleResult
     this.Println(this.BaseName(), "got shuffle return")
 
     if worker.Combiner() != nil {
         // run combiner
+        for k, v := range r {
+            r[k] = []float64{worker.Combiner()(v)}
+        }
     }
 
+    // output the shuffle result
+    chOutLine <- r
 
     this.running = false
 }
