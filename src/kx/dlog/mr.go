@@ -35,3 +35,13 @@ func (this ShuffleData) Append(key string, val float64) {
         this[key] = append(this[key], val)
     }
 }
+
+func (this ShuffleData) AppendSlice(key string, val []float64) {
+    _, ok := this[key]
+    if !ok {
+        this[key] = make([]float64, 1)
+        this[key] = val
+    } else {
+        this[key] = append(this[key], val...)
+    }
+}
