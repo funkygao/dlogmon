@@ -164,7 +164,7 @@ func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResu
     this.Println(T.CallerFuncName(1), "started")
 
     // input for reducer
-    reduceIn := newShuffleData()
+    reduceIn := newTransformData()
 
     var rawLines, validLines int
     for {
@@ -188,7 +188,7 @@ func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResu
                 this.Fatal("line chan closed")
                 break
             }
-            for k, v := range m.(ShuffleData) {
+            for k, v := range m.(TransformData) {
                 reduceIn.AppendSlice(k, v)
             }
         }

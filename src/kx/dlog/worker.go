@@ -73,10 +73,10 @@ func (this *Worker) SafeRun(chOutMap chan<- Any, chOutWorker chan<- WorkerResult
 func (this *Worker) run(chOutMap chan<- Any, chOutWorker chan<- WorkerResult) {
     this.running = true
 
-    // invoke shuffle goroutine to shuffle the k=>v into k=>[]v
-    shuffleResult := make(chan ShuffleData)
-    shuffleIn := make(chan Any)
-    go this.shuffle(shuffleIn, shuffleResult)
+    // invoke transform goroutine to transform k=>v into k=>[]v
+    tranResult := make(chan TransformData)
+    tranIn := make(chan Any)
+    go this.transform(tranIn, tranResult)
 
     input := stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
     input.Open()
@@ -104,17 +104,17 @@ func (this *Worker) run(chOutMap chan<- Any, chOutWorker chan<- WorkerResult) {
         validLines++
 
         // run map for this line
-        this.executor.Map(line, shuffleIn)
+        this.executor.Map(line, tranIn)
     }
 
     chOutWorker <- newWorkerResult(rawLines, validLines)
     this.Printf("%s lines parsed: %d/%d\n", this.BaseName(), validLines, rawLines)
 
-    // shuffle feed done, must close before get data from shuffleResult
-    close(shuffleIn)
+    // transform feed done, must close before get data from tranResult
+    close(tranIn)
 
-    var r ShuffleData = <- shuffleResult
-    this.Println(this.BaseName(), "got shuffle return")
+    var r TransformData = <- tranResult
+    this.Println(this.BaseName(), "transform return")
 
     if this.executor.Combiner() != nil {
         // run combiner
@@ -123,14 +123,14 @@ func (this *Worker) run(chOutMap chan<- Any, chOutWorker chan<- WorkerResult) {
         }
     }
 
-    // output the shuffle result
+    // output the transform result
     chOutMap <- r
 
     this.running = false
 }
 
-func (this *Worker) shuffle(in <-chan Any, out chan<- ShuffleData) {
-    r := newShuffleData()
+func (this *Worker) transform(in <-chan Any, out chan<- TransformData) {
+    r := newTransformData()
     for x := range in {
         for k, v := range x.(MapData) {
             r.Append(k, v)

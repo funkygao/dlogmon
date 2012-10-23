@@ -8,8 +8,8 @@ func newMapData() MapData {
     return make(MapData)
 }
 
-func newShuffleData() ShuffleData {
-    return make(ShuffleData)
+func newTransformData() TransformData {
+    return make(TransformData)
 }
 
 func getKey(t KeyType, key string) string {
@@ -26,7 +26,7 @@ func (this MapData) Get(key string) (val float64, ok bool) {
     return
 }
 
-func (this ShuffleData) Append(key string, val float64) {
+func (this TransformData) Append(key string, val float64) {
     _, ok := this[key]
     if !ok {
         this[key] = make([]float64, 1)
@@ -36,7 +36,7 @@ func (this ShuffleData) Append(key string, val float64) {
     }
 }
 
-func (this ShuffleData) AppendSlice(key string, val []float64) {
+func (this TransformData) AppendSlice(key string, val []float64) {
     _, ok := this[key]
     if !ok {
         this[key] = make([]float64, 1)
