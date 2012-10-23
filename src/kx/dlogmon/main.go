@@ -96,3 +96,10 @@ func dumpMemProfile(pf string) {
         f.Close()
     }
 }
+
+// assert cwd is right
+func init() {
+    if !dlog.FileExists(dlog.VarDir) {
+        panic("must run on top dir")
+    }
+}

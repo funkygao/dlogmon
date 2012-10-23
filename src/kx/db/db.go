@@ -2,41 +2,31 @@ package db
 
 import (
     "database/sql"
+    "kx/dlog"
     _ "github.com/mattn/go-sqlite3"
-    "os"
-)
-
-const (
-    vardir = "var"
-    engine = "sqlite3"
-    dbfile = vardir + "dlogmon.db"
 )
 
 var (
-    agent *DbAgent
+    agent *sql.DB
 )
 
-type DbAgent struct {
-    *sql.DB
-}
-
-// Factory of DbAgent
-func New() *DbAgent {
-    if agent != nil {
-        return agent
+func init() {
+    if dlog.FileExists(dlog.DbFile) {
+        return
     }
 
-    var err error
-    var dir *os.File
-    if dir, err = os.Open(vardir); err != nil {
-        panic("must run on top dir")
-    }
-    dir.Close()
-
-    agent = new(DbAgent)
-    if agent.DB, err = sql.Open(engine, dbfile); err != nil {
+    // create the table
+    db, err := sql.Open(dlog.DbEngine, dlog.DbFile)
+    if err != nil {
         panic(err)
     }
 
-    return agent
+    defer db.Close()
+
+    if _, err := db.Exec(dlog.SQL_CREATE_TABLE); err != nil {
+        panic(err)
+    }
+}
+
+func ImportResult(name string, r dlog.ReduceResult) {
 }

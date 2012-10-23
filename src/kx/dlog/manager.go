@@ -3,6 +3,7 @@ package dlog
 import (
     "fmt"
     T "kx/trace"
+    //"kx/db"
     . "os"
     "os/signal"
     "runtime"
@@ -236,6 +237,8 @@ func (this Manager) exportToDb(name string, r ReduceResult) {
         println("worker name:", name)
         r.Println()
     }
+
+    //db.ImportResult(name, r)
 }
 
 func (this Manager) runTicker() {

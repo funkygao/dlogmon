@@ -24,3 +24,10 @@ const (
     avgMemoryPerWorker     = 800 << 10 // 800 KB
     MAX_CONCURRENT_WORKERS = availableMemory / avgMemoryPerWorker
 )
+
+const (
+    VarDir = "var"
+    DbEngine = "sqlite3"
+    DbFile = VarDir + "dlogmon.db"
+    SQL_CREATE_TABLE = "create table dlogmon(name varchar(20), key varchar(100), num float, ctime datetime)"
+)
