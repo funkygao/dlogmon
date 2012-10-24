@@ -1,11 +1,19 @@
 /*
-MapReduce related package.
-
-MapReduce = select key, aggr(value) from ... group by key order by key
+Key of MapReduce:
+    Is seperating the 'what' of distributed processing from the 'how'!
+    MapReduce = select key, aggr(value) from ... group by key order by key
 
 MapReduce in hadoop:
     map: (k1, v1) => [(k2, v2)] 
     reduce: (k2, [v2]) => [(k3, v3)]
+
+    Extra roles:
+        partitioner, which controls the assignment of words to reducers.
+        combiner
+
+
+
+
 
 WordCount as example:
                     lines
