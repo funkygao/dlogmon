@@ -45,7 +45,7 @@ func GetKeyType(key string) (r KeyType, k string) {
 // Self printable
 func (this MapData) Println() {
     for k, v := range this {
-        fmt.Println(k, v)
+        fmt.Println("mr", k, v)
     }
 }
 
@@ -82,7 +82,7 @@ func (this TransformData) AppendSlice(key string, val []float64) {
 // Self printable
 func (this TransformData) Println() {
     for k, v := range this {
-        fmt.Println(k, v)
+        fmt.Println("mr", k, v)
     }
 }
 
@@ -106,7 +106,7 @@ func (this TransformData) KeyTypes() (r []KeyType) {
 // Self printable
 func (this ReduceData) Println() {
     for keyType, d := range this {
-        println("\nKeyType:", keyType)
+        println("\nmr KeyType:", keyType)
         d.Println()
     }
 }
@@ -114,7 +114,7 @@ func (this ReduceData) Println() {
 // Self printable
 func (this ReduceResult) Println() {
     for keyType, d := range this {
-        println("\nKeyType:", keyType)
+        println("\nmr KeyType:", keyType)
         d.Println()
     }
 }
