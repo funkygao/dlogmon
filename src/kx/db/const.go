@@ -18,7 +18,7 @@ package db
 const (
     SQL_CREATE_TABLE = `CREATE TABLE IF NOT EXISTS dlog(
         id INTEGER PRIMARY KEY,
-        type VARCHAR(30), 
+        type VARCHAR(30) NOT NULL, 
         k1 VARCHAR(100),
         k2 VARCHAR(100),
         k3 VARCHAR(100),
