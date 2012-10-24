@@ -26,7 +26,8 @@ const (
 )
 
 const (
+    DbShard  = "0" // 可以任意扩充总的容量
     VarDir   = "var"
     DbEngine = "sqlite3"
-    DbFile   = VarDir + "/dlogmon.db"
+    DbFile   = VarDir + "/dlogmon" + DbShard + ".db"
 )
