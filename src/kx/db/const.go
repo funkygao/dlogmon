@@ -1,10 +1,27 @@
+/*
+Schema:
+
+    id: PK auto increment
+    k1:
+    k2:
+    type: worker type
+    n:
+    min:
+    max:
+    sum:
+    mean:
+    std:
+
+*/
 package db
 
 const (
-    SQL_CREATE_TABLE = `create table dlog(
+    SQL_CREATE_TABLE = `CREATE TABLE IF NOT EXISTS dlog(
         id INTEGER PRIMARY KEY,
-        name varchar(20), 
-        key varchar(100), 
-        num float, 
-        ctime datetime)`
+        type VARCHAR(30), 
+        k1 VARCHAR(100),
+        k2 VARCHAR(100),
+        k3 VARCHAR(100),
+        num FLOAT, 
+        ctime DATETIME DEFAULT CURRENT_TIMESTAMP)`
 )
