@@ -69,7 +69,6 @@ func (this *AmfWorker) Map(line string, out chan<- interface{}) {
     req.parseLine(line)
 
     d := mr.NewMapData()
-    // keyType must starts with 0
     d.Set(0, req.class+"."+req.method, 1)
     d.Set(1, req.uri, 1)
     d.Set(2, req.rid, 1)
@@ -84,10 +83,10 @@ func (this *AmfWorker) Reduce(in mr.ReduceData) (r mr.ReduceResult) {
     this.Println(this.name, "reduce")
 
     r = mr.NewReduceResult(len(in))
-    for keyType, d := range in {
+    for tagType, d := range in {
         for k, v := range d {
             // sum up
-            r[keyType][k] = stats.StatsSum(v)
+            r[tagType][k] = stats.StatsSum(v)
         }
     }
 
