@@ -181,7 +181,9 @@ func (this *Manager) WaitForCompletion() {
     }
 
     close(this.chTotal)
-    close(this.chProgress)
+    if this.chProgress != nil {
+        close(this.chProgress)
+    }
 
     this.Println("manager ready to finish")
 }
