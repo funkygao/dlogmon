@@ -58,3 +58,5 @@ Todo
 - timespan in db
 
 - external map reduce stream
+
+  ExtractLineInfo deprecated
