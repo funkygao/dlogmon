@@ -238,11 +238,6 @@ func (this Manager) exportToDb(name string, r mr.ReduceResult) {
 
     this.Println(name, "export reduce result to db")
 
-    if this.option.debug {
-        println("worker name:", name)
-        r.Println()
-    }
-
     db.ImportResult(name, r)
 }
 
