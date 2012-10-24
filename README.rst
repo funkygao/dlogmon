@@ -45,8 +45,6 @@ Todo
 
   enhance performance of strings.Contains
 
-- progress bar
-
 - distributed
 
 - chunk size
