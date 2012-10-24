@@ -1,4 +1,15 @@
-PKGS = kx/dlogmon kx/db kx/dlog kx/log kx/progress kx/sb kx/size kx/stream kx/trace kx/cache kx/util kx/stats
+PKGS = kx/dlogmon \
+	   kx/db \
+	   kx/dlog \
+	   kx/log \
+	   kx/progress \
+	   kx/sb \
+	   kx/size \
+	   kx/stream \
+	   kx/trace \
+	   kx/cache \
+	   kx/util \
+	   kx/stats
 SRC = src
 BIN = bin
 PKG = pkg
@@ -6,7 +17,6 @@ VAR = var
 
 install:mkvar
 	@go install ${PKGS}
-	@strip bin/dlogmon 2> /dev/null
 
 linux:
 	@echo 'cd /usr/local/go/src; CGO_ENABLED=0 GOOS=linux GOARCH=amd64 ./make.bash --no-clean'
