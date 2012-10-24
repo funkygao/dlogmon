@@ -1,7 +1,7 @@
 PKGS = kx/dlogmon \
 	   kx/db \
 	   kx/dlog \
-	   kx/log \
+	   kx/logger \
 	   kx/progress \
 	   kx/sb \
 	   kx/size \
@@ -54,7 +54,7 @@ trace:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -t -d
 
 mr:install
-	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -mapper ./mr/amfMapper.py
+	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -mapper ./mr/amfMapper.py -progress
 
 loc:
 	@echo `find src/kx -name '*.go' | xargs wc -l | tail -1` lines
