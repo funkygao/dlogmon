@@ -10,6 +10,8 @@ const (
     SAMPLER_HOST      = "100.123"
     FLAG_TIMESPAN_SEP = "-"
     KEYTYPE_SEP       = ":"
+    LINES_PER_FILE    = 600000 // deprecated
+    PROGRESS_LINES_STEP = 50000 // TODO calculated instead of const
 )
 
 const (

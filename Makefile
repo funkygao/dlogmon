@@ -45,7 +45,7 @@ clean:
 	rm -rf ${BIN} ${PKG} ${VAR}
 
 run:install
-	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 500 -cpuprofile var/cpu.prof -memprofile var/mem.prof
+	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
 prof:run
 	@go tool pprof ./bin/dlogmon var/cpu.prof

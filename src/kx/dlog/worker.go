@@ -30,6 +30,12 @@ func (this *Worker) Running() bool {
     return this.running
 }
 
+// How many lines in this worker file
+// TODO accurate line count instead of const
+func (this Worker) TotalLines() int {
+    return LINES_PER_FILE
+}
+
 func (this *Worker) initMapper() *stream.Stream {
     defer T.Un(T.Trace(""))
 
@@ -48,7 +54,7 @@ func (this *Worker) initMapper() *stream.Stream {
 
 // Scan each line of a dlog file and apply validator and parser.
 // Invoke mapper if neccessary
-func (this *Worker) SafeRun(chOutMap chan<- interface{}, chOutWorker chan<- WorkerResult) {
+func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- interface{}, chOutWorker chan<- WorkerResult) {
     defer T.Un(T.Trace(""))
 
     // recover to make this worker safe for other workers
@@ -68,10 +74,10 @@ func (this *Worker) SafeRun(chOutMap chan<- interface{}, chOutWorker chan<- Work
         defer mapper.Close()
     }
 
-    this.run(chOutMap, chOutWorker)
+    this.run(chOutProgress, chOutMap, chOutWorker)
 }
 
-func (this *Worker) run(chOutMap chan<- interface{}, chOutWorker chan<- WorkerResult) {
+func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- interface{}, chOutWorker chan<- WorkerResult) {
     this.running = true
 
     // invoke transform goroutine to transform k=>v into k=>[]v
@@ -98,6 +104,10 @@ func (this *Worker) run(chOutMap chan<- interface{}, chOutWorker chan<- WorkerRe
         }
 
         rawLines++
+        if chOutProgress != nil && rawLines % PROGRESS_LINES_STEP == 0 {
+            // report progress
+            chOutProgress <- PROGRESS_LINES_STEP
+        }
 
         if !this.executor.IsLineValid(line) {
             continue

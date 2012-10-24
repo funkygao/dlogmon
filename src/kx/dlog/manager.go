@@ -5,6 +5,7 @@ import (
     "kx/db"
     "kx/mr"
     T "kx/trace"
+    "kx/progress"
     . "os"
     "os/signal"
     "runtime"
@@ -54,6 +55,15 @@ func (this *Manager) workersCount() int {
     return this.FilesCount()
 }
 
+// How many lines added up
+// For progress bar purpose
+func (this Manager) totalLines() (total int) {
+    for _, w := range this.workers {
+        total += w.TotalLines()
+    }
+    return
+}
+
 // Are all dlog workers finished?
 func (this *Manager) workersAllDone() bool {
     if !this.workersStarted {
@@ -94,6 +104,23 @@ func (this Manager) ValidLines() int {
     return this.validLines
 }
 
+// Create all workers instances
+func (this *Manager) newWorkers() {
+    var worker IWorker
+    this.workers = make([]IWorker, 0)
+    for _, file := range this.option.files {
+        worker = workerConstructors[this.option.Kind()](this, this.option.Kind(), file)
+        this.workers = append(this.workers, worker)
+
+        // type assertion
+        if w, ok := worker.(IWorker); ok {
+            if this.option.debug {
+                fmt.Fprintf(Stderr, "worker type: %T\n", w)
+            }
+        }
+    }
+}
+
 // Start and manage all the workers safely
 func (this *Manager) SafeRun() (err error) {
     defer T.Un(T.Trace(""))
@@ -108,10 +135,18 @@ func (this *Manager) SafeRun() (err error) {
         }
     }()
 
+    // create workers first
+    this.newWorkers()
+
     go this.trapSignal()
 
     if this.ticker != nil {
         go this.runTicker()
+    }
+
+    if this.option.progress {
+        this.chProgress = make(chan int)
+        go this.showProgress()
     }
 
     chMap, chWorker := make(chan interface{}, this.workersCount()), make(chan WorkerResult, this.workersCount())
@@ -123,20 +158,8 @@ func (this *Manager) SafeRun() (err error) {
     this.Println("starting workers...")
 
     // run each dlog in a goroutine
-    var worker IWorker
-    this.workers = make([]IWorker, 0)
-    for _, file := range this.option.files {
-        worker = workerConstructors[this.option.Kind()](this, this.option.Kind(), file)
-        this.workers = append(this.workers, worker)
-
-        // type assertion
-        if w, ok := worker.(IWorker); ok {
-            if this.option.debug {
-                fmt.Fprintf(Stderr, "worker type: %T\n", w)
-            }
-
-            go w.SafeRun(chMap, chWorker)
-        }
+    for _, worker := range this.workers {
+        go worker.SafeRun(this.chProgress, chMap, chWorker)
     }
 
     this.Println("all workers started")
@@ -158,6 +181,7 @@ func (this *Manager) WaitForCompletion() {
     }
 
     close(this.chTotal)
+    close(this.chProgress)
 
     this.Println("manager ready to finish")
 }
@@ -246,6 +270,18 @@ func (this Manager) runTicker() {
 
     for _ = range this.ticker.C {
         this.Println("mem:", T.MemAlloced(), "goroutines:", runtime.NumGoroutine())
+    }
+}
+
+// Show progress bar
+func (this Manager) showProgress() {
+    total := this.totalLines()
+    p := progress.New(total)
+
+    var lines int
+    for n := range this.chProgress {
+        lines += n
+        p.ShowProgress(lines)
     }
 }
 

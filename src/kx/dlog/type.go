@@ -18,12 +18,17 @@ type Namer interface {
     Name() string
 }
 
+type LineCounter interface {
+    TotalLines() int
+}
+
 // Worker struct method signatures
 type IWorker interface {
     Namer // each kind of worker has a uniq name
-    SafeRun(chan<- interface{}, chan<- WorkerResult)
+    SafeRun(chan<- int, chan<- interface{}, chan<- WorkerResult)
     Running() bool
     Combiner() mr.CombinerFunc
+    LineCounter
     DlogParser
     mr.Mapper
     mr.Reducer
@@ -70,6 +75,7 @@ type Manager struct {
     *log.Logger
     workers []IWorker
     chTotal chan TotalResult
+    chProgress chan int // default <nil>
 }
 
 // map -> sort -> merge -> reduce
@@ -87,6 +93,7 @@ type Option struct {
     trace                  bool
     verbose                bool
     version                bool
+    progress               bool
     Nworkers               int // how many concurrent workers(goroutines) permitted
     tick                   int // in ms
     cpuprofile, memprofile string

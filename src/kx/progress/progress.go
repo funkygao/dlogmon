@@ -47,6 +47,9 @@ func (this Progress) SetBar(bar string) {
 
 // Show current progress bar
 func (this Progress) ShowProgress(current int) {
+    if current > this.total {
+        current = this.total
+    }
     bar := progress(current, this.total, this.terminalWidth)
     os.Stdout.Write([]byte(bar + "\r"))
     os.Stdout.Sync()
