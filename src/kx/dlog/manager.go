@@ -44,6 +44,7 @@ func (this *Manager) String() string {
     return fmt.Sprintf("Manager{%#v}", this.option)
 }
 
+// Get any worker of the same type TODO
 func (this *Manager) getOneWorker() IWorker {
     defer T.Un(T.Trace(""))
 
@@ -150,6 +151,7 @@ func (this *Manager) Submit() (err error) {
     }
 
     chMap, chWorker := make(chan interface{}, this.workersCount()), make(chan WorkerResult, this.workersCount())
+    // the barrier
     this.chTotal = make(chan TotalResult)
 
     // collect all workers output
@@ -228,6 +230,7 @@ func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan Wo
     }
 
     // reduce the merged result
+    // reduce cannot start until all the mappers have finished
     worker := this.getOneWorker()
     var r mr.ReduceResult = worker.Reduce(this.merge(worker.Name(), transFromMapper))
     this.exportToDb(worker.Name(), r)
