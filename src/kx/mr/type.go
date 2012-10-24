@@ -11,11 +11,13 @@ type TagType uint8
 // Mapper raw output format
 type MapData map[string]float64
 
-// mapper -> TransformData -> reduce
+// mapper -> TransformData -> merge -> reduce
 type TransformData map[string][]float64
 
+// Input of Reducer
 type ReduceData []TransformData
 
+// Output of Reducer
 type ReduceResult []MapData
 
 // map
