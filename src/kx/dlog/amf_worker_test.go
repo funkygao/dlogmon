@@ -8,7 +8,7 @@ import (
 func newWorker() IWorker {
     option := new(Option)
     m := NewManager(option)
-    return NewAmfWorker(m, "")
+    return NewAmfWorker(m, "", "")
 }
 
 func TestIsLineValid(t *testing.T) {

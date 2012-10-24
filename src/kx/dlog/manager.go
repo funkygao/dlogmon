@@ -3,7 +3,8 @@ package dlog
 import (
     "fmt"
     T "kx/trace"
-    //"kx/db"
+    "kx/mr"
+    "kx/db"
     . "os"
     "os/signal"
     "runtime"
@@ -11,6 +12,10 @@ import (
     "sync"
     "time"
 )
+
+func init() {
+    db.Initialize(DbEngine, DbFile, SQL_CREATE_TABLE)
+}
 
 // Construct a TotalResult instance
 func newTotalResult(rawLines, validLines int) TotalResult {
@@ -109,7 +114,7 @@ func (this *Manager) SafeRun() (err error) {
         go this.runTicker()
     }
 
-    chMap, chWorker := make(chan Any, this.workersCount()), make(chan WorkerResult, this.workersCount())
+    chMap, chWorker := make(chan interface{}, this.workersCount()), make(chan WorkerResult, this.workersCount())
     this.chTotal = make(chan TotalResult)
 
     // collect all workers output
@@ -159,12 +164,12 @@ func (this *Manager) WaitForCompletion() {
 
 // Collect worker's output
 // including map data and worker summary
-func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResult) {
+func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan WorkerResult) {
     defer T.Un(T.Trace(""))
 
     this.Println(T.CallerFuncName(1), "started")
 
-    transFromMapper := newTransformData()
+    transFromMapper := mr.NewTransformData()
 
     var rawLines, validLines int
     for {
@@ -188,7 +193,7 @@ func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResu
                 this.Fatal("line chan closed")
                 break
             }
-            for k, v := range m.(TransformData) {
+            for k, v := range m.(mr.TransformData) {
                 transFromMapper.AppendSlice(k, v)
             }
         }
@@ -198,7 +203,7 @@ func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResu
 
     // reduce the merged result
     worker := this.getOneWorker()
-    var r ReduceResult = worker.Reduce(this.merge(worker.Name(), transFromMapper))
+    var r mr.ReduceResult = worker.Reduce(this.merge(worker.Name(), transFromMapper))
     this.exportToDb(worker.Name(), r)
 
     // all workers done, so close the channels
@@ -210,25 +215,25 @@ func (this *Manager) collectWorkers(chInMap chan Any, chInWorker chan WorkerResu
     this.Println(T.CallerFuncName(1), "all workers collected")
 }
 
-func (this Manager) merge(name string, t TransformData) (r ReduceData) {
+func (this Manager) merge(name string, t mr.TransformData) (r mr.ReduceData) {
     defer T.Un(T.Trace(""))
 
     this.Println(name, "merge")
 
     // init the ReduceData
     keyTypes := t.KeyTypes()
-    r = newReduceData(len(keyTypes))
+    r = mr.NewReduceData(len(keyTypes))
 
     // trans -> reduce
     for k, v := range t {
-        keyType, key := getKeyType(k)
+        keyType, key := mr.GetKeyType(k)
         r[keyType].AppendSlice(key, v)
     }
 
     return
 }
 
-func (this Manager) exportToDb(name string, r ReduceResult) {
+func (this Manager) exportToDb(name string, r mr.ReduceResult) {
     defer T.Un(T.Trace(""))
 
     this.Println(name, "export reduce result to db")
@@ -238,7 +243,7 @@ func (this Manager) exportToDb(name string, r ReduceResult) {
         r.Println()
     }
 
-    //db.ImportResult(name, r)
+    db.ImportResult(name, r)
 }
 
 func (this Manager) runTicker() {

@@ -2,6 +2,7 @@ package dlog
 
 import (
     "fmt"
+    "kx/mr"
     "kx/stats"
     T "kx/trace"
     "strings"
@@ -57,7 +58,7 @@ func (this *AmfWorker) IsLineValid(line string) bool {
 }
 
 // Extract meta info related to amf from a valid line
-func (this *AmfWorker) Map(line string, out chan<- Any) {
+func (this *AmfWorker) Map(line string, out chan<- interface{}) {
     if x := this.Worker.ExtractLineInfo(line); x != nil {
         if this.manager.option.debug {
             this.Println(line)
@@ -67,7 +68,7 @@ func (this *AmfWorker) Map(line string, out chan<- Any) {
     req := new(amfRequest)
     req.parseLine(line)
 
-    d := newMapData()
+    d := mr.NewMapData()
     // keyType must starts with 0
     d.Set(0, req.class + "." + req.method, 1)
     d.Set(1, req.uri, 1)
@@ -77,12 +78,12 @@ func (this *AmfWorker) Map(line string, out chan<- Any) {
 }
 
 // Reduce
-func (this *AmfWorker) Reduce(in ReduceData) (r ReduceResult) {
+func (this *AmfWorker) Reduce(in mr.ReduceData) (r mr.ReduceResult) {
     defer T.Un(T.Trace(""))
 
     this.Println(this.name, "reduce")
 
-    r = newReduceResult(len(in))
+    r = mr.NewReduceResult(len(in))
     for keyType, d := range in {
         for k, v := range d {
             // sum up

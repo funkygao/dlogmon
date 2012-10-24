@@ -1,0 +1,12 @@
+debug 2012/10/24 13:23:08.240019 manager.go:123: starting workers...
+debug 2012/10/24 13:23:08.240218 manager.go:142: all workers started
+debug 2012/10/24 13:23:08.240270 worker.go:61: lz.121015-104410 amf start scanning...
+debug 2012/10/24 13:23:08.240298 manager.go:170: kx/dlog.(*Manager).collectWorkers started
+debug 2012/10/24 13:23:08.240356 manager.go:221: amf merge
+debug 2012/10/24 13:23:08.240376 amf_worker.go:84: amf reduce
+debug 2012/10/24 13:23:08.240395 manager.go:239: amf export reduce result to db
+debug 2012/10/24 13:23:08.240453 manager.go:215: kx/dlog.(*Manager).collectWorkers all workers collected
+debug 2012/10/24 13:23:08.240464 manager.go:153: got the summary
+debug 2012/10/24 13:23:08.240528 manager.go:162: manager ready to finish
+debug 2012/10/24 13:23:08.240598 main.go:57: Parsed 0/0 lines in 1 files within 765us [0.0 lines per second]
+debug 2012/10/24 13:23:08.242057 worker.go:86: lz.121015-104410 amf lzop exec opened

@@ -2,31 +2,39 @@ package db
 
 import (
     "database/sql"
-    "kx/dlog"
+    "kx/util"
+    "kx/mr"
     _ "github.com/mattn/go-sqlite3"
 )
 
 var (
-    agent *sql.DB
+    db *sql.DB
+    dbfile, dbengine, sql_create_table string
 )
 
-func init() {
-    if dlog.FileExists(dlog.DbFile) {
+func Initialize(engine, file, sql_create string) {
+    dbfile = file
+    dbengine = engine
+    sql_create_table = sql_create
+
+    if util.FileExists(dbfile) {
         return
     }
 
     // create the table
-    db, err := sql.Open(dlog.DbEngine, dlog.DbFile)
+    var err error
+    db, err = sql.Open(dbengine, dbfile)
     if err != nil {
         panic(err)
     }
 
     defer db.Close()
 
-    if _, err := db.Exec(dlog.SQL_CREATE_TABLE); err != nil {
+    if _, err := db.Exec(sql_create_table); err != nil {
         panic(err)
     }
 }
 
-func ImportResult(name string, r dlog.ReduceResult) {
+func ImportResult(name string, r mr.ReduceResult) {
+    r.Println()
 }

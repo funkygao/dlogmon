@@ -4,6 +4,7 @@ import (
     "fmt"
     "kx/dlog"
     T "kx/trace"
+    "kx/util"
     "os"
     "runtime"
     "runtime/pprof"
@@ -99,7 +100,7 @@ func dumpMemProfile(pf string) {
 
 // assert cwd is right
 func init() {
-    if !dlog.FileExists(dlog.VarDir) {
+    if !util.FileExists(dlog.VarDir) {
         panic("must run on top dir")
     }
 }

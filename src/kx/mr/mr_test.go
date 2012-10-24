@@ -1,4 +1,4 @@
-package dlog
+package mr
 
 import (
     "github.com/bmizerany/assert"
@@ -6,7 +6,7 @@ import (
 )
 
 func TestAppend(t *testing.T) {
-    d := newTransformData()
+    d := NewTransformData()
     d.Append("a", 1.0)
     d.Append("a", 2.0)
     d.Append("b", 3.0)
@@ -15,7 +15,7 @@ func TestAppend(t *testing.T) {
 }
 
 func TestAppendSlice(t *testing.T) {
-    d := newTransformData()
+    d := NewTransformData()
     d.Append("a", 2.0)
     d.AppendSlice("a", []float64{3.1, 4.1})
     d.Append("b", 3.0)

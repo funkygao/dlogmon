@@ -1,29 +1,33 @@
-package dlog
+package mr
 
 import (
     "fmt"
 )
 
-func newMapData() MapData {
+// Factory
+func NewMapData() MapData {
     return make(MapData)
 }
 
-func newTransformData() TransformData {
+// Factory
+func NewTransformData() TransformData {
     return make(TransformData)
 }
 
-func newReduceData(size int) ReduceData {
+// Factory
+func NewReduceData(size int) ReduceData {
     r := make(ReduceData, size)
     for i:=0; i<size; i++ {
-        r[i] = newTransformData()
+        r[i] = NewTransformData()
     }
     return r
 }
 
-func newReduceResult(size int) ReduceResult {
+// Factory
+func NewReduceResult(size int) ReduceResult {
     r := make(ReduceResult, size)
     for i:=0; i<size; i++ {
-        r[i] = newMapData()
+        r[i] = NewMapData()
     }
     return r
 }
@@ -32,12 +36,13 @@ func getKeyByType(t KeyType, key string) string {
     return fmt.Sprintf("%d%s%s", t, KEYTYPE_SEP, key)
 }
 
-func getKeyType(key string) (r KeyType, k string) {
+func GetKeyType(key string) (r KeyType, k string) {
     format := "%d" + KEYTYPE_SEP + "%s"
     fmt.Sscanf(key, format, &r, &k)
     return
 }
 
+// Self printable
 func (this MapData) Println() {
     for k, v := range this {
         fmt.Println(k, v)
@@ -74,6 +79,7 @@ func (this TransformData) AppendSlice(key string, val []float64) {
     }
 }
 
+// Self printable
 func (this TransformData) Println() {
     for k, v := range this {
         fmt.Println(k, v)
@@ -84,7 +90,7 @@ func (this TransformData) Println() {
 func (this TransformData) KeyTypes() (r []KeyType) {
     var m = make(map[KeyType] bool)
     for k, _ := range this {
-        key, _ := getKeyType(k)
+        key, _ := GetKeyType(k)
         m[key] = true
     }
 
@@ -97,6 +103,7 @@ func (this TransformData) KeyTypes() (r []KeyType) {
     return
 }
 
+// Self printable
 func (this ReduceData) Println() {
     for keyType, d := range this {
         println("\nKeyType:", keyType)
@@ -104,6 +111,7 @@ func (this ReduceData) Println() {
     }
 }
 
+// Self printable
 func (this ReduceResult) Println() {
     for keyType, d := range this {
         println("\nKeyType:", keyType)

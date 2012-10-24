@@ -1,4 +1,4 @@
-package dlog
+package util
 
 import (
     "os"

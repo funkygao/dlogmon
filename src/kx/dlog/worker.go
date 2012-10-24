@@ -4,6 +4,7 @@ import (
     "fmt"
     "io"
     "kx/stream"
+    "kx/mr"
     T "kx/trace"
     "log"
     "path"
@@ -47,7 +48,7 @@ func (this *Worker) initMapper() *stream.Stream {
 
 // Scan each line of a dlog file and apply validator and parser.
 // Invoke mapper if neccessary
-func (this *Worker) SafeRun(chOutMap chan<- Any, chOutWorker chan<- WorkerResult) {
+func (this *Worker) SafeRun(chOutMap chan<- interface{}, chOutWorker chan<- WorkerResult) {
     defer T.Un(T.Trace(""))
 
     // recover to make this worker safe for other workers
@@ -70,12 +71,12 @@ func (this *Worker) SafeRun(chOutMap chan<- Any, chOutWorker chan<- WorkerResult
     this.run(chOutMap, chOutWorker)
 }
 
-func (this *Worker) run(chOutMap chan<- Any, chOutWorker chan<- WorkerResult) {
+func (this *Worker) run(chOutMap chan<- interface{}, chOutWorker chan<- WorkerResult) {
     this.running = true
 
     // invoke transform goroutine to transform k=>v into k=>[]v
-    tranResult := make(chan TransformData)
-    tranIn := make(chan Any)
+    tranResult := make(chan mr.TransformData)
+    tranIn := make(chan interface{})
     go this.transform(tranIn, tranResult)
 
     input := stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
@@ -114,7 +115,7 @@ func (this *Worker) run(chOutMap chan<- Any, chOutWorker chan<- WorkerResult) {
     // transform feed done, must close before get data from tranResult
     close(tranIn)
 
-    var r TransformData = <- tranResult
+    var r mr.TransformData = <- tranResult
     this.Println(this.BaseName(), this.name, "transformed")
 
     if this.executor.Combiner() != nil {
@@ -132,10 +133,10 @@ func (this *Worker) run(chOutMap chan<- Any, chOutWorker chan<- WorkerResult) {
     this.running = false
 }
 
-func (this *Worker) transform(in <-chan Any, out chan<- TransformData) {
-    r := newTransformData()
+func (this *Worker) transform(in <-chan interface{}, out chan<- mr.TransformData) {
+    r := mr.NewTransformData()
     for x := range in {
-        for k, v := range x.(MapData) {
+        for k, v := range x.(mr.MapData) {
             r.Append(k, v)
         }
     }
@@ -144,7 +145,7 @@ func (this *Worker) transform(in <-chan Any, out chan<- TransformData) {
 }
 
 // My combiner func pointer
-func (this *Worker) Combiner() CombinerFunc {
+func (this *Worker) Combiner() mr.CombinerFunc {
     return this.combiner
 }
 
@@ -159,7 +160,7 @@ func (this *Worker) IsLineValid(line string) bool {
 
 // Base to extract meta info from a valid line string.
 // If mapper specified, return the mapper output, else return nil
-func (this *Worker) ExtractLineInfo(line string) Any {
+func (this *Worker) ExtractLineInfo(line string) interface{} {
     if this.mapReader == nil || this.mapWriter == nil {
         return nil
     }

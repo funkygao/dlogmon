@@ -6,40 +6,12 @@ import (
     "log"
     "sync"
     "time"
+    "kx/mr"
 )
-
-// Any kind of things
-type Any interface{}
-
-// TODO tag
-type KeyType uint8
-
-// Local aggregator
-type CombinerFunc func([]float64) float64
-
-// Mapper raw output format
-type MapData map[string] float64
-
-// mapper -> TransformData -> reduce
-type TransformData map[string] []float64
-
-type ReduceData []TransformData
-
-type ReduceResult []MapData
 
 // dlog parser interface
 type DlogParser interface {
     IsLineValid(string) bool
-}
-
-// map
-type Mapper interface {
-    Map(string, chan<- Any)
-}
-
-// reduce
-type Reducer interface {
-    Reduce(ReduceData) ReduceResult
 }
 
 type Namer interface {
@@ -49,12 +21,12 @@ type Namer interface {
 // Worker struct method signatures
 type IWorker interface {
     Namer  // each kind of worker has a uniq name
-    SafeRun(chan<- Any, chan<- WorkerResult)
+    SafeRun(chan<- interface{}, chan<- WorkerResult)
     Running() bool
-    Combiner() CombinerFunc
+    Combiner() mr.CombinerFunc
     DlogParser
-    Mapper
-    Reducer
+    mr.Mapper
+    mr.Reducer
 }
 
 // For 1 dlog file worker
@@ -66,7 +38,7 @@ type Worker struct {
     mapWriter *bufio.Writer
     *log.Logger
     manager *Manager
-    combiner CombinerFunc // can be nil
+    combiner mr.CombinerFunc // can be nil
     executor IWorker // runtime dispatch
 }
 
