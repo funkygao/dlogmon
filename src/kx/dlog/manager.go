@@ -221,13 +221,13 @@ func (this Manager) merge(name string, t mr.TransformData) (r mr.ReduceData) {
     this.Println(name, "merge")
 
     // init the ReduceData
-    keyTypes := t.KeyTypes()
-    r = mr.NewReduceData(len(keyTypes))
+    tagTypes := t.TagTypes()
+    r = mr.NewReduceData(len(tagTypes))
 
     // trans -> reduce
     for k, v := range t {
-        keyType, key := mr.GetKeyType(k)
-        r[keyType].AppendSlice(key, v)
+        tagType, key := mr.GetTagType(k)
+        r[tagType].AppendSlice(key, v)
     }
 
     return

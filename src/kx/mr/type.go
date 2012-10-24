@@ -6,7 +6,7 @@ const KEYTYPE_SEP = ":"
 type CombinerFunc func([]float64) float64
 
 // TODO tag
-type KeyType uint8
+type TagType uint8 
 
 // Mapper raw output format
 type MapData map[string]float64

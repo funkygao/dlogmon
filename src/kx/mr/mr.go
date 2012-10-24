@@ -32,13 +32,13 @@ func NewReduceResult(size int) ReduceResult {
     return r
 }
 
-func getKeyByType(t KeyType, key string) string {
+func getTagByType(t TagType, key string) string {
     return fmt.Sprintf("%d%s%s", t, KEYTYPE_SEP, key)
 }
 
-func GetKeyType(key string) (r KeyType, k string) {
+func GetTagType(key string) (t TagType, k string) {
     format := "%d" + KEYTYPE_SEP + "%s"
-    fmt.Sscanf(key, format, &r, &k)
+    fmt.Sscanf(key, format, &t, &k)
     return
 }
 
@@ -49,8 +49,8 @@ func (this MapData) Println() {
     }
 }
 
-func (this MapData) Set(t KeyType, key string, val float64) {
-    key = getKeyByType(t, key)
+func (this MapData) Set(t TagType, key string, val float64) {
+    key = getTagByType(t, key)
     this[key] = val
 }
 
@@ -86,15 +86,15 @@ func (this TransformData) Println() {
     }
 }
 
-// Get key types into slice of KeyType
-func (this TransformData) KeyTypes() (r []KeyType) {
-    var m = make(map[KeyType]bool)
+// Get key types into slice of TagType
+func (this TransformData) TagTypes() (r []TagType) {
+    var m = make(map[TagType]bool)
     for k := range this {
-        key, _ := GetKeyType(k)
+        key, _ := GetTagType(k)
         m[key] = true
     }
 
-    r = make([]KeyType, len(m))
+    r = make([]TagType, len(m))
     var i int
     for k := range m {
         r[i] = k
@@ -105,16 +105,16 @@ func (this TransformData) KeyTypes() (r []KeyType) {
 
 // Self printable
 func (this ReduceData) Println() {
-    for keyType, d := range this {
-        println("\nmr KeyType:", keyType)
+    for tagType, d := range this {
+        println("\nmr TagType:", tagType)
         d.Println()
     }
 }
 
 // Self printable
 func (this ReduceResult) Println() {
-    for keyType, d := range this {
-        println("\nmr KeyType:", keyType)
+    for tagType, d := range this {
+        println("\nmr TagType:", tagType)
         d.Println()
     }
 }
