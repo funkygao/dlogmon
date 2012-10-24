@@ -56,3 +56,5 @@ Todo
 - signal skipped not work
 
 - timespan in db
+
+- external map reduce stream
