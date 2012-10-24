@@ -41,24 +41,18 @@ compile
 Todo
 ====
 
-- profiler
-
 - why first strings.Contains(100.123) will be slower to 280000 per sec
 
   enhance performance of strings.Contains
-
-- godoc enhancement
-
-  done
 
 - progress bar
 
 - distributed
 
-- check dlog content
-
 - chunk size
 
-- map reduce
+  control cpu load
 
 - signal skipped not work
+
+- timespan in db
