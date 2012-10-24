@@ -25,6 +25,7 @@ linux:
 up:
 	go get -u github.com/bmizerany/assert
 	go get -u github.com/kless/goconfig/config
+	go get -u github.com/mattn/go-sqlite3
 
 dep:
 	@find src/kx -name '*.go' | xargs grep -e 'github.com' -e 'code.google.com'
