@@ -16,7 +16,7 @@ PKG = pkg
 VAR = var
 
 install:mkvar
-	@go install ${PKGS}
+	go install ${PKGS}
 
 linux:
 	@echo 'cd /usr/local/go/src; CGO_ENABLED=0 GOOS=linux GOARCH=amd64 ./make.bash --no-clean'
@@ -26,6 +26,8 @@ up:
 	go get -u github.com/bmizerany/assert
 	go get -u github.com/kless/goconfig/config
 	go get -u github.com/mattn/go-sqlite3
+
+rb:clean install
 
 dep:
 	@find src/kx -name '*.go' | xargs grep -e 'github.com' -e 'code.google.com'
