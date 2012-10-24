@@ -5,6 +5,7 @@ import (
     "kx/dlog"
     T "kx/trace"
     "kx/util"
+    "log"
     "os"
     "runtime"
     "runtime/pprof"
@@ -36,25 +37,27 @@ func main() {
     // timing all the jobs up
     start := time.Now()
 
-    go manager.SafeRun()
+    go manager.Submit()
 
     // mem profile
     dumpMemProfile(option.Memprofile())
+
     manager.WaitForCompletion()
 
-    displaySummary(start, manager)
+    displaySummary(manager.Logger, start, 
+        manager.FilesCount(), manager.RawLines(), manager.ValidLines())
 }
 
-func displaySummary(start time.Time, manager *dlog.Manager) {
+func displaySummary(logger *log.Logger, start time.Time, files, rawLines, validLines int) {
     defer T.Un(T.Trace(""))
 
     end := time.Now()
     delta := end.Sub(start)
-    manager.Printf("Parsed %d/%d lines in %d files within %s [%.1f lines per second]\n",
-        manager.ValidLines(),
-        manager.RawLines(),
-        manager.FilesCount(),
-        delta, float64(manager.RawLines())/delta.Seconds())
+    logger.Printf("Parsed %d/%d lines in %d files within %s [%.1f lines per second]\n",
+        validLines,
+        rawLines,
+        files,
+        delta, float64(rawLines)/delta.Seconds())
 }
 
 func setup(option *dlog.Option) {

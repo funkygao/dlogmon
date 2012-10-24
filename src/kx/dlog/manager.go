@@ -121,8 +121,8 @@ func (this *Manager) newWorkers() {
     }
 }
 
-// Start and manage all the workers safely
-func (this *Manager) SafeRun() (err error) {
+// Submit the job and start the job
+func (this *Manager) Submit() (err error) {
     defer T.Un(T.Trace(""))
 
     // safely: collection the panic's
