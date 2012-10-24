@@ -3,10 +3,10 @@ package dlog
 import (
     "bufio"
     "github.com/kless/goconfig/config"
+    "kx/mr"
     "log"
     "sync"
     "time"
-    "kx/mr"
 )
 
 // dlog parser interface
@@ -20,7 +20,7 @@ type Namer interface {
 
 // Worker struct method signatures
 type IWorker interface {
-    Namer  // each kind of worker has a uniq name
+    Namer // each kind of worker has a uniq name
     SafeRun(chan<- interface{}, chan<- WorkerResult)
     Running() bool
     Combiner() mr.CombinerFunc
@@ -37,9 +37,9 @@ type Worker struct {
     mapReader *bufio.Reader
     mapWriter *bufio.Writer
     *log.Logger
-    manager *Manager
+    manager  *Manager
     combiner mr.CombinerFunc // can be nil
-    executor IWorker // runtime dispatch
+    executor IWorker         // runtime dispatch
 }
 
 // AMF_SLOW tag analyzer

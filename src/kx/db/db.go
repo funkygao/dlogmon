@@ -2,20 +2,19 @@ package db
 
 import (
     "database/sql"
-    "kx/util"
-    "kx/mr"
     _ "github.com/mattn/go-sqlite3"
+    "kx/mr"
+    "kx/util"
 )
 
 var (
-    db *sql.DB
+    db                                 *sql.DB
     dbfile, dbengine, sql_create_table string
 )
 
-func Initialize(engine, file, sql_create string) {
+func Initialize(engine, file string) {
     dbfile = file
     dbengine = engine
-    sql_create_table = sql_create
 
     if util.FileExists(dbfile) {
         return
@@ -30,7 +29,7 @@ func Initialize(engine, file, sql_create string) {
 
     defer db.Close()
 
-    if _, err := db.Exec(sql_create_table); err != nil {
+    if _, err := db.Exec(SQL_CREATE_TABLE); err != nil {
         panic(err)
     }
 }

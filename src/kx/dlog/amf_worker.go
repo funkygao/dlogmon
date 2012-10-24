@@ -28,7 +28,7 @@ func NewAmfWorker(manager *Manager, name, filename string) IWorker {
     this.Logger = this.manager.Logger
 
     // set the combiner
-//    this.combiner = stats.StatsSum
+    //    this.combiner = stats.StatsSum
 
     return this
 }
@@ -70,7 +70,7 @@ func (this *AmfWorker) Map(line string, out chan<- interface{}) {
 
     d := mr.NewMapData()
     // keyType must starts with 0
-    d.Set(0, req.class + "." + req.method, 1)
+    d.Set(0, req.class+"."+req.method, 1)
     d.Set(1, req.uri, 1)
     d.Set(2, req.rid, 1)
 

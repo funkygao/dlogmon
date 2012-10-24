@@ -2,9 +2,9 @@ package dlog
 
 import (
     "fmt"
-    T "kx/trace"
-    "kx/mr"
     "kx/db"
+    "kx/mr"
+    T "kx/trace"
     . "os"
     "os/signal"
     "runtime"
@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-    db.Initialize(DbEngine, DbFile, SQL_CREATE_TABLE)
+    db.Initialize(DbEngine, DbFile)
 }
 
 // Construct a TotalResult instance
@@ -152,7 +152,7 @@ func (this *Manager) WaitForCompletion() {
     case r := <-this.chTotal:
         this.Println("got the summary")
         this.rawLines, this.validLines = r.RawLines, r.ValidLines
-    case <- time.After(time.Hour * 10):
+    case <-time.After(time.Hour * 10):
         // timeout 10 hours? just demo useage of timeout
         break
     }

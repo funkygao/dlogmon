@@ -9,10 +9,10 @@ type CombinerFunc func([]float64) float64
 type KeyType uint8
 
 // Mapper raw output format
-type MapData map[string] float64
+type MapData map[string]float64
 
 // mapper -> TransformData -> reduce
-type TransformData map[string] []float64
+type TransformData map[string][]float64
 
 type ReduceData []TransformData
 

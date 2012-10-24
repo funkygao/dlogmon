@@ -3,8 +3,8 @@ package dlog
 import (
     "fmt"
     "io"
-    "kx/stream"
     "kx/mr"
+    "kx/stream"
     T "kx/trace"
     "log"
     "path"
@@ -115,7 +115,7 @@ func (this *Worker) run(chOutMap chan<- interface{}, chOutWorker chan<- WorkerRe
     // transform feed done, must close before get data from tranResult
     close(tranIn)
 
-    var r mr.TransformData = <- tranResult
+    var r mr.TransformData = <-tranResult
     this.Println(this.BaseName(), this.name, "transformed")
 
     if this.executor.Combiner() != nil {

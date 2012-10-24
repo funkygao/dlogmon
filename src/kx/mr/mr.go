@@ -17,7 +17,7 @@ func NewTransformData() TransformData {
 // Factory
 func NewReduceData(size int) ReduceData {
     r := make(ReduceData, size)
-    for i:=0; i<size; i++ {
+    for i := 0; i < size; i++ {
         r[i] = NewTransformData()
     }
     return r
@@ -26,7 +26,7 @@ func NewReduceData(size int) ReduceData {
 // Factory
 func NewReduceResult(size int) ReduceResult {
     r := make(ReduceResult, size)
-    for i:=0; i<size; i++ {
+    for i := 0; i < size; i++ {
         r[i] = NewMapData()
     }
     return r
@@ -55,7 +55,7 @@ func (this MapData) Set(t KeyType, key string, val float64) {
 }
 
 func (this MapData) Get(key string) (val float64, ok bool) {
-    val, ok= this[key]
+    val, ok = this[key]
     return
 }
 
@@ -88,17 +88,17 @@ func (this TransformData) Println() {
 
 // Get key types into slice of KeyType
 func (this TransformData) KeyTypes() (r []KeyType) {
-    var m = make(map[KeyType] bool)
-    for k, _ := range this {
+    var m = make(map[KeyType]bool)
+    for k := range this {
         key, _ := GetKeyType(k)
         m[key] = true
     }
 
     r = make([]KeyType, len(m))
     var i int
-    for k, _ := range m {
+    for k := range m {
         r[i] = k
-        i ++
+        i++
     }
     return
 }
