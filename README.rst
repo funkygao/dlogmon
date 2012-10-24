@@ -60,3 +60,5 @@ Todo
 - external map reduce stream
 
   ExtractLineInfo deprecated
+
+- chain of workers and reducers
