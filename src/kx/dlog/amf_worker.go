@@ -77,16 +77,16 @@ func (this *AmfWorker) Map(line string, out chan<- interface{}) {
 }
 
 // Reduce
-func (this *AmfWorker) Reduce(in mr.ReduceData) (r mr.ReduceResult) {
+func (this *AmfWorker) Reduce(in mr.ReduceData) (out mr.ReduceResult) {
     defer T.Un(T.Trace(""))
 
     this.Println(this.name, "reduce")
 
-    r = mr.NewReduceResult(len(in))
+    out = mr.NewReduceResult(len(in))
     for tagType, d := range in {
         for k, v := range d {
             // sum up
-            r[tagType][k] = stats.StatsSum(v)
+            out[tagType][k] = stats.StatsSum(v)
         }
     }
 
