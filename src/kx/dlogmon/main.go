@@ -18,16 +18,24 @@ const (
     maxprocsenv = "GOMAXPROCS"
 )
 
+// assert cwd is right
+func init() {
+    if !util.FileExists(dlog.VarDir) {
+        panic("must run on top dir")
+    }
+}
+
 func main() {
     // cli options
     option := dlog.ParseFlags()
-
-    defer T.Un(T.Trace(""))
-
-    setup(option)
+    initialize(option)
 
     // construct the manager
     manager := dlog.NewManager(option)
+    // mutex pass through
+    T.SetLock(manager.GetLock())
+
+    defer T.Un(T.Trace(""))
 
     // cpu profile
     if option.Cpuprofile() != "" {
@@ -37,14 +45,16 @@ func main() {
     // timing all the jobs up
     start := time.Now()
 
+    manager.Println("about to submit jobs")
     go manager.Submit()
 
     // mem profile
     dumpMemProfile(option.Memprofile())
 
+    manager.Println("waiting for completion...")
     manager.WaitForCompletion()
 
-    displaySummary(manager.Logger, start, 
+    displaySummary(manager.Logger, start,
         manager.FilesCount(), manager.RawLines(), manager.ValidLines())
 }
 
@@ -60,7 +70,7 @@ func displaySummary(logger *log.Logger, start time.Time, files, rawLines, validL
         delta, float64(rawLines)/delta.Seconds())
 }
 
-func setup(option *dlog.Option) {
+func initialize(option *dlog.Option) {
     defer T.Un(T.Trace(""))
 
     if option.Version() {
@@ -98,12 +108,5 @@ func dumpMemProfile(pf string) {
 
         pprof.WriteHeapProfile(f)
         f.Close()
-    }
-}
-
-// assert cwd is right
-func init() {
-    if !util.FileExists(dlog.VarDir) {
-        panic("must run on top dir")
     }
 }
