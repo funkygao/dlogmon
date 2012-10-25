@@ -135,5 +135,10 @@ func ParseFlags() *Option {
         }
     }
 
+    if len(option.files) < 1 {
+        fmt.Fprintln(os.Stderr, "Fatal error: empty dlog")
+        os.Exit(0)
+    }
+
     return option
 }
