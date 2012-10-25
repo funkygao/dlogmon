@@ -118,3 +118,9 @@ func (this ReduceResult) Println() {
         d.Println()
     }
 }
+
+// Dump to plain sql statements
+// TODO
+func (this ReduceResult) DumpToSql() {
+    this.Println()
+}

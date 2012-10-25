@@ -2,9 +2,9 @@ package db
 
 import (
     "database/sql"
-    _ "github.com/mattn/go-sqlite3"
+    // _ "github.com/mattn/go-sqlite3"
     "kx/mr"
-    "kx/util"
+    //"kx/util"
 )
 
 var (
@@ -13,6 +13,7 @@ var (
 )
 
 func Initialize(engine, file string) {
+    /*
     dbfile = file
     dbengine = engine
 
@@ -32,8 +33,9 @@ func Initialize(engine, file string) {
     if _, err := db.Exec(SQL_CREATE_TABLE); err != nil {
         panic(err)
     }
+    */
 }
 
 func ImportResult(name string, r mr.ReduceResult) {
-    r.Println()
+    r.DumpToSql()
 }
