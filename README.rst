@@ -60,3 +60,7 @@ Todo
   ExtractLineInfo deprecated
 
 - chain of workers and reducers
+
+- Task abstraction
+
+  channel direction in care
