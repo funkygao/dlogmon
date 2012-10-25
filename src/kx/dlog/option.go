@@ -49,7 +49,7 @@ func ParseFlags() *Option {
     f := flag.String("f", "", "specify a single dlog file to analyze")
     verbose := flag.Bool("v", false, "verbose")
     version := flag.Bool("V", false, "show version")
-    progress := flag.Bool("progress", false, "show progress bar")
+    progress := flag.Bool("progress", true, "show progress bar")
     kind := flag.String("k", "amf", "what kind of content to scan in dlog[amf|xxx]")
     cpuprofile := flag.String("cpuprofile", "", "write cpu profile to a file for pprof")
     memprofile := flag.String("memprofile", "", "write cpu profile to a file for pprof")
@@ -64,9 +64,6 @@ func ParseFlags() *Option {
     flag.Parse()
 
     option := new(Option)
-    if *f != "" {
-        option.files = []string{*f}
-    }
     option.debug = *debug
     option.progress = *progress
     option.mapper = *mapper
@@ -83,6 +80,12 @@ func ParseFlags() *Option {
     if option.trace {
         T.Enable()
     }
+    if *f != "" {
+        option.files = []string{*f}
+        return option
+    }
+
+    // 根据指定的时间范围判断分析哪些文件
 
     // day
     dir := *d
