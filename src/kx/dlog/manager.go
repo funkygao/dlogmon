@@ -260,7 +260,7 @@ func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan Wo
 func (this Manager) merge(name string, t mr.TransformData) (r mr.ReduceData) {
     defer T.Un(T.Trace(""))
 
-    this.Println(name, "start to merge...")
+    this.Printf("start to merge %s...\n", name)
 
     // init the ReduceData
     tagTypes := t.TagTypes()
@@ -278,7 +278,7 @@ func (this Manager) merge(name string, t mr.TransformData) (r mr.ReduceData) {
 func (this Manager) exportToDb(name string, r mr.ReduceResult) {
     defer T.Un(T.Trace(""))
 
-    this.Println(name, "export reduce result to db")
+    this.Printf("export %s reduce result to db\n", name)
     db.ImportResult(name, r)
 }
 

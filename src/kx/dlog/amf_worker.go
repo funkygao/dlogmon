@@ -86,7 +86,7 @@ func (this *AmfWorker) Map(line string, out chan<- interface{}) {
 func (this *AmfWorker) Reduce(in mr.ReduceData) (out mr.ReduceResult) {
     defer T.Un(T.Trace(""))
 
-    this.Println(this.name, "reduce")
+    this.Println(this.name, "start to reduce...")
 
     out = mr.NewReduceResult(len(in))
     for tagType, d := range in {
