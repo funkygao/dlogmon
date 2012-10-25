@@ -51,8 +51,8 @@ func (this Progress) ShowProgress(current int) {
         current = this.total
     }
     bar := progress(current, this.total, this.terminalWidth)
-    os.Stdout.Write([]byte(bar + "\r"))
-    os.Stdout.Sync()
+    os.Stderr.Write([]byte(bar + "\r"))
+    os.Stderr.Sync()
 }
 
 func bold(str string) string {

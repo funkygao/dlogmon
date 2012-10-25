@@ -105,16 +105,14 @@ func (this TransformData) TagTypes() (r []TagType) {
 
 // Self printable
 func (this ReduceData) Println() {
-    for tagType, d := range this {
-        println("\nmr TagType:", tagType)
+    for _, d := range this {
         d.Println()
     }
 }
 
 // Self printable
 func (this ReduceResult) Println() {
-    for tagType, d := range this {
-        println("\nmr TagType:", tagType)
+    for _, d := range this {
         d.Println()
     }
 }

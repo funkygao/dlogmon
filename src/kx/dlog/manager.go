@@ -244,9 +244,6 @@ func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan Wo
     // reduce cannot start until all the mappers have finished
     worker := this.getOneWorker()
     var r mr.ReduceResult = worker.Reduce(this.merge(worker.Name(), transFromMapper))
-    if this.option.progress {
-        this.showProgressComplete()
-    }
     this.exportToDb(worker.Name(), r)
 
     // all workers done, so close the channels
@@ -302,12 +299,6 @@ func (this Manager) showProgress() {
         p.ShowProgress(lines)
     }
     println()
-}
-
-func (this Manager) showProgressComplete() {
-    total := this.totalLines()
-    p := progress.New(total)
-    p.ShowProgress(total)
 }
 
 func (this Manager) Shutdown() {

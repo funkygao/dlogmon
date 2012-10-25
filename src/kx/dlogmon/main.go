@@ -63,11 +63,13 @@ func displaySummary(logger *log.Logger, start time.Time, files, rawLines, validL
 
     end := time.Now()
     delta := end.Sub(start)
-    logger.Printf("Parsed %d/%d lines in %d files within %s [%.1f lines per second]\n",
+    summary := fmt.Sprintf("Parsed %d/%d lines in %d files within %s [%.1f lines per second]\n",
         validLines,
         rawLines,
         files,
         delta, float64(rawLines)/delta.Seconds())
+    logger.Print(summary)
+    fmt.Fprintf(os.Stderr, summary)
 }
 
 func initialize(option *dlog.Option) {
@@ -82,7 +84,7 @@ func initialize(option *dlog.Option) {
     if os.Getenv(maxprocsenv) == "" {
         parallel := runtime.NumCPU()/2 + 1
         runtime.GOMAXPROCS(parallel)
-        fmt.Printf("Parallel CPU: %d / %d\n", parallel, runtime.NumCPU())
+        fmt.Fprintf(os.Stderr, "Parallel CPU: %d / %d\n", parallel, runtime.NumCPU())
     }
 
     // cpu profile

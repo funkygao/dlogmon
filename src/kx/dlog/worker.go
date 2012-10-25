@@ -7,6 +7,7 @@ import (
     "kx/stream"
     T "kx/trace"
     "log"
+    "os"
     "path"
     "strings"
 )
@@ -60,7 +61,7 @@ func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- interface{
     }()
 
     if this.manager.option.debug {
-        fmt.Println(this)
+        fmt.Fprintln(os.Stderr, this)
     }
 
     if mapper := this.initMapper(); mapper != nil {
