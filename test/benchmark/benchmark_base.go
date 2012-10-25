@@ -2,6 +2,7 @@ package main
 
 import (
     "fmt"
+    "runtime"
     "testing"
 )
 
@@ -16,11 +17,18 @@ func main() {
     fmt.Printf("%5s %s\n", "if", testing.Benchmark(benchmarkIf).String())
     fmt.Printf("%5s %s\n", "print", testing.Benchmark(benchmarkPrint).String())
     fmt.Printf("%5s %s\n", "go", testing.Benchmark(benchmarkGo).String())
+    fmt.Printf("%5s %s\n", "sched", testing.Benchmark(benchmarkGosched).String())
 }
 
 func benchmarkPrint(b *testing.B) {
     for i:=0; i<b.N; i++ {
         print("")
+    }
+}
+
+func benchmarkGosched(b *testing.B) {
+    for i:=0; i<b.N; i++ {
+        runtime.Gosched()
     }
 }
 
