@@ -12,6 +12,7 @@ const (
     KEYTYPE_SEP       = ":"
     LINES_PER_FILE    = 600000 // deprecated
     PROGRESS_LINES_STEP = 50000 // TODO calculated instead of const
+    PROGRESS_CHAN_BUF = 1000
 )
 
 const (
