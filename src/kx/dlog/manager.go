@@ -28,7 +28,6 @@ func NewManager(option *Option) *Manager {
     defer T.Un(T.Trace(""))
 
     this := new(Manager)
-    this.workersStarted = false
     if option.tick > 0 {
         this.ticker = time.NewTicker(time.Millisecond * time.Duration(option.tick))
     }
@@ -161,7 +160,6 @@ func (this *Manager) Submit() (err error) {
     }
     this.Println("all workers started")
 
-    this.workersStarted = true
     return
 }
 

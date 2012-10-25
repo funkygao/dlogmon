@@ -65,7 +65,6 @@ type TotalResult struct {
 
 // Manager(coordinator) of all the dlog goroutines
 type Manager struct {
-    workersStarted       bool // all workers started?
     rawLines, validLines int
     option               *Option
     lock                 *sync.Mutex
