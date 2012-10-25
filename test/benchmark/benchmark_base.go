@@ -8,11 +8,32 @@ import (
 var ops uint64
 
 func main() {
+    fmt.Printf("%5s %s\n", "loop", testing.Benchmark(benchmarkEmptyLoop).String())
     fmt.Printf("%5s %s\n", "+", testing.Benchmark(benchmarkAdd).String())
     fmt.Printf("%5s %s\n", "-", testing.Benchmark(benchmarkMinus).String())
     fmt.Printf("%5s %s\n", "*", testing.Benchmark(benchmarkProduct).String())
     fmt.Printf("%5s %s\n", "/", testing.Benchmark(benchmarkDivide).String())
     fmt.Printf("%5s %s\n", "if", testing.Benchmark(benchmarkIf).String())
+    fmt.Printf("%5s %s\n", "print", testing.Benchmark(benchmarkPrint).String())
+    fmt.Printf("%5s %s\n", "go", testing.Benchmark(benchmarkGo).String())
+}
+
+func benchmarkPrint(b *testing.B) {
+    for i:=0; i<b.N; i++ {
+        print("")
+    }
+}
+
+func benchmarkGo(b *testing.B) {
+    for i:=0; i<b.N; i++ {
+        go func() {
+        }()
+    }
+}
+
+func benchmarkEmptyLoop(b *testing.B) {
+    for i:=0; i<b.N; i++ {
+    }
 }
 
 func benchmarkAdd(b *testing.B) {
