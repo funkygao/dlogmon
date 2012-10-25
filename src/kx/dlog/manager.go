@@ -154,13 +154,18 @@ func (this *Manager) Submit() (err error) {
     // collect all workers output
     go this.collectWorkers(chMap, chWorker)
 
+    // launch workers in chunk
+    go this.launchWorkers(chMap, chWorker)
+
+    return
+}
+
+func (this Manager) launchWorkers(chMap chan<- interface{}, chWorker chan<- WorkerResult) {
     this.Println("starting workers...")
     for _, worker := range this.workers {
         go worker.SafeRun(this.chProgress, chMap, chWorker)
     }
     this.Println("all workers started")
-
-    return
 }
 
 // Wait for all the dlog goroutines finish and collect final result
