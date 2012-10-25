@@ -36,6 +36,8 @@ func NewManager(option *Option) *Manager {
     this.option = option
     this.lock = new(sync.Mutex)
 
+    this.Println("manager created")
+
     return this
 }
 
@@ -65,21 +67,6 @@ func (this Manager) totalLines() (total int) {
     return
 }
 
-// Are all dlog workers finished?
-func (this *Manager) workersAllDone() bool {
-    if !this.workersStarted {
-        return false
-    }
-
-    for _, w := range this.workers {
-        if w.Running() {
-            return false
-        }
-    }
-
-    return true
-}
-
 // How many dlog files are being and to be analyzed
 func (this *Manager) FilesCount() int {
     return len(this.option.files)
@@ -88,6 +75,11 @@ func (this *Manager) FilesCount() int {
 // Altogether how many raw lines parsed
 func (this Manager) RawLines() int {
     return this.rawLines
+}
+
+// Get the global mutex object
+func (this Manager) GetLock() *sync.Mutex {
+    return this.lock
 }
 
 // Uock the global mutex
@@ -120,6 +112,8 @@ func (this *Manager) newWorkers() {
             }
         }
     }
+
+    this.Println("all worker instances created")
 }
 
 // Submit the job and start the job
@@ -136,9 +130,17 @@ func (this *Manager) Submit() (err error) {
         }
     }()
 
+    this.Println("submitted job accepted")
+
+    // create channels first
+    chMap, chWorker := make(chan interface{}, this.workersCount()), make(chan WorkerResult, this.workersCount())
+    // the barrier
+    this.chTotal = make(chan TotalResult)
+
     // create workers first
     this.newWorkers()
 
+    // TODO
     go this.trapSignal()
 
     if this.ticker != nil {
@@ -146,36 +148,38 @@ func (this *Manager) Submit() (err error) {
     }
 
     if this.option.progress {
-        this.chProgress = make(chan int)
+        this.chProgress = make(chan int, PROGRESS_CHAN_BUF)
         go this.showProgress()
     }
-
-    chMap, chWorker := make(chan interface{}, this.workersCount()), make(chan WorkerResult, this.workersCount())
-    // the barrier
-    this.chTotal = make(chan TotalResult)
 
     // collect all workers output
     go this.collectWorkers(chMap, chWorker)
 
     this.Println("starting workers...")
-
-    // run each dlog in a goroutine
     for _, worker := range this.workers {
         go worker.SafeRun(this.chProgress, chMap, chWorker)
     }
-
     this.Println("all workers started")
+
     this.workersStarted = true
     return
 }
 
 // Wait for all the dlog goroutines finish and collect final result
+// Must run after collectWorkers() finished
 func (this *Manager) WaitForCompletion() {
     defer T.Un(T.Trace(""))
 
+    if this.chTotal == nil {
+        panic("chTotal is nil")
+    }
+
     select {
-    case r := <-this.chTotal:
-        this.Println("got the summary")
+    case r, ok := <-this.chTotal:
+        if !ok {
+            panic("chTotal unkown error")
+        }
+
         this.rawLines, this.validLines = r.RawLines, r.ValidLines
     case <-time.After(time.Hour * 10):
         // timeout 10 hours? just demo useage of timeout
@@ -187,7 +191,7 @@ func (this *Manager) WaitForCompletion() {
         close(this.chProgress)
     }
 
-    this.Println("manager ready to finish")
+    this.Println("got workers summary, ready to finish")
 }
 
 // Collect worker's output
@@ -195,13 +199,15 @@ func (this *Manager) WaitForCompletion() {
 func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan WorkerResult) {
     defer T.Un(T.Trace(""))
 
-    this.Println(T.CallerFuncName(1), "started")
+    this.Println("collectWorkers started")
 
     transFromMapper := mr.NewTransformData()
 
     var rawLines, validLines int
+    const barrierDone = 1 << 2
+    var barrier int = 1
     for {
-        if this.workersAllDone() {
+        if barrier == barrierDone {
             break
         }
 
@@ -212,6 +218,7 @@ func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan Wo
                 this.Fatal("worker chan closed")
                 break
             }
+            barrier = barrier << 1
             rawLines += w.RawLines
             validLines += w.ValidLines
 
@@ -224,30 +231,36 @@ func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan Wo
             for k, v := range m.(mr.TransformData) {
                 transFromMapper.AppendSlice(k, v)
             }
+            barrier = barrier << 1
         }
 
         runtime.Gosched()
     }
 
+    this.Println("all workers collected, next to merge and reduce...")
+
     // reduce the merged result
     // reduce cannot start until all the mappers have finished
     worker := this.getOneWorker()
     var r mr.ReduceResult = worker.Reduce(this.merge(worker.Name(), transFromMapper))
+    if this.option.progress {
+        this.showProgressComplete()
+    }
     this.exportToDb(worker.Name(), r)
 
     // all workers done, so close the channels
+    this.Println("close channels")
     close(chInMap)
     close(chInWorker)
 
+    // WaitForCompletion will wait for this
     this.chTotal <- newTotalResult(rawLines, validLines)
-
-    this.Println(T.CallerFuncName(1), "all workers collected")
 }
 
 func (this Manager) merge(name string, t mr.TransformData) (r mr.ReduceData) {
     defer T.Un(T.Trace(""))
 
-    this.Println(name, "merge")
+    this.Println(name, "start to merge...")
 
     // init the ReduceData
     tagTypes := t.TagTypes()
@@ -266,7 +279,6 @@ func (this Manager) exportToDb(name string, r mr.ReduceResult) {
     defer T.Un(T.Trace(""))
 
     this.Println(name, "export reduce result to db")
-
     db.ImportResult(name, r)
 }
 
@@ -288,6 +300,13 @@ func (this Manager) showProgress() {
         lines += n
         p.ShowProgress(lines)
     }
+    println()
+}
+
+func (this Manager) showProgressComplete() {
+    total := this.totalLines()
+    p := progress.New(total)
+    p.ShowProgress(total)
 }
 
 func (this Manager) Shutdown() {

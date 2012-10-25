@@ -25,11 +25,6 @@ func newWorkerResult(rawLines, validLines int) WorkerResult {
     return WorkerResult{rawLines, validLines}
 }
 
-// Is this dlog worker running?
-func (this *Worker) Running() bool {
-    return this.running
-}
-
 // How many lines in this worker file
 // TODO accurate line count instead of const
 func (this Worker) TotalLines() int {
@@ -76,8 +71,6 @@ func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- interface{
 }
 
 func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- interface{}, chOutWorker chan<- WorkerResult) {
-    this.running = true
-
     // invoke transform goroutine to transform k=>v into k=>[]v
     tranResult := make(chan mr.TransformData)
     tranIn := make(chan interface{})
@@ -137,8 +130,6 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- interface{}, c
 
     // output the transform result
     chOutMap <- r
-
-    this.running = false
 }
 
 func (this *Worker) transform(in <-chan interface{}, out chan<- mr.TransformData) {

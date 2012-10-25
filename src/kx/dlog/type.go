@@ -26,7 +26,6 @@ type LineCounter interface {
 type IWorker interface {
     Namer // each kind of worker has a uniq name
     SafeRun(chan<- int, chan<- interface{}, chan<- WorkerResult)
-    Running() bool
     Combiner() mr.CombinerFunc
     LineCounter
     DlogParser
@@ -37,7 +36,6 @@ type IWorker interface {
 // For 1 dlog file worker
 type Worker struct {
     name      string
-    running   bool
     filename  string // dlog filename
     mapReader *bufio.Reader
     mapWriter *bufio.Writer
