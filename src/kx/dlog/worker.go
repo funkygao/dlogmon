@@ -71,6 +71,10 @@ func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- interface{
     this.run(chOutProgress, chOutMap, chOutWorker)
 }
 
+// 每个worker向chan写入的次数：
+// chOutProgress: N
+// chOutMap: 1
+// chOutWorker: 1
 func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- interface{}, chOutWorker chan<- WorkerResult) {
     // invoke transform goroutine to transform k=>v into k=>[]v
     tranResult := make(chan mr.TransformData)

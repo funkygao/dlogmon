@@ -207,22 +207,24 @@ func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan Wo
 
     transFromMapper := mr.NewTransformData()
 
-    var rawLines, validLines int
-    const barrierDone = 1 << 2
-    var barrier int = 1
+    var (
+        rawLines, validLines int
+        doneWorkers int
+        allDone int = 2 * this.workersCount()
+    )
     for {
-        if barrier == barrierDone {
+        if doneWorkers == allDone {
             break
         }
 
         select {
-        case w, ok := <-chInWorker:
+        case w, ok := <-chInWorker: // each worker send 1 msg to this chan
             if !ok {
                 // this can never happens, worker can't close this chan
                 this.Fatal("worker chan closed")
                 break
             }
-            barrier = barrier << 1
+            doneWorkers ++
             rawLines += w.RawLines
             validLines += w.ValidLines
 
@@ -235,7 +237,7 @@ func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan Wo
             for k, v := range m.(mr.TransformData) {
                 transFromMapper.AppendSlice(k, v)
             }
-            barrier = barrier << 1
+            doneWorkers ++
         }
 
         runtime.Gosched()
