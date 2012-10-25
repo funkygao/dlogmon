@@ -67,6 +67,7 @@ type TotalResult struct {
 // Manager(coordinator) of all the dlog goroutines
 type Manager struct {
     rawLines, validLines int
+    doneWorkers          int
     option               *Option
     lock                 *sync.Mutex
     ticker               *time.Ticker

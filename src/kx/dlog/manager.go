@@ -162,7 +162,13 @@ func (this *Manager) Submit() (err error) {
 
 func (this Manager) launchWorkers(chMap chan<- interface{}, chWorker chan<- WorkerResult) {
     this.Println("starting workers...")
-    for _, worker := range this.workers {
+    for i, worker := range this.workers {
+        if this.option.Nworkers > 0 {
+            running := i - this.doneWorkers // running workers count
+            if running > this.option.Nworkers {
+                runtime.Gosched()
+            }
+        }
         go worker.SafeRun(this.chProgress, chMap, chWorker)
     }
     this.Println("all workers started")
@@ -225,6 +231,7 @@ func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan Wo
                 break
             }
             doneWorkers ++
+            this.doneWorkers ++
             rawLines += w.RawLines
             validLines += w.ValidLines
 
