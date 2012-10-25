@@ -64,8 +64,6 @@ func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- interface{
         }
     }()
 
-    this.Println(this.BaseName(), this.name, "start scanning...")
-
     if this.manager.option.debug {
         fmt.Println(this)
     }
