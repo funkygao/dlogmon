@@ -44,7 +44,7 @@ type Worker struct {
     *log.Logger
     manager  *Manager
     combiner mr.CombinerFunc // can be nil
-    executor IWorker         // runtime dispatch
+    self IWorker         // runtime dispatch
 }
 
 // AMF_SLOW tag analyzer

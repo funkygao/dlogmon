@@ -109,14 +109,14 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- interface{}, c
             chOutProgress <- PROGRESS_LINES_STEP
         }
 
-        if !this.executor.IsLineValid(line) {
+        if !this.self.IsLineValid(line) {
             continue
         }
 
         validLines++
 
         // run map for this line
-        this.executor.Map(line, tranIn)
+        this.self.Map(line, tranIn)
     }
 
     chOutWorker <- newWorkerResult(rawLines, validLines)
@@ -128,10 +128,10 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- interface{}, c
     var r mr.TransformData = <-tranResult
     this.Println(this.BaseName(), this.name, "transformed")
 
-    if this.executor.Combiner() != nil {
+    if this.self.Combiner() != nil {
         // run combiner
         for k, v := range r {
-            r[k] = []float64{this.executor.Combiner()(v)}
+            r[k] = []float64{this.self.Combiner()(v)}
         }
 
         this.Println(this.BaseName(), this.name, "combined")

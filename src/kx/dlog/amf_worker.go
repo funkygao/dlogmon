@@ -22,7 +22,7 @@ func NewAmfWorker(manager *Manager, name, filename string) IWorker {
     this.name = name
     this.filename = filename
     this.manager = manager
-    this.executor = this
+    this.self = this
 
     // notice how to access embedded types
     this.Logger = this.manager.Logger
