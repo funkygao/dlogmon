@@ -100,8 +100,8 @@ func (this Manager) ValidLines() int {
 func (this *Manager) newWorkers() {
     var worker IWorker
     this.workers = make([]IWorker, 0)
-    for _, file := range this.option.files {
-        worker = workerConstructors[this.option.Kind()](this, this.option.Kind(), file)
+    for seq, file := range this.option.files {
+        worker = workerConstructors[this.option.Kind()](this, this.option.Kind(), file, uint16(seq+1))
         this.workers = append(this.workers, worker)
 
         // type assertion
@@ -252,7 +252,7 @@ func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan Wo
     this.exportToDb(worker.Name(), r)
 
     // all workers done, so close the channels
-    this.Println("close channels")
+    this.Println("closing channels")
     close(chInMap)
     close(chInWorker)
 

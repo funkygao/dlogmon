@@ -85,7 +85,7 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- interface{}, c
     input.Open()
     defer input.Close()
 
-    this.Println(this.BaseName(), this.name, LZOP_CMD, "exec opened")
+    this.Printf("%s worker[%d] %s opened %s\n", this.name, this.seq, LZOP_CMD, this.BaseName())
 
     inputReader := input.Reader()
     var rawLines, validLines int
@@ -116,13 +116,13 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- interface{}, c
     }
 
     chOutWorker <- newWorkerResult(rawLines, validLines)
-    this.Printf("%s %s lines parsed: %d/%d\n", this.BaseName(), this.name, validLines, rawLines)
+    this.Printf("%s worker[%d] %s parsed: %d/%d\n", this.name, this.seq, this.BaseName(), validLines, rawLines)
 
     // transform feed done, must close before get data from tranResult
     close(tranIn)
 
     var r mr.TransformData = <-tranResult
-    this.Println(this.BaseName(), this.name, "transformed")
+    this.Printf("%s worker[%d] %s transformed\n", this.name, this.seq, this.BaseName())
 
     if this.self.Combiner() != nil {
         // run combiner

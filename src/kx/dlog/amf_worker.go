@@ -6,7 +6,6 @@ import (
     "kx/stats"
     T "kx/trace"
     "strings"
-    "sync"
 )
 
 // Printable amfRequest 
@@ -16,12 +15,13 @@ func (this *amfRequest) String() string {
 }
 
 // Constructor of AmfWorker
-func NewAmfWorker(manager *Manager, name, filename string) IWorker {
+func NewAmfWorker(manager *Manager, name, filename string, seq uint16) IWorker {
     defer T.Un(T.Trace(""))
 
     this := new(AmfWorker)
     this.name = name
     this.filename = filename
+    this.seq = seq
     this.manager = manager
     this.self = this
 
@@ -31,10 +31,7 @@ func NewAmfWorker(manager *Manager, name, filename string) IWorker {
     // set the combiner
     //    this.combiner = stats.StatsSum
 
-    var once sync.Once
-    once.Do(func() {
-        this.Println(this.name, "worker created")
-    })
+    this.Printf("%s worker[%d] created\n", this.name, this.seq)
 
     return this
 }

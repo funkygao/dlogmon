@@ -36,6 +36,7 @@ type IWorker interface {
 // For 1 dlog file worker
 type Worker struct {
     name      string
+    seq       uint16 // sequence number
     filename  string // dlog filename
     mapReader *bufio.Reader
     mapWriter *bufio.Writer
@@ -51,7 +52,7 @@ type AmfWorker struct {
 }
 
 // Worker constructor signature
-type WorkerConstructor func(*Manager, string, string) IWorker
+type WorkerConstructor func(*Manager, string, string, uint16) IWorker
 
 // Result of a worker
 type WorkerResult struct {
