@@ -6,6 +6,7 @@ import (
     "kx/stats"
     T "kx/trace"
     "strings"
+    "sync"
 )
 
 // Printable amfRequest 
@@ -29,6 +30,11 @@ func NewAmfWorker(manager *Manager, name, filename string) IWorker {
 
     // set the combiner
     //    this.combiner = stats.StatsSum
+
+    var once sync.Once
+    once.Do(func() {
+        this.Println(this.name, "worker created")
+    })
 
     return this
 }
