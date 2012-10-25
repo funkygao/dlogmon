@@ -170,8 +170,9 @@ func (this *Manager) Submit() (err error) {
 func (this *Manager) WaitForCompletion() {
     defer T.Un(T.Trace(""))
 
-    if this.chTotal == nil {
-        panic("chTotal is nil")
+    // 也可能我走的太快，得等他们先把chTotal创建好之后再开始
+    for this.chTotal == nil {
+        runtime.Gosched()
     }
 
     select {
