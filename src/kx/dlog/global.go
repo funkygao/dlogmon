@@ -7,7 +7,8 @@ import (
 
 var (
     workerConstructors = map[string]WorkerConstructor{
-        "amf": NewAmfWorker}
+        "amf": NewAmfWorker,
+        "noop": NewNoopWorker}
 
     amfLineValidatorRegexes = [...][]string{
         {"AMF_SLOW", "PHP.CDlog"}, // must exists

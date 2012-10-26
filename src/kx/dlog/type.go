@@ -51,6 +51,10 @@ type AmfWorker struct {
     Worker
 }
 
+type NoopWorker struct {
+    Worker
+}
+
 // Worker constructor signature
 type WorkerConstructor func(*Manager, string, string, uint16) IWorker
 
