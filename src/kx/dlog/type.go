@@ -56,6 +56,11 @@ type NoopWorker struct {
     Worker
 }
 
+// A normal file worker
+type FileWorker struct {
+    Worker
+}
+
 // Worker constructor signature
 type WorkerConstructor func(*Manager, string, string, uint16) IWorker
 
@@ -96,6 +101,7 @@ type Option struct {
     trace                  bool
     verbose                bool
     version                bool
+    filemode               bool
     progress               bool
     Nworkers               uint8 // how many concurrent workers(goroutines) permitted
     tick                   int // in ms

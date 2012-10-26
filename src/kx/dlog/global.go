@@ -8,6 +8,7 @@ import (
 var (
     workerConstructors = map[string]WorkerConstructor{
         "amf": NewAmfWorker,
+        "file": NewFileWorker,
         "noop": NewNoopWorker}
 
     amfLineValidatorRegexes = [...][]string{

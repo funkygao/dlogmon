@@ -91,11 +91,16 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, 
     chKv := make(chan mr.KeyValue)
     go this.transform(chKv, chKvs)
 
-    input := stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
+    var input *stream.Stream
+    if this.manager.option.filemode {
+        input = stream.NewStream(this.filename)
+    } else {
+        input = stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
+    }
     input.Open()
     defer input.Close()
 
-    this.Printf("%s worker[%d] %s opened %s\n", this.name, this.seq, LZOP_CMD, this.BaseName())
+    this.Printf("%s worker[%d] opened %s\n", this.name, this.seq, this.BaseName())
 
     var rawLines, validLines int
     for {

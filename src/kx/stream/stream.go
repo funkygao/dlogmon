@@ -4,24 +4,31 @@ package stream
 import (
     "bufio"
     "os/exec"
+    "os"
 )
 
-// Stream data
-type Stream struct {
-    name   string   // command name
-    arg    []string // command arguments
-    cmd    *exec.Cmd
-    reader *bufio.Reader
-    writer *bufio.Writer
-}
-
-// constructor
+// Constructor factory
 func NewStream(name string, arg ...string) *Stream {
     return &Stream{name: name, arg: arg}
 }
 
+func (this *Stream) plainFileMode() bool {
+    return len(this.arg) == 0
+}
+
 // open stream
 func (this *Stream) Open() {
+    if this.plainFileMode() {
+        // direct file open instead of exec pipe stream
+        file, err := os.Open(this.name)
+        if err != nil {
+            panic(this.name + " not exist")
+        }
+
+        this.reader = bufio.NewReader(file)
+        return
+    }
+
     this.cmd = exec.Command(this.name, this.arg...)
 
     // stdout pipe
@@ -58,6 +65,10 @@ func (this Stream) Writer() *bufio.Writer {
 
 // close the stream
 func (this *Stream) Close() {
+    if this.plainFileMode() {
+        return
+    }
+
     if err := this.cmd.Wait(); err != nil {
         panic(err)
     }

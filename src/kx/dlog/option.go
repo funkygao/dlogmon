@@ -59,6 +59,7 @@ func ParseFlags() *Option {
     reducer := flag.String("reducer", "", "let a runnable script be the reducer")
     conf := flag.String("conf", "conf/dlogmon.ini", "conf file path")
     tick := flag.Int("tick", 0, "tick in ms")
+    filemode := flag.Bool("filemode", false, "input is plain text file(s)")
     trace := flag.Bool("t", false, "trace each func call")
 
     flag.Parse()
@@ -72,6 +73,7 @@ func ParseFlags() *Option {
     option.memprofile = *memprofile
     option.kind = *kind
     option.version = *version
+    option.filemode = *filemode
     option.tick = *tick
     option.Nworkers = uint8(*nworkers)
     option.verbose = *verbose
