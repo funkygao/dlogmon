@@ -124,13 +124,13 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- interface{}, c
     var r mr.TransformData = <-tranResult
     this.Printf("%s worker[%d] %s transformed\n", this.name, this.seq, this.BaseName())
 
+    // after the work has done it's job, run it's combiner as a whole of this worker
     if this.self.Combiner() != nil {
-        // run combiner
         for k, v := range r {
-            r[k] = []float64{this.self.Combiner()(v)}
+            r[k] = []float64{this.self.Combiner()(v)} // [1]float64
         }
 
-        this.Println(this.BaseName(), this.name, "combined")
+        this.Printf("%s worker[%d] %s local combined\n", this.name, this.seq, this.BaseName())
     }
 
     // output the transform result

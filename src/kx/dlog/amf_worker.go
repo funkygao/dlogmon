@@ -74,6 +74,7 @@ func (this *AmfWorker) Map(line string, out chan<- interface{}) {
     d.Set(1, req.uri, 1)
     d.Set(2, req.rid, 1)
 
+    // emit an intermediate data
     out <- d
 }
 

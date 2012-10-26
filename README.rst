@@ -58,3 +58,7 @@ Todo
 - Task abstraction
 
   channel direction in care
+
+- Job abstraction
+
+  it has member Option
