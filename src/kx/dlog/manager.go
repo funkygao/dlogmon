@@ -167,9 +167,12 @@ func (this Manager) launchWorkers(chMap chan<- interface{}, chWorker chan<- Work
             running := i - this.doneWorkers // running workers count
             if running > this.option.Nworkers {
                 runtime.Gosched()
+            } else {
+                go worker.SafeRun(this.chProgress, chMap, chWorker)
             }
+        } else {
+            go worker.SafeRun(this.chProgress, chMap, chWorker)
         }
-        go worker.SafeRun(this.chProgress, chMap, chWorker)
     }
     this.Println("all workers started")
 }

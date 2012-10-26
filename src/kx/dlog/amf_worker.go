@@ -31,8 +31,6 @@ func NewAmfWorker(manager *Manager, name, filename string, seq uint16) IWorker {
     // set the combiner
     //    this.combiner = stats.StatsSum
 
-    this.Printf("%s worker[%d] created\n", this.name, this.seq)
-
     return this
 }
 
