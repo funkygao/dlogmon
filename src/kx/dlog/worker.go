@@ -137,7 +137,7 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- interface{}, c
     // after the work has done it's job, run it's combiner as a whole of this worker
     if this.self.Combiner() != nil {
         for k, v := range r {
-            r[k] = []float64{this.self.Combiner()(v)} // [1]float64
+            r[k] = []interface{}{this.self.Combiner()(convert(v))} // [1]float64
         }
 
         this.Printf("%s worker[%d] %s local combined\n", this.name, this.seq, this.BaseName())

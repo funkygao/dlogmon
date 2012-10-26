@@ -298,7 +298,7 @@ func (this Manager) merge(name string, t mr.TransformData) (r mr.ReduceData) {
 
     // trans -> reduce
     for k, v := range t {
-        tagType, key := mr.GetTagType(k)
+        tagType, key := mr.GetTagType(k.(string))
         r[tagType].AppendSlice(key, v)
     }
 

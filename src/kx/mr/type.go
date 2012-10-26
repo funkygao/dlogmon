@@ -9,10 +9,10 @@ type CombinerFunc func([]float64) float64
 type TagType uint8 
 
 // Mapper raw output format
-type MapData map[string]float64
+type MapData map[interface{}]interface{}
 
 // mapper -> TransformData -> merge -> reduce
-type TransformData map[string][]float64
+type TransformData map[interface{}][]interface{}
 
 // Input of Reducer
 type ReduceData []TransformData

@@ -32,7 +32,7 @@ func NewReduceResult(size int) ReduceResult {
     return r
 }
 
-func getTagByType(t TagType, key string) string {
+func getTagByType(t TagType, key interface{}) string {
     return fmt.Sprintf("%d%s%s", t, KEYTYPE_SEP, key)
 }
 
@@ -49,30 +49,30 @@ func (this MapData) Println() {
     }
 }
 
-func (this MapData) Set(t TagType, key string, val float64) {
+func (this MapData) Set(t TagType, key interface{}, val interface{}) {
     key = getTagByType(t, key)
     this[key] = val
 }
 
-func (this MapData) Get(key string) (val float64, ok bool) {
+func (this MapData) Get(key interface{}) (val interface{}, ok bool) {
     val, ok = this[key]
     return
 }
 
-func (this TransformData) Append(key string, val float64) {
+func (this TransformData) Append(key interface{}, val interface{}) {
     _, ok := this[key]
     if !ok {
-        this[key] = make([]float64, 1)
+        this[key] = make([]interface{}, 1)
         this[key][0] = val
     } else {
         this[key] = append(this[key], val)
     }
 }
 
-func (this TransformData) AppendSlice(key string, val []float64) {
+func (this TransformData) AppendSlice(key interface{}, val []interface{}) {
     _, ok := this[key]
     if !ok {
-        this[key] = make([]float64, 1)
+        this[key] = make([]interface{}, 1)
         this[key] = val
     } else {
         this[key] = append(this[key], val...)
@@ -90,7 +90,7 @@ func (this TransformData) Println() {
 func (this TransformData) TagTypes() (r []TagType) {
     var m = make(map[TagType]bool)
     for k := range this {
-        key, _ := GetTagType(k)
+        key, _ := GetTagType(k.(string))
         m[key] = true
     }
 

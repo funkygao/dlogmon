@@ -5,6 +5,7 @@ import (
     "kx/mr"
     "kx/stats"
     T "kx/trace"
+    "reflect"
     "strings"
 )
 
@@ -23,7 +24,7 @@ func NewAmfWorker(manager *Manager, name, filename string, seq uint16) IWorker {
     this.init(manager, name, filename, seq)
 
     // set the combiner
-    //    this.combiner = stats.StatsSum
+    this.combiner = stats.StatsSum
 
     return this
 }
@@ -64,12 +65,25 @@ func (this *AmfWorker) Map(line string, out chan<- interface{}) {
     req.parseLine(line)
 
     d := mr.NewMapData()
-    d.Set(0, req.class+"."+req.method, 1)
-    d.Set(1, req.uri, 1)
-    d.Set(2, req.rid, 1)
+    d.Set(0, req.class+"."+req.method, 1.0)
+    d.Set(1, req.uri, 10)
+    d.Set(2, req.rid, 1.0)
 
     // emit an intermediate data
     out <- d
+}
+
+// TODO
+func convert(v []interface{}) []float64 {
+    r := make([]float64, 0)
+    for i, _ := range v {
+        d, ok := v[i].(float64)
+        if !ok {
+            fmt.Println("shit", d, ok)
+        }
+        r = append(r, d)
+    }
+    return r
 }
 
 // Reduce
@@ -81,8 +95,10 @@ func (this *AmfWorker) Reduce(in mr.ReduceData) (out mr.ReduceResult) {
     out = mr.NewReduceResult(len(in))
     for tagType, d := range in {
         for k, v := range d {
-            // sum up
-            out[tagType][k] = stats.StatsSum(v)
+            // sum up []float64 for this key
+            x := reflect.TypeOf(v).Elem()
+            fmt.Printf("%#v\n", x)
+            out[tagType][k] = stats.StatsSum(convert(v))
         }
     }
 
