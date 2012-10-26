@@ -21,7 +21,7 @@ func NewNoopWorker(manager *Manager, name, filename string, seq uint16) IWorker 
 }
 
 func (this *NoopWorker) IsLineValid(line string) bool {
-    return true
+    return false
 }
 
 // Extract meta info related to amf from a valid line

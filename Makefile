@@ -47,8 +47,14 @@ clean:
 run:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
+noop:install
+	./bin/dlogmon -k noop -f test/fixture/lz.121015-104410 -d -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
+
 real:install
 	./bin/dlogmon -tick 30000 -progress -n 50
+
+nreal:install
+	./bin/dlogmon -k noop -tick 30000 -progress -n 50
 
 prof:run
 	@go tool pprof ./bin/dlogmon var/cpu.prof
