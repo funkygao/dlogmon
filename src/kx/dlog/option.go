@@ -73,7 +73,7 @@ func ParseFlags() *Option {
     option.kind = *kind
     option.version = *version
     option.tick = *tick
-    option.Nworkers = *nworkers
+    option.Nworkers = uint8(*nworkers)
     option.verbose = *verbose
     option.conf, _ = loadConf(*conf)
     option.trace = *trace

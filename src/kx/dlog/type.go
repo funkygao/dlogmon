@@ -93,7 +93,7 @@ type Option struct {
     verbose                bool
     version                bool
     progress               bool
-    Nworkers               int // how many concurrent workers(goroutines) permitted
+    Nworkers               uint8 // how many concurrent workers(goroutines) permitted
     tick                   int // in ms
     cpuprofile, memprofile string
     mapper                 string

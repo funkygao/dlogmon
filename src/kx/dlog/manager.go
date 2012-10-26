@@ -116,14 +116,14 @@ func (this *Manager) newWorkers() {
 }
 
 func (this *Manager) initRateLimit() chan bool {
-    if this.option.Nworkers == 0 || this.option.Nworkers > this.FilesCount() {
-        this.option.Nworkers = this.FilesCount()
+    if this.option.Nworkers == 0 || int(this.option.Nworkers) > this.FilesCount() {
+        this.option.Nworkers = uint8(this.FilesCount())
     }
 
     chRateLimit := make(chan bool, this.option.Nworkers)
     
     // first let it start Nworkers
-    for i:=0; i<this.option.Nworkers; i++ {
+    for i:=uint8(0); i<this.option.Nworkers; i++ {
         chRateLimit <- true
     }
 
