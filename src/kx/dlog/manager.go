@@ -122,7 +122,7 @@ func (this *Manager) initRateLimit() chan bool {
 
     chRateLimit := make(chan bool, this.option.Nworkers)
     
-    // first let it start Nworkers
+    // first let it start Nworkers without being blocked
     for i:=uint8(0); i<this.option.Nworkers; i++ {
         chRateLimit <- true
     }
@@ -147,7 +147,7 @@ func (this *Manager) Submit() (err error) {
     this.Println("submitted job accepted")
 
     // each worker send map(combined) result to this chan
-    chMap := make(chan interface{}, this.workersCount())
+    chMap := make(chan mr.KeyValues, this.workersCount())
     // each worker send info of analyzed lines to this chan
     chWorker := make(chan WorkerResult, this.workersCount())
     // the barrier of sum up of all WorkerResult
@@ -179,11 +179,12 @@ func (this *Manager) Submit() (err error) {
     return
 }
 
-func (this Manager) launchWorkers(chRateLimit <-chan bool, chMap chan<- interface{}, chWorker chan<- WorkerResult) {
+func (this Manager) launchWorkers(chRateLimit <-chan bool, chMap chan<- mr.KeyValues, chWorker chan<- WorkerResult) {
     this.Println("starting workers...")
 
     for seq:=0; seq<this.workersCount(); seq++ {
-        <- chRateLimit
+        <- chRateLimit // 放闸
+
         worker := this.workers[seq]
         go worker.SafeRun(this.chProgress, chMap, chWorker)
     }
@@ -208,8 +209,8 @@ func (this *Manager) WaitForCompletion() {
         }
 
         this.rawLines, this.validLines = r.RawLines, r.ValidLines
-    case <-time.After(time.Hour * 10):
-        // timeout 10 hours? just demo useage of timeout
+    case <-time.After(time.Hour):
+        // timeout 1 hour? just demo useage of timeout
         break
     }
 
@@ -223,18 +224,19 @@ func (this *Manager) WaitForCompletion() {
 
 // Collect worker's output
 // including map data and worker summary
-func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan interface{}, chInWorker chan WorkerResult) {
+func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyValues, chInWorker chan WorkerResult) {
     defer T.Un(T.Trace(""))
 
     this.Println("collectWorkers started")
 
-    transFromMapper := mr.NewTransformData()
+    kvs := mr.NewKeyValues()
 
     var (
         rawLines, validLines int
         doneWorkers int
         allDone int = 2 * this.workersCount()
     )
+
     for {
         if doneWorkers == allDone {
             break
@@ -247,8 +249,8 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan interfac
                 this.Fatal("worker chan closed")
                 break
             }
+
             doneWorkers ++
-            this.doneWorkers ++
             rawLines += w.RawLines
             validLines += w.ValidLines
 
@@ -260,8 +262,9 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan interfac
                 this.Fatal("line chan closed")
                 break
             }
-            for k, v := range m.(mr.TransformData) {
-                transFromMapper.AppendSlice(k, v)
+
+            for k, v := range m {
+                kvs.AppendSlice(k, v)
             }
             doneWorkers ++
         }
@@ -271,45 +274,27 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan interfac
 
     this.Println("all workers collected, next to merge and reduce...")
 
-    // reduce the merged result
-    // reduce cannot start until all the mappers have finished
-    worker := this.getOneWorker()
-    var r mr.ReduceResult = worker.Reduce(this.merge(worker.Name(), transFromMapper))
-    this.exportToDb(worker.Name(), r)
-
     // all workers done, so close the channels
     this.Println("closing channels")
     close(chInMap)
     close(chInWorker)
     close(chRateLimit)
 
+    // reduce the merged result
+    // reduce cannot start until all the mappers have finished
+    worker := this.getOneWorker()
+    var kv mr.KeyValue = worker.Reduce(kvs)
+    this.exportToDb(worker.Name(), kv)
+
     // WaitForCompletion will wait for this
     this.chTotal <- newTotalResult(rawLines, validLines)
 }
 
-func (this Manager) merge(name string, t mr.TransformData) (r mr.ReduceData) {
-    defer T.Un(T.Trace(""))
-
-    this.Printf("start to merge %s...\n", name)
-
-    // init the ReduceData
-    tagTypes := t.TagTypes()
-    r = mr.NewReduceData(len(tagTypes))
-
-    // trans -> reduce
-    for k, v := range t {
-        tagType, key := mr.GetTagType(k.(string))
-        r[tagType].AppendSlice(key, v)
-    }
-
-    return
-}
-
-func (this Manager) exportToDb(name string, r mr.ReduceResult) {
+func (this Manager) exportToDb(name string, kv mr.KeyValue) {
     defer T.Un(T.Trace(""))
 
     this.Printf("export %s reduce result to db\n", name)
-    db.ImportResult(name, r)
+    db.ImportResult(name, kv)
 }
 
 func (this Manager) runTicker() {

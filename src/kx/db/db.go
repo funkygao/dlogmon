@@ -36,6 +36,6 @@ func Initialize(engine, file string) {
     */
 }
 
-func ImportResult(name string, r mr.ReduceResult) {
-    r.DumpToSql()
+func ImportResult(name string, kv mr.KeyValue) {
+    kv.DumpToSql()
 }

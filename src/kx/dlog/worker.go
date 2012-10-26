@@ -60,7 +60,7 @@ func (this *Worker) initMapper() *stream.Stream {
 
 // Scan each line of a dlog file and apply validator and parser.
 // Invoke mapper if neccessary
-func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- interface{}, chOutWorker chan<- WorkerResult) {
+func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, chOutWorker chan<- WorkerResult) {
     defer T.Un(T.Trace(""))
 
     // recover to make this worker safe for other workers
@@ -85,11 +85,11 @@ func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- interface{
 // chOutProgress: N
 // chOutMap: 1
 // chOutWorker: 1
-func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- interface{}, chOutWorker chan<- WorkerResult) {
+func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, chOutWorker chan<- WorkerResult) {
     // invoke transform goroutine to transform k=>v into k=>[]v
-    tranResult := make(chan mr.TransformData)
-    tranIn := make(chan interface{})
-    go this.transform(tranIn, tranResult)
+    chKvs := make(chan mr.KeyValues)
+    chKv := make(chan mr.KeyValue)
+    go this.transform(chKv, chKvs)
 
     input := stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
     input.Open()
@@ -97,10 +97,9 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- interface{}, c
 
     this.Printf("%s worker[%d] %s opened %s\n", this.name, this.seq, LZOP_CMD, this.BaseName())
 
-    inputReader := input.Reader()
     var rawLines, validLines int
     for {
-        line, err := inputReader.ReadString(EOL)
+        line, err := input.Reader().ReadString(EOL)
         if err != nil {
             if err != io.EOF {
                 log.Fatal(err)
@@ -122,40 +121,40 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- interface{}, c
         validLines++
 
         // run map for this line
-        this.self.Map(line, tranIn)
+        this.self.Map(line, chKv)
     }
 
     chOutWorker <- newWorkerResult(rawLines, validLines)
     this.Printf("%s worker[%d] %s parsed: %d/%d\n", this.name, this.seq, this.BaseName(), validLines, rawLines)
 
     // transform feed done, must close before get data from tranResult
-    close(tranIn)
+    close(chKv)
 
-    var r mr.TransformData = <-tranResult
+    var kvs mr.KeyValues = <- chKvs
     this.Printf("%s worker[%d] %s transformed\n", this.name, this.seq, this.BaseName())
 
     // after the work has done it's job, run it's combiner as a whole of this worker
     if this.self.Combiner() != nil {
-        for k, v := range r {
-            r[k] = []interface{}{this.self.Combiner()(convert(v))} // [1]float64
+        for k, v := range kvs {
+            kvs[k] = []interface{}{this.self.Combiner()(convertAnySliceToFloat(v))} // [1]float64
         }
 
         this.Printf("%s worker[%d] %s local combined\n", this.name, this.seq, this.BaseName())
     }
 
     // output the transform result
-    chOutMap <- r
+    chOutMap <- kvs
 }
 
-func (this *Worker) transform(in <-chan interface{}, out chan<- mr.TransformData) {
-    r := mr.NewTransformData()
+func (this *Worker) transform(in <-chan mr.KeyValue, out chan<- mr.KeyValues) {
+    kvs := mr.NewKeyValues()
     for x := range in {
-        for k, v := range x.(mr.MapData) {
-            r.Append(k, v)
+        for k, v := range x {
+            kvs.Append(k, v)
         }
     }
 
-    out <- r
+    out <- kvs
 }
 
 // My combiner func pointer

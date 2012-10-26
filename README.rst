@@ -62,3 +62,5 @@ Todo
 - Job abstraction
 
   it has member Option
+
+- input stream other than lzop

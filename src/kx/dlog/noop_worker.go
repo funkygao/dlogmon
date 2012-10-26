@@ -21,17 +21,15 @@ func (this *NoopWorker) IsLineValid(line string) bool {
 }
 
 // Extract meta info related to amf from a valid line
-func (this *NoopWorker) Map(line string, out chan<- interface{}) {
-    d := mr.NewMapData()
-
-    out <- d
+func (this *NoopWorker) Map(line string, out chan<- mr.KeyValue) {
+    out <- mr.NewKeyValue()
 }
 
 // Reduce
-func (this *NoopWorker) Reduce(in mr.ReduceData) mr.ReduceResult {
+func (this *NoopWorker) Reduce(in mr.KeyValues) mr.KeyValue {
     defer T.Un(T.Trace(""))
 
     this.Println(this.name, "start to reduce...")
 
-    return mr.NewReduceResult(len(in))
+    return mr.NewKeyValue()
 }

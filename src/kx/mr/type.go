@@ -1,31 +1,21 @@
 package mr
 
-const KEYTYPE_SEP = ":"
-
 // Local aggregator
+// TODO combiner is not just a func, it's a mini reducer
 type CombinerFunc func([]float64) float64
 
-// TODO tag
-type TagType uint8 
+// key->value pair with key and value being any type
+type KeyValue map[interface{}] interface{}
 
-// Mapper raw output format
-type MapData map[interface{}]interface{}
+// key->[]value pair with key and value being any type
+type KeyValues map[interface{}] []interface{}
 
-// mapper -> TransformData -> merge -> reduce
-type TransformData map[interface{}][]interface{}
-
-// Input of Reducer
-type ReduceData []TransformData
-
-// Output of Reducer
-type ReduceResult []MapData
-
-// map
+// Mapper
 type Mapper interface {
-    Map(string, chan<- interface{})
+    Map(string, chan<- KeyValue)
 }
 
-// reduce
+// Reducer
 type Reducer interface {
-    Reduce(ReduceData) ReduceResult
+    Reduce(KeyValues) KeyValue
 }

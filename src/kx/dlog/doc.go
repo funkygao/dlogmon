@@ -31,14 +31,14 @@ Data flow:
       \------------------->run---------------->map
                                                 |
                                                 V
-              TransformData          MapData    |
+                 KeValues           KeyValue    |
  collectWorkers<---------transform<------------/ 
       |                                          
       V                                          
-      |     ReduceData                           
-    merge------->---------------------------->reduce
+      |     KeyValues
+       --------->---------------------------->reduce
                                                 |
-                                 ReduceResult   |
+                                     KeyValue   |
    exportDB<--------------------------<--------/ 
                                                
 */

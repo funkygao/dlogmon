@@ -25,7 +25,7 @@ type LineCounter interface {
 // Worker struct method signatures
 type IWorker interface {
     Namer // each kind of worker has a uniq name
-    SafeRun(chan<- int, chan<- interface{}, chan<- WorkerResult)
+    SafeRun(chan<- int, chan<- mr.KeyValues, chan<- WorkerResult)
     Combiner() mr.CombinerFunc
     LineCounter
     DlogParser
@@ -72,7 +72,6 @@ type TotalResult struct {
 // Manager(coordinator) of all the dlog goroutines
 type Manager struct {
     rawLines, validLines int
-    doneWorkers          int
     option               *Option
     lock                 *sync.Mutex
     ticker               *time.Ticker

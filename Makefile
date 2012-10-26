@@ -2,6 +2,7 @@ PKGS = kx/dlogmon \
 	   kx/db \
 	   kx/dlog \
 	   kx/logger \
+	   kx/mr \
 	   kx/progress \
 	   kx/sb \
 	   kx/size \

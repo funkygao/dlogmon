@@ -16,7 +16,7 @@ MapReduce in hadoop:
 
     Extra roles:
         partitioner, which controls the assignment of words to reducers.
-        combiner
+        combiner, which is a mini reducer whose input hte output of mapper
 
 
 
