@@ -51,6 +51,7 @@ type AmfWorker struct {
     Worker
 }
 
+// A no operation worker, just scan lines without parsing
 type NoopWorker struct {
     Worker
 }
