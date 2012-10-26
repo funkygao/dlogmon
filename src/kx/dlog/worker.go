@@ -32,6 +32,16 @@ func (this Worker) TotalLines() int {
     return LINES_PER_FILE
 }
 
+// Common for worker constructors
+func (this *Worker) init(manager *Manager, name, filename string, seq uint16) {
+    this.manager = manager
+    this.name = name
+    this.filename = filename
+    this.seq = seq
+
+    this.Logger = this.manager.Logger
+}
+
 func (this *Worker) initMapper() *stream.Stream {
     defer T.Un(T.Trace(""))
 

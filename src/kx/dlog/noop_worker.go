@@ -10,12 +10,8 @@ func NewNoopWorker(manager *Manager, name, filename string, seq uint16) IWorker 
     defer T.Un(T.Trace(""))
 
     this := new(NoopWorker)
-    this.name = name
-    this.filename = filename
-    this.seq = seq
-    this.manager = manager
     this.self = this
-    this.Logger = this.manager.Logger
+    this.init(manager, name, filename, seq)
 
     return this
 }

@@ -19,14 +19,8 @@ func NewAmfWorker(manager *Manager, name, filename string, seq uint16) IWorker {
     defer T.Un(T.Trace(""))
 
     this := new(AmfWorker)
-    this.name = name
-    this.filename = filename
-    this.seq = seq
-    this.manager = manager
-    this.self = this
-
-    // notice how to access embedded types
-    this.Logger = this.manager.Logger
+    this.self = this // don't forget this
+    this.init(manager, name, filename, seq)
 
     // set the combiner
     //    this.combiner = stats.StatsSum
