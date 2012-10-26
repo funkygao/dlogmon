@@ -47,13 +47,7 @@ Todo
 
 - distributed
 
-- chunk size
-
-  control cpu load
-
 - signal skipped not work
-
-- timespan in db
 
 - external map reduce stream
 
@@ -64,5 +58,3 @@ Todo
 - Task abstraction
 
   channel direction in care
-
-- task rate limit
