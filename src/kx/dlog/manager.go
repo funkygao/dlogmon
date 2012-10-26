@@ -115,6 +115,21 @@ func (this *Manager) newWorkers() {
     this.Println("all worker instances created")
 }
 
+func (this *Manager) initRateLimit() chan bool {
+    if this.option.Nworkers == 0 || this.option.Nworkers > this.FilesCount() {
+        this.option.Nworkers = this.FilesCount()
+    }
+
+    chRateLimit := make(chan bool, this.option.Nworkers)
+    
+    // first let it start Nworkers
+    for i:=0; i<this.option.Nworkers; i++ {
+        chRateLimit <- true
+    }
+
+    return chRateLimit
+}
+
 // Submit the job and start the job
 func (this *Manager) Submit() (err error) {
     defer T.Un(T.Trace(""))
@@ -131,10 +146,14 @@ func (this *Manager) Submit() (err error) {
 
     this.Println("submitted job accepted")
 
-    // create channels first
-    chMap, chWorker := make(chan interface{}, this.workersCount()), make(chan WorkerResult, this.workersCount())
-    // the barrier
+    // each worker send map(combined) result to this chan
+    chMap := make(chan interface{}, this.workersCount())
+    // each worker send info of analyzed lines to this chan
+    chWorker := make(chan WorkerResult, this.workersCount())
+    // the barrier of sum up of all WorkerResult
     this.chTotal = make(chan TotalResult)
+    // rate limit for the running workers
+    chRateLimit := this.initRateLimit()
 
     // create workers first
     this.newWorkers()
@@ -152,28 +171,23 @@ func (this *Manager) Submit() (err error) {
     }
 
     // collect all workers output
-    go this.collectWorkers(chMap, chWorker)
+    go this.collectWorkers(chRateLimit, chMap, chWorker)
 
     // launch workers in chunk
-    go this.launchWorkers(chMap, chWorker)
+    go this.launchWorkers(chRateLimit, chMap, chWorker)
 
     return
 }
 
-func (this Manager) launchWorkers(chMap chan<- interface{}, chWorker chan<- WorkerResult) {
+func (this Manager) launchWorkers(chRateLimit <-chan bool, chMap chan<- interface{}, chWorker chan<- WorkerResult) {
     this.Println("starting workers...")
-    for i, worker := range this.workers {
-        if this.option.Nworkers > 0 {
-            running := i - this.doneWorkers // running workers count
-            if running > this.option.Nworkers {
-                runtime.Gosched()
-            } else {
-                go worker.SafeRun(this.chProgress, chMap, chWorker)
-            }
-        } else {
-            go worker.SafeRun(this.chProgress, chMap, chWorker)
-        }
+
+    for seq:=0; seq<this.workersCount(); seq++ {
+        <- chRateLimit
+        worker := this.workers[seq]
+        go worker.SafeRun(this.chProgress, chMap, chWorker)
     }
+
     this.Println("all workers started")
 }
 
@@ -209,7 +223,7 @@ func (this *Manager) WaitForCompletion() {
 
 // Collect worker's output
 // including map data and worker summary
-func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan WorkerResult) {
+func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan interface{}, chInWorker chan WorkerResult) {
     defer T.Un(T.Trace(""))
 
     this.Println("collectWorkers started")
@@ -238,6 +252,8 @@ func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan Wo
             rawLines += w.RawLines
             validLines += w.ValidLines
 
+            chRateLimit <- true
+
         case m, ok := <-chInMap:
             if !ok {
                 // this can never happens, worker can't close this chan
@@ -265,6 +281,7 @@ func (this *Manager) collectWorkers(chInMap chan interface{}, chInWorker chan Wo
     this.Println("closing channels")
     close(chInMap)
     close(chInWorker)
+    close(chRateLimit)
 
     // WaitForCompletion will wait for this
     this.chTotal <- newTotalResult(rawLines, validLines)
