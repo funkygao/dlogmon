@@ -1,17 +1,16 @@
 package trace
 
 import (
+    "errors"
     "fmt"
     "kx/size"
+    "reflect"
     "runtime"
     "strings"
     "sync/atomic"
     "sync"
     "time"
 )
-
-// TODO how about any return values?
-type AnyFunc func(args ...interface{})
 
 const (
     DEPTH_CHAR = " "
@@ -82,14 +81,30 @@ func SetLock(l *sync.Mutex) {
 }
 
 // Measure how long it takes to run a func
-func Timeit(f AnyFunc, args ...interface{}) time.Duration {
+func Timeit(fun interface{}, args ...interface{}) (result []reflect.Value, delta time.Duration, err error) {
+    // assertions
+    f := reflect.ValueOf(fun)
+    if f.Kind().String() != "func" {
+        err = errors.New("fun must be a func")
+        return
+    }
+    if len(args) != f.Type().NumIn() {
+        err = errors.New("input arguments not match")
+        return
+    }
+
+    // prepare input arguments
+    in := make([]reflect.Value, len(args))
+    for i, arg := range args {
+        in[i] = reflect.ValueOf(arg)
+    }
+
     start := time.Now()
-
-    f(args...) // call the func
-
+    result = f.Call(in) // call the universal func
     end := time.Now()
-    delta := end.Sub(start)
-    return delta
+
+    delta = end.Sub(start)
+    return
 }
 
 // How much mem allocated
