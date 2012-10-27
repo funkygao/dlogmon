@@ -49,7 +49,7 @@ run:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
 f:install
-	./bin/dlogmon -f Makefile -filemode -d -tick 500 -progress -k file
+	./bin/dlogmon -f README.rst -filemode -d -tick 500 -progress -k file
 
 noop:install
 	./bin/dlogmon -k noop -f test/fixture/lz.121015-104410 -d -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
