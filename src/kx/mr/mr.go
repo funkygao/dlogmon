@@ -5,6 +5,10 @@ import (
     T "kx/trace"
 )
 
+const (
+    PRINT_FMT = "%s %60v %v\n"
+)
+
 // Factory
 func NewKeyValue() KeyValue {
     return make(KeyValue)
@@ -18,18 +22,19 @@ func NewKeyValues() KeyValues {
 // Self printable
 func (this KeyValue) Println() {
     for k, v := range this {
-        fmt.Printf("%s %v %v\n", T.CallerFuncName(1), k, v)
+        fmt.Printf(PRINT_FMT, T.CallerFuncName(1), k, v)
     }
 }
 
 func (this KeyValue) DumpToSql() {
+    println()
     this.Println()
 }
 
 // Self printable
 func (this KeyValues) Println() {
     for k, v := range this {
-        fmt.Printf("%s %v %v\n", T.CallerFuncName(1), k, v)
+        fmt.Printf(PRINT_FMT, T.CallerFuncName(1), k, v)
     }
 }
 
