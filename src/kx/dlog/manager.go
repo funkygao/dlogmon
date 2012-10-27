@@ -298,7 +298,7 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
 func (this Manager) exportToDb(name string, kv mr.KeyValue) {
 	defer T.Un(T.Trace(""))
 
-	this.Printf("export %s reduce result to db\n", name)
+	this.Printf("export %s worker reduce result to db\n", name)
 	db.ImportResult(name, kv)
 }
 
