@@ -64,9 +64,9 @@ func (this *AmfWorker) Map(line string, out chan<- mr.KeyValue) {
     req.parseLine(line)
 
     kv := mr.NewKeyValue()
-    kv[req.class+"."+req.method] = 1.0
-    kv[req.uri] = 1.0
-    kv[req.rid] = 1.0
+    kv[req.class+"."+req.method] = 1
+    kv[req.uri] = 1
+    kv[req.rid] = 1
 
     // emit an intermediate data
     out <- kv
