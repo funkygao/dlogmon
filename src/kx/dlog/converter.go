@@ -1,14 +1,21 @@
 package dlog
 
-// TODO
+// []interface{}.([]float64) is not supported in golang, see FAQ
+// so we need do it ourself
 func convertAnySliceToFloat(v []interface{}) []float64 {
     r := make([]float64, 0)
     for i, _ := range v {
-        d, ok := v[i].(float64)
-        if !ok {
-            panic("invalid type")
+        if d, ok := v[i].(float64); ok {
+            r = append(r, d)
+        } else if d, ok := v[i].(int); ok {
+            r = append(r, float64(d))
+        } else if d, ok := v[i].(int32); ok {
+            r = append(r, float64(d))
+        } else if d, ok := v[i].(int64); ok {
+            r = append(r, float64(d))
+        } else {
+            panic("Unkown type")
         }
-        r = append(r, d)
     }
 
     return r
