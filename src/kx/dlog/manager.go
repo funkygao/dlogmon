@@ -281,8 +281,9 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
 	close(chRateLimit)
 
 	start := time.Now()
+	alloced := T.MemAlloced()
 	runtime.GC()
-	this.Println("GC", time.Now().Sub(start))
+	this.Println("GC", time.Now().Sub(start), alloced, "->", T.MemAlloced())
 
 	// reduce the merged result
 	// reduce cannot start until all the mappers have finished
