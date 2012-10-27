@@ -67,6 +67,7 @@ func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- mr.KeyValu
     defer func() {
         if err := recover(); err != nil {
             this.Println("panic recovered:", err)
+            panic(err)
         }
     }()
 
@@ -125,8 +126,8 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, 
 
         validLines++
 
-        // run map for this line
-        this.self.Map(line, chKv)
+        // run map for this line with EOL stripped
+        this.self.Map(line[:len(line)-1], chKv)
     }
 
     chOutWorker <- newWorkerResult(rawLines, validLines)
