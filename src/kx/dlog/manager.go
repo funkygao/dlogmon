@@ -280,6 +280,10 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
     close(chInWorker)
     close(chRateLimit)
 
+    this.Println("GC start")
+    runtime.GC()
+    this.Println("GC done")
+
     // reduce the merged result
     // reduce cannot start until all the mappers have finished
     worker := this.getOneWorker()
