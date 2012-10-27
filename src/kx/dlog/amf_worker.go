@@ -76,7 +76,7 @@ func (this *AmfWorker) Map(line string, out chan<- mr.KeyValue) {
 func (this *AmfWorker) Reduce(in mr.KeyValues) (out mr.KeyValue) {
     defer T.Un(T.Trace(""))
 
-    this.Println(this.name, "start to reduce...")
+    this.Println(this.name, "worker start to reduce...")
 
     out = mr.NewKeyValue()
     for k, v := range in {
