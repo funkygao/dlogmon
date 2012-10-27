@@ -1,9 +1,11 @@
 package dlog
 
 import (
+    "fmt"
     "io"
     "log"
     "os"
+    "syscall"
 )
 
 func newLogger(option *Option) *log.Logger {
@@ -18,9 +20,10 @@ func newLogger(option *Option) *log.Logger {
         }
     }
 
+    prefix := fmt.Sprintf("[%d] ", syscall.Getpid())
     if option.debug {
-        return log.New(logWriter, LOG_PREFIX_DEBUG, LOG_OPTIONS_DEBUG)
+        return log.New(logWriter, prefix, LOG_OPTIONS_DEBUG)
     }
 
-    return log.New(logWriter, LOG_PREFIX, LOG_OPTIONS)
+    return log.New(logWriter, prefix, LOG_OPTIONS)
 }

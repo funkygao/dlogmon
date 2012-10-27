@@ -18,8 +18,6 @@ const (
 const (
     LOG_OPTIONS_DEBUG = log.Ldate | log.Lshortfile | log.Ltime | log.Lmicroseconds
     LOG_OPTIONS       = log.LstdFlags
-    LOG_PREFIX_DEBUG  = "debug "
-    LOG_PREFIX        = ""
 )
 
 const (
