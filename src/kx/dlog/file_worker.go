@@ -55,7 +55,7 @@ func (this *FileWorker) Reduce(in mr.KeyValues) (out mr.KeyValue) {
 
     out = mr.NewKeyValue()
     for k, v := range in {
-        var occurence = stats.StatsSum(convertAnySliceToInt(v))
+        var occurence = stats.StatsSum(convertAnySliceToFloat(v))
         if occurence > 1 {
             out[k.(tuple)] = occurence
         }
