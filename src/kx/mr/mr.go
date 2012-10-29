@@ -2,9 +2,7 @@ package mr
 
 import (
 	"fmt"
-	//"github.com/pmylund/sortutil"
 	T "kx/trace"
-	//"reflect"
 )
 
 const (
@@ -38,6 +36,16 @@ func (this KeyValues) Println() {
 	for k, v := range this {
 		fmt.Printf(PRINT_FMT, T.CallerFuncName(1), k, v)
 	}
+}
+
+func (this KeyValues) Keys() interface{} {
+	ks := make([]interface{}, len(this))
+	var i int
+	for k, _ := range this {
+		ks[i] = k
+	}
+
+	return ks
 }
 
 func (this KeyValues) Append(key interface{}, val interface{}) {

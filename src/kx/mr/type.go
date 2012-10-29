@@ -17,5 +17,5 @@ type Mapper interface {
 
 // Reducer
 type Reducer interface {
-	Reduce(key interface{}, values []interface{}) interface{}
+	Reduce(key interface{}, values []interface{}) (out KeyValue)
 }
