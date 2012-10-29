@@ -287,12 +287,14 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
 
 	// reduce the merged result
 	// reduce cannot start until all the mappers have finished
+
+    this.Println("start to reduce ordered keys")
 	worker := this.getOneWorker()
     var kv mr.KeyValue = make(mr.KeyValue)
-    for k, v := range kvs {
-        value := worker.Reduce(k, v)
+    for k, vals := range kvs {
+        value := worker.Reduce(k, vals)
         if value != nil {
-            kv[k] = worker.Reduce(k, v)
+            kv[k] = value
         }
     }
 	this.exportToDb(worker.Name(), kv)
