@@ -39,6 +39,9 @@ test:install
 bench:
 	go test -test.bench=".*" -test.benchtime 5 kx/dlog
 
+benchmark:
+	go test -v -test.bench=".*" github.com/feyeleanor/gospeed
+
 fmt:
 	@gofmt -s -tabs=false -tabwidth=4 -w=true ${SRC}
 
