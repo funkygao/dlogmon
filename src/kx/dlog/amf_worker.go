@@ -67,7 +67,10 @@ func (this *AmfWorker) Map(line string, out chan<- mr.KeyValue) {
 
 // Reduce
 func (this *AmfWorker) Reduce(key interface{}, values []interface{}) (out interface{}) {
-	out = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
+	aggregate := stats.StatsSum(mr.ConvertAnySliceToFloat(values))
+	if aggregate > 0 {
+		out = aggregate
+	}
 
 	return
 }
