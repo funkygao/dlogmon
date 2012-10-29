@@ -1,16 +1,16 @@
 package net
 
 import (
-    "net"
+	"net"
 )
 
 type Client struct {
-    addr string
+	addr string
 }
 
 func (this Client) Connect() {
-    conn, err := net.Dial("tcp", this.addr)
-    if err != nil {
-        panic(err)
-    }
+	conn, err := net.Dial("tcp", this.addr)
+	if err != nil {
+		panic(err)
+	}
 }

@@ -2,15 +2,15 @@
 package stream
 
 import (
-    "bufio"
-    "os/exec"
+	"bufio"
+	"os/exec"
 )
 
 // Stream data
 type Stream struct {
-    name   string   // command name
-    arg    []string // command arguments
-    cmd    *exec.Cmd
-    reader *bufio.Reader
-    writer *bufio.Writer
+	name   string   // command name
+	arg    []string // command arguments
+	cmd    *exec.Cmd
+	reader *bufio.Reader
+	writer *bufio.Writer
 }

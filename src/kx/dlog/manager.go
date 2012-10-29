@@ -219,8 +219,8 @@ func (this *Manager) WaitForCompletion() {
 		close(this.chProgress)
 	}
 
-    // stop the ticker
-    this.ticker.Stop()
+	// stop the ticker
+	this.ticker.Stop()
 
 	this.Println("got workers summary, ready to finish")
 }
@@ -290,16 +290,15 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
 
 	// reduce the merged result
 	// reduce cannot start until all the mappers have finished
-
-    this.Println("start to reduce ordered keys")
+	this.Println("start to reduce ordered keys")
 	worker := this.getOneWorker()
-    var kv mr.KeyValue = make(mr.KeyValue)
-    for k, vals := range kvs {
-        value := worker.Reduce(k, vals)
-        if value != nil {
-            kv[k] = value
-        }
-    }
+	var kv mr.KeyValue = make(mr.KeyValue)
+	for k, vals := range kvs {
+		value := worker.Reduce(k, vals)
+		if value != nil {
+			kv[k] = value
+		}
+	}
 	this.exportToDb(worker.Name(), kv)
 
 	// WaitForCompletion will wait for this

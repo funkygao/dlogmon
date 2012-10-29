@@ -1,31 +1,31 @@
 package net
 
 import (
-    "log"
-    "net"
+	"log"
+	"net"
 )
 
 type Server struct {
-    addr string
+	addr string
 }
 
 func (this Server) Listen() {
-    l, err := net.Listen("tcp", this.addr)
-    if err != nil {
-        panic(err)
-    }
+	l, err := net.Listen("tcp", this.addr)
+	if err != nil {
+		panic(err)
+	}
 
-    for {
-        conn, err := l.Accept()
-        if err != nil {
-            log.Println(err)
-            continue
-        }
+	for {
+		conn, err := l.Accept()
+		if err != nil {
+			log.Println(err)
+			continue
+		}
 
-        go onRequest(conn)
-    }
+		go onRequest(conn)
+	}
 }
 
 func onRequest(conn net.Conn) {
-    conn.Close()
+	conn.Close()
 }

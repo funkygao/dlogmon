@@ -43,7 +43,7 @@ benchmark:
 	go test -v -test.bench=".*" github.com/feyeleanor/gospeed
 
 fmt:
-	@gofmt -s -tabs=false -tabwidth=4 -w=true ${SRC}
+	@gofmt -s -tabs=true -tabwidth=4 -w=true ${SRC}
 
 clean:
 	rm -rf ${BIN} ${PKG} ${VAR}

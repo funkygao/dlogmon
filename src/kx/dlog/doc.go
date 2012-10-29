@@ -40,6 +40,6 @@ Data flow:
                                                 |
                                      KeyValue   |
    exportDB<--------------------------<--------/ 
-                                               
+
 */
 package dlog

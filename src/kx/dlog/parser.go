@@ -27,7 +27,7 @@ func trimAllRune(line string, cutset []rune) string {
 // TODO
 func trimAllString(line string, cutset []string) string {
 	sb := sb.NewStringBuilder("")
-    return sb.String()
+	return sb.String()
 }
 
 func (this *amfRequest) parseLine(line string) {
