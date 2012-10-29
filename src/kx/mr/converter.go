@@ -5,14 +5,14 @@ package mr
 func ConvertAnySliceToFloat(v []interface{}) []float64 {
 	r := make([]float64, 0)
 	for i := range v {
-		if d, ok := v[i].(float64); ok {
-			r = append(r, d)
-		} else if d, ok := v[i].(int); ok {
+		if d, ok := v[i].(int); ok {
 			r = append(r, float64(d))
 		} else if d, ok := v[i].(int32); ok {
 			r = append(r, float64(d))
 		} else if d, ok := v[i].(int64); ok {
 			r = append(r, float64(d))
+        } else if d, ok := v[i].(float64); ok {
+			r = append(r, d)
 		} else {
 			panic("Unkown type")
 		}
@@ -20,3 +20,4 @@ func ConvertAnySliceToFloat(v []interface{}) []float64 {
 
 	return r
 }
+
