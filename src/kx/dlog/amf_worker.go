@@ -1,18 +1,11 @@
 package dlog
 
 import (
-    "fmt"
     "kx/mr"
     "kx/stats"
     T "kx/trace"
     "strings"
 )
-
-// Printable amfRequest 
-func (this *amfRequest) String() string {
-    return fmt.Sprintf("amfRequest{http:%s uri:%s rid:%s class:%s method:%s time:%d args:%s}",
-        this.http_method, this.uri, this.rid, this.class, this.method, this.time, this.args)
-}
 
 // Constructor of AmfWorker
 func NewAmfWorker(manager *Manager, name, filename string, seq uint16) IWorker {

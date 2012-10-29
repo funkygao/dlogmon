@@ -219,6 +219,9 @@ func (this *Manager) WaitForCompletion() {
 		close(this.chProgress)
 	}
 
+    // stop the ticker
+    this.ticker.Stop()
+
 	this.Println("got workers summary, ready to finish")
 }
 
