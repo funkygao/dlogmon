@@ -4,5 +4,10 @@ import (
     "testing"
 )
 
-func TestParse(t *testing.T) {
+func TestTrimAllRune(t *testing.T) {
+    got := trimAllRune("acd,-mmq", []rune{'a', 'm', ','})
+    expected := "cd-q"
+    if got != expected {
+        t.Error(got + " != " + expected)
+    }
 }

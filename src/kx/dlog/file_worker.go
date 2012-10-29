@@ -33,14 +33,8 @@ func (this *FileWorker) IsLineValid(line string) bool {
 // Extract meta info related to amf from a valid line
 func (this *FileWorker) Map(line string, out chan<- mr.KeyValue) {
     kv := mr.NewKeyValue()
-    line = strings.TrimFunc(line, func(r rune) bool {
-        for _, c := range [...]rune{'=', ':', '+', '-', '.', ' ' } {
-            if c == r {
-                return true
-            }
-        }
-        return false
-    })
+    line = trimAllRune(line, []rune{'=', ':', '+', '.', '-'})
+    line = strings.Trim(line, "  ")
     if len(line) == 0 {
         return
     }
