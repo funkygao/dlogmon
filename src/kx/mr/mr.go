@@ -2,6 +2,7 @@ package mr
 
 import (
     "fmt"
+    "github.com/pmylund/sortutil"
     T "kx/trace"
 )
 
@@ -54,4 +55,26 @@ func (this KeyValues) AppendSlice(key interface{}, val []interface{}) {
     } else {
         this[key] = append(this[key], val...)
     }
+}
+
+func (this KeyValues) Keys() []interface{} {
+    keys := make([]interface{}, len(this))
+    var i int
+    for k, _ := range this {
+        keys[i] = k
+        i ++
+    }
+    return keys
+}
+
+func (this KeyValues) SortedKeys() []string {
+    keys := make([]string, len(this))
+    for i, v := range this.Keys() {
+        keys[i] = v.(string)
+    }
+    fmt.Println(keys)
+    sortutil.Desc(keys)
+    fmt.Println(keys)
+
+    return keys
 }

@@ -73,15 +73,8 @@ func (this *AmfWorker) Map(line string, out chan<- mr.KeyValue) {
 }
 
 // Reduce
-func (this *AmfWorker) Reduce(in mr.KeyValues) (out mr.KeyValue) {
-    defer T.Un(T.Trace(""))
-
-    this.Println(this.name, "worker start to reduce...")
-
-    out = mr.NewKeyValue()
-    for k, v := range in {
-        out[k] = stats.StatsSum(convertAnySliceToFloat(v))
-    }
+func (this *AmfWorker) Reduce(key interface{}, values []interface{}) (out interface{}) {
+    out = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
 
     return
 }

@@ -288,7 +288,13 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
 	// reduce the merged result
 	// reduce cannot start until all the mappers have finished
 	worker := this.getOneWorker()
-	var kv mr.KeyValue = worker.Reduce(kvs)
+    var kv mr.KeyValue = make(mr.KeyValue)
+    for k, v := range kvs {
+        value := worker.Reduce(k, v)
+        if value != nil {
+            kv[k] = worker.Reduce(k, v)
+        }
+    }
 	this.exportToDb(worker.Name(), kv)
 
 	// WaitForCompletion will wait for this

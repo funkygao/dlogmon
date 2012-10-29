@@ -26,10 +26,6 @@ func (this *NoopWorker) Map(line string, out chan<- mr.KeyValue) {
 }
 
 // Reduce
-func (this *NoopWorker) Reduce(in mr.KeyValues) mr.KeyValue {
-    defer T.Un(T.Trace(""))
-
-    this.Println(this.name, "start to reduce...")
-
-    return mr.NewKeyValue()
+func (this *NoopWorker) Reduce(key interface{}, values []interface{}) (out interface{}) {
+    return
 }

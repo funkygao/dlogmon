@@ -48,17 +48,10 @@ func (this *FileWorker) Map(line string, out chan<- mr.KeyValue) {
 }
 
 // Reduce
-func (this *FileWorker) Reduce(in mr.KeyValues) (out mr.KeyValue) {
-    defer T.Un(T.Trace(""))
-
-    this.Println(this.name, "start to reduce...")
-
-    out = mr.NewKeyValue()
-    for k, v := range in {
-        var occurence = stats.StatsSum(convertAnySliceToFloat(v))
-        if occurence > 1 {
-            out[k.(tuple)] = occurence
-        }
+func (this *FileWorker) Reduce(key interface{}, values []interface{}) (out interface{}) {
+    var occurence = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
+    if occurence > 1 {
+        out = occurence
     }
 
     return

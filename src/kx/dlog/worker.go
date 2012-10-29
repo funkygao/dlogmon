@@ -142,7 +142,7 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, 
     // after the work has done it's job, run it's combiner as a whole of this worker
     if this.self.Combiner() != nil {
         for k, v := range kvs {
-            kvs[k] = []interface{}{this.self.Combiner()(convertAnySliceToFloat(v))} // [1]float64
+            kvs[k] = []interface{}{this.self.Combiner()(mr.ConvertAnySliceToFloat(v))} // [1]float64
         }
 
         this.Printf("%s worker[%d] %s local combined\n", this.name, this.seq, this.BaseName())

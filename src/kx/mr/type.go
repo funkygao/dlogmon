@@ -12,10 +12,10 @@ type KeyValues map[interface{}] []interface{}
 
 // Mapper
 type Mapper interface {
-    Map(string, chan<- KeyValue)
+    Map(line string, out chan<- KeyValue)
 }
 
 // Reducer
 type Reducer interface {
-    Reduce(KeyValues) KeyValue
+    Reduce(key interface{}, values []interface{}) interface{}
 }

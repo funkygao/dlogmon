@@ -1,8 +1,8 @@
-package dlog
+package mr
 
 // []interface{}.([]float64) is not supported in golang, see FAQ
 // so we need do it ourself
-func convertAnySliceToFloat(v []interface{}) []float64 {
+func ConvertAnySliceToFloat(v []interface{}) []float64 {
     r := make([]float64, 0)
     for i, _ := range v {
         if d, ok := v[i].(float64); ok {
