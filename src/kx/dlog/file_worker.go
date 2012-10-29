@@ -33,7 +33,18 @@ func (this *FileWorker) IsLineValid(line string) bool {
 // Extract meta info related to amf from a valid line
 func (this *FileWorker) Map(line string, out chan<- mr.KeyValue) {
     kv := mr.NewKeyValue()
-    line = strings.TrimSpace(strings.Replace(line, "  ", " ", 0))
+    line = strings.TrimFunc(line, func(r rune) bool {
+        for _, c := range [...]rune{'=', ':', '+', '-', '.', ' ' } {
+            if c == r {
+                return true
+            }
+        }
+        return false
+    })
+    if len(line) == 0 {
+        return
+    }
+
     terms := strings.Split(line, " ")
     for i, term := range terms {
         for j:=i+1; j<len(terms); j++ {
@@ -49,8 +60,9 @@ func (this *FileWorker) Map(line string, out chan<- mr.KeyValue) {
 
 // Reduce
 func (this *FileWorker) Reduce(key interface{}, values []interface{}) (out interface{}) {
+    const threhold = 0
     var occurence = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
-    if occurence > 1 {
+    if occurence > threhold {
         out = occurence
     }
 
