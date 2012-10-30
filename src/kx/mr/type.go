@@ -1,5 +1,9 @@
 package mr
 
+import (
+    "sort"
+)
+
 // Local aggregator
 // TODO combiner is not just a func, it's a mini reducer
 type CombinerFunc func([]float64) float64
@@ -18,4 +22,13 @@ type Mapper interface {
 // Reducer
 type Reducer interface {
     Reduce(key interface{}, values []interface{}) (out KeyValue)
+}
+
+type SortType uint8
+
+type Sorter struct {
+    keys []interface{}
+    vals []interface{}
+    t SortType
+    sort.Interface
 }
