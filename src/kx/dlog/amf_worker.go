@@ -1,6 +1,7 @@
 package dlog
 
 import (
+    "fmt"
     "kx/mr"
     "kx/stats"
     T "kx/trace"
@@ -57,7 +58,7 @@ func (this *AmfWorker) Map(line string, out chan<- mr.KeyValue) {
     req.parseLine(line)
 
     kv := mr.NewKeyValue()
-    kv[req.class+"."+req.method+":"+req.uri] = 1
+    kv[req.class+"."+req.method+"@"+req.uri] = 1
 
     // emit an intermediate data
     out <- kv
@@ -75,6 +76,7 @@ func (this *AmfWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
 }
 
 func (this AmfWorker) Printr(key interface{}, value interface{}) string {
-    println(key.(string))
+    v := value.(mr.KeyValue)
+    fmt.Printf("%88s %4.0f\n", key.(string), v[key.(string)])
     return ""
 }
