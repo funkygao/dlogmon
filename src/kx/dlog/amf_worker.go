@@ -46,7 +46,6 @@ func (this *AmfWorker) IsLineValid(line string) bool {
     return true
 }
 
-// Extract meta info related to amf from a valid line
 func (this *AmfWorker) Map(line string, out chan<- mr.KeyValue) {
     if x := this.Worker.ExtractLineInfo(line); x != nil {
         if this.manager.option.debug {
@@ -58,14 +57,18 @@ func (this *AmfWorker) Map(line string, out chan<- mr.KeyValue) {
     req.parseLine(line)
 
     kv := mr.NewKeyValue()
-    kv[req.class+"."+req.method+"@"+req.uri] = 1
+    var key [2]string // prepare key type
+    key[0] = req.class+"."+req.method
+    key[1] = req.uri
+    kv[key] = 1
 
     // emit an intermediate data
     out <- kv
 }
 
-// Reduce
 func (this *AmfWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyValue) {
+    // here we don't care about the key
+    // we only care about values
     aggregate := stats.StatsSum(mr.ConvertAnySliceToFloat(values))
     if aggregate > 0 {
         kv = mr.NewKeyValue()
@@ -77,7 +80,20 @@ func (this *AmfWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
 
 func (this AmfWorker) Printr(key interface{}, value interface{}) string {
     v := value.(mr.KeyValue)
-    p := strings.Split(key.(string), "@")
-    fmt.Printf("%58s    %-35s %4.0f\n", p[0], p[1], v[key])
-    return ""
+    k := key.([2]string)
+    if count := v[k].(float64); count >= this.printThreshold() {
+        fmt.Printf("%65s  %-35s %5.0f\n", k[0], k[1], v[k])
+    }
+
+    return fmt.Sprintf("insert into %s(method, uri, c) values('%s', '%s', %d)",
+        TABLE_AMF, k[0], k[1], v[k])
+}
+
+func (this AmfWorker) printThreshold() float64 {
+    const default_threshold = 5
+    t, e := this.manager.Conf().Float("amf", "export.threshold")
+    if e != nil {
+        return default_threshold
+    }
+    return t
 }

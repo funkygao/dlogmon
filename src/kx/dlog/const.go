@@ -33,3 +33,7 @@ const (
     DbEngine = "sqlite3"
     DbFile   = VarDir + "/dlogmon" + DbShard + ".db"
 )
+
+const (
+    TABLE_AMF = "t_amf"
+)

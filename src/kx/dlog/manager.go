@@ -2,6 +2,7 @@ package dlog
 
 import (
     "fmt"
+    "github.com/kless/goconfig/config"
     "kx/db"
     "kx/mr"
     "kx/progress"
@@ -38,6 +39,10 @@ func NewManager(option *Option) *Manager {
     this.Println("manager created")
 
     return this
+}
+
+func (this Manager) Conf() *config.Config {
+    return this.option.conf
 }
 
 // Printable Manager
