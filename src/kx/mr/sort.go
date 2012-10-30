@@ -82,12 +82,13 @@ func (this Sorter) lessStringSlice(si, sj []string) bool {
 }
 
 func (this *Sorter) Less(i, j int) bool {
-    ki := this.keys[i]
     if this.t == SORT_BY_KEY {
+        ki := this.keys[i]
+
         switch ki.(type) {
         case string:
             ki, kj := this.keys[i].(string), this.keys[j].(string)
-            if !this.asc() {
+            if this.asc() {
                 return ki < kj
             } else {
                 return ki > kj
@@ -109,7 +110,31 @@ func (this *Sorter) Less(i, j int) bool {
             return this.lessStringSlice(arrayToSlice6(ki), arrayToSlice6(kj))
         }
     } else if this.t == SORT_BY_VALUE {
-        _ = this.vals[i]
+        vi, vj := this.vals[i].(KeyValue), this.vals[j].(KeyValue)
+        rvi, rvj := vi[this.keys[i]], vj[this.keys[j]]
+        switch rvi.(type) {
+        case float64:
+            rvi, rvj := rvi.(float64), rvj.(float64)
+            if this.asc() {
+                return rvi < rvj
+            } else {
+                return rvi > rvj
+            }
+        case int:
+            rvi, rvj := rvi.(int), rvj.(int)
+            if this.asc() {
+                return rvi < rvj
+            } else {
+                return rvi > rvj
+            }
+        case int64:
+            rvi, rvj := rvi.(int64), rvj.(int64)
+            if this.asc() {
+                return rvi < rvj
+            } else {
+                return rvi > rvj
+            }
+        }
     } else {
         panic("invalid sort type")
     }

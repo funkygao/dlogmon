@@ -39,8 +39,8 @@ func (this KeyValues) AppendSlice(key interface{}, val []interface{}) {
 func (this KeyValues) LaunchReducer(r Reducer) (out KeyValue) {
     out = NewKeyValue()
 
-    // sort by key
     s := newSort(this)
+    // sort by key asc
     s.Sort(SORT_BY_KEY, SORT_ORDER_ASC)
     for _, k := range s.keys {
         if v := r.Reduce(k, this[k]); v != nil && !v.Empty() {
