@@ -1,31 +1,31 @@
 package dlog
 
 import (
-	"kx/mr"
-	T "kx/trace"
+    "kx/mr"
+    T "kx/trace"
 )
 
 // Constructor of NoopWorker
 func NewNoopWorker(manager *Manager, name, filename string, seq uint16) IWorker {
-	defer T.Un(T.Trace(""))
+    defer T.Un(T.Trace(""))
 
-	this := new(NoopWorker)
-	this.self = this
-	this.init(manager, name, filename, seq)
+    this := new(NoopWorker)
+    this.self = this
+    this.init(manager, name, filename, seq)
 
-	return this
+    return this
 }
 
 func (this *NoopWorker) IsLineValid(line string) bool {
-	return false
+    return false
 }
 
 // Extract meta info related to amf from a valid line
 func (this *NoopWorker) Map(line string, out chan<- mr.KeyValue) {
-	out <- mr.NewKeyValue()
+    out <- mr.NewKeyValue()
 }
 
 // Reduce
-func (this *NoopWorker) Reduce(key interface{}, values []interface{}) (out interface{}) {
-	return
+func (this *NoopWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyValue) {
+    return
 }

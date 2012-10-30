@@ -19,7 +19,7 @@ Schema:
 package db
 
 const (
-	SQL_CREATE_TABLE = `CREATE TABLE IF NOT EXISTS dlog(
+    SQL_CREATE_TABLE = `CREATE TABLE IF NOT EXISTS dlog(
         id INTEGER PRIMARY KEY,
         type VARCHAR(30) NOT NULL, 
         ctx VARCHAR(100),

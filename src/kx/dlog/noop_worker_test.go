@@ -1,7 +1,7 @@
 package dlog
 
 import (
-	"testing"
+    "testing"
 )
 
 func TestNoop(t *testing.T) {
