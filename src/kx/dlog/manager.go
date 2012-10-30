@@ -266,6 +266,7 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
                 break
             }
 
+            // merge all output of workers to one key values pair
             for k, v := range m {
                 kvs.AppendSlice(k, v)
             }
