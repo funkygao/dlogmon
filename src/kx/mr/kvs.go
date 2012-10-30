@@ -50,6 +50,7 @@ func (this KeyValues) LaunchReducer(r Reducer) (out KeyValue) {
     return
 }
 
+// TODO deprecated
 func (this KeyValues) Keys() interface{} {
     key := this.getOneKey()
     if key == nil {

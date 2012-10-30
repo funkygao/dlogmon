@@ -20,3 +20,44 @@ func ConvertAnySliceToFloat(v []interface{}) []float64 {
 
     return r
 }
+
+func arrayToSlice2(in [2]string) []string {
+    out := make([]string, len(in))
+    for i, s := range in {
+        out[i] = s
+    }
+    return out
+}
+
+func arrayToSlice3(in [3]string) []string {
+    out := make([]string, len(in))
+    for i, s := range in {
+        out[i] = s
+    }
+    return out
+}
+
+func arrayToSlice4(in [4]string) []string {
+    out := make([]string, len(in))
+    for i, s := range in {
+        out[i] = s
+    }
+    return out
+}
+
+func arrayToSlice5(in [5]string) []string {
+    out := make([]string, len(in))
+    for i, s := range in {
+        out[i] = s
+    }
+    return out
+}
+
+func arrayToSlice6(in [6]string) []string {
+    out := make([]string, len(in))
+    for i, s := range in {
+        out[i] = s
+    }
+    return out
+}
+

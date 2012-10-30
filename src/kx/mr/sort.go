@@ -44,16 +44,76 @@ func (this *Sorter) Len() int {
     return len(this.keys)
 }
 
+func (this Sorter) byKey() bool {
+    return this.t == SORT_BY_KEY
+}
+
+func (this Sorter) asc() bool {
+    return this.o == SORT_ORDER_ASC
+}
+
+func (this Sorter) lessStringSlice(si, sj []string) bool {
+    if len(si) != len(sj) {
+        if this.asc() {
+            return len(si) < len(sj)
+        } else {
+            return len(si) > len(sj)
+        }
+    }
+
+    for i, _ := range si {
+        vi, vj := si[i], sj[i]
+        if vi < vj {
+            if this.asc() {
+                return true
+            } else {
+                return false
+            }
+        } else if vi > vj {
+            if this.asc() {
+                return false
+            } else {
+                return true
+            }
+        }
+    }
+
+    return false
+}
+
 func (this *Sorter) Less(i, j int) bool {
+    ki := this.keys[i]
     if this.t == SORT_BY_KEY {
-        ki, kj := this.keys[i].(string), this.keys[j].(string)
-        return ki < kj
-        
+        switch ki.(type) {
+        case string:
+            ki, kj := this.keys[i].(string), this.keys[j].(string)
+            if !this.asc() {
+                return ki < kj
+            } else {
+                return ki > kj
+            }
+        case [2]string:
+            ki, kj := this.keys[i].([2]string), this.keys[j].([2]string)
+            return this.lessStringSlice(arrayToSlice2(ki), arrayToSlice2(kj))
+        case [3]string:
+            ki, kj := this.keys[i].([3]string), this.keys[j].([3]string)
+            return this.lessStringSlice(arrayToSlice3(ki), arrayToSlice3(kj))
+        case [4]string:
+            ki, kj := this.keys[i].([4]string), this.keys[j].([4]string)
+            return this.lessStringSlice(arrayToSlice4(ki), arrayToSlice4(kj))
+        case [5]string:
+            ki, kj := this.keys[i].([5]string), this.keys[j].([5]string)
+            return this.lessStringSlice(arrayToSlice5(ki), arrayToSlice5(kj))
+        case [6]string:
+            ki, kj := this.keys[i].([6]string), this.keys[j].([6]string)
+            return this.lessStringSlice(arrayToSlice6(ki), arrayToSlice6(kj))
+        }
     } else if this.t == SORT_BY_VALUE {
+        _ = this.vals[i]
     } else {
         panic("invalid sort type")
     }
-    return true
+    return false
 }
 
 func (this *Sorter) Swap(i, j int) {
