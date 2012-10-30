@@ -54,53 +54,62 @@ func (this KeyValues) getOneKey() (key interface{}) {
     return
 }
 
+func (this KeyValues) Empty() bool {
+    return len(this) == 0
+}
+
 func (this KeyValues) Keys() interface{} {
     key := this.getOneKey()
     if key == nil {
         return nil
     }
 
-    if _, ok := key.(string); ok {
+    var i int
+    switch key.(type) {
+    case string:
         keys := make([]string, len(this))
-        var i int
         for k, _ := range this {
             keys[i] = k.(string)
             i ++
         }
 
         return keys
-    } else if _, ok := key.([2]string); ok {
+    case [2]string:
         keys := make([][2]string, len(this))
-        var i int
         for k, _ := range this {
             keys[i] = k.([2]string)
             i ++
         }
 
         return keys
-    } else if _, ok := key.([3]string); ok {
+    case [3]string:
         keys := make([][3]string, len(this))
-        var i int
         for k, _ := range this {
             keys[i] = k.([3]string)
             i ++
         }
 
         return keys
-    } else if _, ok := key.([4]string); ok {
+    case [4]string:
         keys := make([][4]string, len(this))
-        var i int
         for k, _ := range this {
             keys[i] = k.([4]string)
             i ++
         }
 
         return keys
-    } else if _, ok := key.([5]string); ok {
+    case [5]string:
         keys := make([][5]string, len(this))
-        var i int
         for k, _ := range this {
             keys[i] = k.([5]string)
+            i ++
+        }
+
+        return keys
+    case [6]string:
+        keys := make([][6]string, len(this))
+        for k, _ := range this {
+            keys[i] = k.([6]string)
             i ++
         }
 
