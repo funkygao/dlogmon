@@ -77,6 +77,6 @@ func (this *AmfWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
 
 func (this AmfWorker) Printr(key interface{}, value interface{}) string {
     v := value.(mr.KeyValue)
-    fmt.Printf("%88s %4.0f\n", key.(string), v[key.(string)])
+    fmt.Printf("%88s %4.0f\n", key, v[key])
     return ""
 }

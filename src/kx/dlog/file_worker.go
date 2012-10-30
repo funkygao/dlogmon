@@ -66,6 +66,10 @@ func (this *FileWorker) Reduce(key interface{}, values []interface{}) (kv mr.Key
 }
 
 func (this FileWorker) Printr(key interface{}, value interface{}) string {
-    fmt.Println(key.([2]string))
+    v := value.(mr.KeyValue)
+    k := key.([2]string)
+    if v[k].(float64) > 1 {
+        fmt.Printf("%25s%25s %4.0f\n", k[0], k[1], v[k])
+    }
     return ""
 }

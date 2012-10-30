@@ -48,10 +48,10 @@ fmt:
 clean:
 	rm -rf ${BIN} ${PKG} ${VAR}
 
-run:install
+amf:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
-f:install
+file:install
 	./bin/dlogmon -f README.rst -filemode -d -tick 500 -progress -k file -progress
 
 noop:install
