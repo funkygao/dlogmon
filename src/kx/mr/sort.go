@@ -4,20 +4,40 @@ import (
     "sort"
 )
 
-func newKvSort(kv KeyValue) *Sorter {
-    s := &Sorter{
-        keys: make([]interface{}, len(kv)),
-        vals: make([]interface{}, len(kv)),
-    }
-    var i int
-    for k, v := range kv {
-        s.keys[i] = k
-        s.vals[i] = v
+func newSort(p interface{}) *Sorter {
+    if kv, ok := p.(KeyValue); ok {
+        s := &Sorter{
+            keys: make([]interface{}, len(kv)),
+            vals: make([]interface{}, len(kv)),
+        }
+        var i int
+        for k, v := range kv {
+            s.keys[i] = k
+            s.vals[i] = v
 
-        i++
+            i++
+        }
+
+        return s
+    } else if kv, ok := p.(KeyValues); ok {
+        s := &Sorter{
+            keys: make([]interface{}, len(kv)),
+            vals: make([]interface{}, len(kv)),
+        }
+        var i int
+        for k, v := range kv {
+            s.keys[i] = k
+            s.vals[i] = v
+
+            i++
+        }
+
+        return s
+    } else {
+        panic("invalid sorter type")
     }
 
-    return s
+    return nil
 }
 
 func (this *Sorter) Len() int {
@@ -26,6 +46,9 @@ func (this *Sorter) Len() int {
 
 func (this *Sorter) Less(i, j int) bool {
     if this.t == SORT_BY_KEY {
+        ki, kj := this.keys[i].(string), this.keys[j].(string)
+        return ki < kj
+        
     } else if this.t == SORT_BY_VALUE {
     } else {
         panic("invalid sort type")
@@ -38,7 +61,9 @@ func (this *Sorter) Swap(i, j int) {
     this.vals[i], this.vals[j] = this.vals[j], this.vals[i]
 }
 
-func (this *Sorter) Sort(t SortType) {
+func (this *Sorter) Sort(t SortType, o SortOrdering) {
     this.t = t
+    this.o = o
+
     sort.Sort(this)
 }

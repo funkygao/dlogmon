@@ -29,6 +29,4 @@ func (this KeyValue) Empty() bool {
 }
 
 func (this KeyValue) DumpToSql(sortedKeys interface{}) {
-    println()
-    this.PrintByOrderedKey(sortedKeys)
 }

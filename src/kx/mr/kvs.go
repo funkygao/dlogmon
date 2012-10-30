@@ -32,10 +32,18 @@ func (this KeyValues) Empty() bool {
 
 func (this KeyValues) LaunchReducer(r Reducer) (out KeyValue) {
     out = NewKeyValue()
-    for k, vals := range this {
-        v := r.Reduce(k, vals)
-        if v != nil {
+
+    // sort by key
+    s := newSort(this)
+    s.Sort(SORT_BY_KEY, SORT_ORDER_ASC)
+    // FIXME
+    println()
+    for _, k := range s.keys {
+        if v := r.Reduce(k, this[k]); v != nil && !v.Empty() {
             out[k] = v
+
+            // FIXME
+            fmt.Println(k)
         }
     }
 

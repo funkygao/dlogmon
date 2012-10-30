@@ -24,11 +24,15 @@ type Reducer interface {
     Reduce(key interface{}, values []interface{}) (out KeyValue)
 }
 
-type SortType uint8
+type (
+    SortType uint8
+    SortOrdering uint8
+)
 
 type Sorter struct {
     keys []interface{}
     vals []interface{}
     t SortType
+    o SortOrdering
     sort.Interface
 }
