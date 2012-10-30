@@ -98,6 +98,7 @@ type Merger interface {
 // CLI options object
 type Option struct {
     files                  []string
+    Timespan               string
     debug                  bool
     trace                  bool
     verbose                bool

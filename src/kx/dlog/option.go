@@ -1,6 +1,7 @@
 package dlog
 
 import (
+    "errors"
     "flag"
     "fmt"
     T "kx/trace"
@@ -43,7 +44,7 @@ func (this *Option) Version() bool {
 }
 
 // Parse CLI options
-func ParseFlags() *Option {
+func ParseFlags() (*Option, error) {
     d := flag.String("D", "", "day of dlog[default today] e,g 121005")
     h := flag.String("H", "10", "hour of dlog[default 10] e,g 9-11")
     f := flag.String("f", "", "specify a single dlog file to analyze")
@@ -84,7 +85,8 @@ func ParseFlags() *Option {
     }
     if *f != "" {
         option.files = []string{*f}
-        return option
+        option.Timespan = fmt.Sprintf("Single dlog file: %s", *f)
+        return option, nil
     }
 
     // 根据指定的时间范围判断分析哪些文件
@@ -121,6 +123,7 @@ func ParseFlags() *Option {
         fmt.Println("Invalid hour option:", *h)
         os.Exit(1)
     }
+
     globs := make([]string, 0)
     for i := h1; i <= h2; i++ {
         globs = append(globs, fmt.Sprintf("%s%s/*.%s-%02d*", DLOG_BASE_DIR, dir, dir, i))
@@ -138,9 +141,11 @@ func ParseFlags() *Option {
     }
 
     if len(option.files) < 1 {
-        fmt.Fprintln(os.Stderr, "Fatal error: empty dlog")
-        os.Exit(0)
+        return option, errors.New("Fatal error: empty dlog")
     }
 
-    return option
+    option.Timespan = fmt.Sprintf("20%s %02d:00-%02d:00[%d dlog files]", dir, 
+        h1, h2+1, len(option.files))
+
+    return option, nil
 }

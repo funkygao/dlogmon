@@ -27,8 +27,8 @@ func init() {
 
 func main() {
     // cli options
-    option := dlog.ParseFlags()
-    initialize(option)
+    option, err := dlog.ParseFlags()
+    initialize(option, err)
 
     // construct the manager
     manager := dlog.NewManager(option)
@@ -72,12 +72,17 @@ func displaySummary(logger *log.Logger, start time.Time, files, rawLines, validL
     fmt.Fprintf(os.Stderr, summary)
 }
 
-func initialize(option *dlog.Option) {
+func initialize(option *dlog.Option, err error) {
     defer T.Un(T.Trace(""))
 
     if option.Version() {
         fmt.Fprintf(os.Stderr, "%s %s\n", "dlogmon", VERSION)
         os.Exit(0)
+    }
+
+    if err != nil {
+        fmt.Fprintln(os.Stderr, err)
+        os.Exit(1)
     }
 
     // parallel level
@@ -86,6 +91,7 @@ func initialize(option *dlog.Option) {
         runtime.GOMAXPROCS(parallel)
         fmt.Fprintf(os.Stderr, "Parallel CPU: %d / %d\n", parallel, runtime.NumCPU())
     }
+    fmt.Fprintln(os.Stderr, option.Timespan)
 
     // cpu profile
     if option.Cpuprofile() != "" {
