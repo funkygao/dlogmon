@@ -73,3 +73,8 @@ func (this *AmfWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
 
     return
 }
+
+func (this AmfWorker) Printr(key interface{}, value interface{}) string {
+    println(key.(string))
+    return ""
+}

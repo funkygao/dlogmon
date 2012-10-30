@@ -31,6 +31,7 @@ type IWorker interface {
     DlogParser
     mr.Mapper
     mr.Reducer
+    mr.Printer
 }
 
 // For 1 dlog file worker

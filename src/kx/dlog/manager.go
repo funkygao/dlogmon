@@ -220,7 +220,9 @@ func (this *Manager) WaitForCompletion() {
     }
 
     // stop the ticker
-    this.ticker.Stop()
+    if this.ticker != nil {
+        this.ticker.Stop()
+    }
 
     this.Println("got workers summary, ready to finish")
 }
@@ -289,25 +291,26 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
     runtime.GC()
     this.Println("GC", time.Now().Sub(start), alloced, "->", T.MemAlloced())
 
-    this.Println("start to reduce ordered keys")
+    worker := this.getOneWorker()
 
-    // sort by keys and feed into reducer
+    this.Println(worker.Name(), "worker start to reduce with ordered keys...")
+
     // reduce the merged result
     // reduce cannot start until all the mappers have finished
-    worker := this.getOneWorker()
     kv := kvs.LaunchReducer(worker)
-    keys := kvs.Keys()
-    this.exportToDb(worker.Name(), kv, keys)
+    this.Println(worker.Name(), "worker reduce done")
+
+    start = time.Now()
+    alloced = T.MemAlloced()
+    runtime.GC()
+    this.Println("GC", time.Now().Sub(start), alloced, "->", T.MemAlloced())
+
+    // export final result, possibly export to db
+    this.Println(worker.Name(), "worker start to export result...")
+    kv.ExportResult(worker)
 
     // WaitForCompletion will wait for this
     this.chTotal <- newTotalResult(rawLines, validLines)
-}
-
-func (this Manager) exportToDb(name string, kv mr.KeyValue, sortedKeys interface{}) {
-    defer T.Un(T.Trace(""))
-
-    this.Printf("export %s worker reduce result to db\n", name)
-    db.ImportResult(name, kv, sortedKeys)
 }
 
 func (this Manager) runTicker() {

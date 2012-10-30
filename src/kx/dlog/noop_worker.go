@@ -29,3 +29,7 @@ func (this *NoopWorker) Map(line string, out chan<- mr.KeyValue) {
 func (this *NoopWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyValue) {
     return
 }
+
+func (this NoopWorker) Printr(key interface{}, value interface{}) string {
+    return ""
+}

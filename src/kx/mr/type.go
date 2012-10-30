@@ -24,6 +24,10 @@ type Reducer interface {
     Reduce(key interface{}, values []interface{}) (out KeyValue)
 }
 
+type Printer interface {
+    Printr(key interface{}, value interface{}) string
+}
+
 type (
     SortType uint8
     SortOrdering uint8

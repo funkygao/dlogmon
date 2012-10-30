@@ -37,5 +37,4 @@ func Initialize(engine, file string) {
 }
 
 func ImportResult(name string, kv mr.KeyValue, sortedKeys interface{}) {
-    kv.DumpToSql(sortedKeys)
 }

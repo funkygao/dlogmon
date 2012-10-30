@@ -3,6 +3,7 @@
 package dlog
 
 import (
+    "fmt"
     "kx/mr"
     "kx/stats"
     T "kx/trace"
@@ -62,4 +63,9 @@ func (this *FileWorker) Reduce(key interface{}, values []interface{}) (kv mr.Key
     }
 
     return
+}
+
+func (this FileWorker) Printr(key interface{}, value interface{}) string {
+    fmt.Println(key.([2]string))
+    return ""
 }
