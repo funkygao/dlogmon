@@ -4,6 +4,7 @@ import (
     "fmt"
     "kx/mr"
     "kx/stats"
+    "os"
     T "kx/trace"
     "strings"
 )
@@ -49,7 +50,7 @@ func (this *AmfWorker) IsLineValid(line string) bool {
 func (this *AmfWorker) Map(line string, out chan<- mr.KeyValue) {
     if x := this.Worker.ExtractLineInfo(line); x != nil {
         if this.manager.option.debug {
-            this.Println(line)
+            fmt.Fprintf(os.Stderr, "%s", x)
         }
     }
 
