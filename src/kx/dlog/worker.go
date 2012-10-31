@@ -177,6 +177,12 @@ func (this *Worker) IsLineValid(line string) bool {
     return true
 }
 
+// Only show top N final result
+// Default show all(0)
+func (this Worker) TopN() int {
+    return 0
+}
+
 // Base to extract meta info from a valid line string.
 // If mapper specified, return the mapper output, else return nil
 func (this *Worker) ExtractLineInfo(line string) interface{} {

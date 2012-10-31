@@ -89,6 +89,15 @@ func (this AmfWorker) Printr(key interface{}, value interface{}) string {
         TABLE_AMF, k[0], k[1], v[k])
 }
 
+func (this AmfWorker) TopN() int {
+    t, e := this.manager.Conf().Int("amf", "topN")
+    if e == nil {
+        return t
+    }
+
+    return this.Worker.TopN() // super
+}
+
 func (this AmfWorker) printThreshold() float64 {
     const default_threshold = 5
     t, e := this.manager.Conf().Float("amf", "export.threshold")

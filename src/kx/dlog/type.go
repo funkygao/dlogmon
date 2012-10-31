@@ -22,6 +22,10 @@ type LineCounter interface {
     TotalLines() int
 }
 
+type TopNer interface {
+    TopN() int
+}
+
 // Worker struct method signatures
 type IWorker interface {
     Namer // each kind of worker has a uniq name
@@ -31,6 +35,7 @@ type IWorker interface {
     DlogParser
     mr.Mapper
     mr.Reducer
+    TopNer
     mr.Printer
 }
 

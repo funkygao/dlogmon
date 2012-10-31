@@ -302,7 +302,7 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
 
     // export final result, possibly export to db
     this.Println(worker.Name(), "worker start to export result...")
-    reduceResult.ExportResult(worker)
+    reduceResult.ExportResult(worker, worker.TopN())
 
     // WaitForCompletion will wait for this
     this.chTotal <- newTotalResult(rawLines, validLines)
