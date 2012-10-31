@@ -10,6 +10,14 @@ sql_replace = re.compile(r'sqls?\^~?\d*!?')
 
 MAX_SQL_DISPLAY_LEN = 110
 
+# when the line is invalid, how do we send back to dlogmon?
+INVALID_FEEDBACK = "None"
+
+def is_valid(line):
+    if '/SAMPLE:1/A' not in line:
+        return False
+    return True
+
 def normalize_sql(sql):
     sql = re.sub(r"'(.*?)'", 'S', sql)
     sql = re.sub(r"\d{1,}", 'N', sql)
@@ -57,16 +65,23 @@ def extract_line(line):
 
 	return url, rid, service, 1000.0 * time, sql, time_span
 
+def feedback_invalid():
+    print INVALID_FEEDBACK
+    sys.stdout.flush()
+
 if __name__ == '__main__':
     while True:
         line = sys.stdin.readline()
         if not line:
             break
 
+        if not is_valid(line):
+            feedback_invalid()
+            continue
+
         parsed_result = extract_line(line)
         if parsed_result is None:
-            print parsed_result
-            sys.stdout.flush()
+            feedback_invalid()
             continue
 
         url, rid, service, time, sql, time_span = parsed_result

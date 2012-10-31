@@ -7,7 +7,6 @@ import (
     "os"
 )
 
-// Constructor of KxiWorker
 func NewKxiWorker(manager *Manager, name, filename string, seq uint16) IWorker {
     defer T.Un(T.Trace(""))
 
@@ -23,6 +22,7 @@ func (this *KxiWorker) IsLineValid(line string) bool {
         return false
     }
 
+    // mapper stream will decide valididation of the line
     return true
 }
 
