@@ -89,7 +89,8 @@ func initialize(option *dlog.Option, err error) {
     if os.Getenv(maxprocsenv) == "" {
         parallel := runtime.NumCPU()/2 + 1
         runtime.GOMAXPROCS(parallel)
-        fmt.Fprintf(os.Stderr, "Parallel CPU: %d / %d\n", parallel, runtime.NumCPU())
+        fmt.Fprintf(os.Stderr, "Parallel CPU(core): %d / %d, Concurrent workers: %d\n", parallel,
+            runtime.NumCPU(), option.Nworkers)
     }
     fmt.Fprintln(os.Stderr, option.Timespan)
 
