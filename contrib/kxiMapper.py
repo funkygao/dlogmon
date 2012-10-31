@@ -3,6 +3,7 @@
 '''dlog sql extractor and normalizer'''
 
 import re
+import sys
 
 sql_find = re.compile(r'sqls?\^~?\d*!?.*')
 sql_replace = re.compile(r'sqls?\^~?\d*!?')
@@ -14,7 +15,7 @@ def normalize_sql(sql):
     sql = re.sub(r"\d{1,}", 'N', sql)
     return sql 
 
-def skipped_url(url):
+def is_skipped_url(url):
     if 'kaixin002' in url:
         return None
     if '/admin/' in url:
@@ -25,6 +26,9 @@ def extract_line(line):
     '''从日志的一行记录里提取结构化信息'''
     items = line.split(None, 10)
     time_span = items[0].replace('>', '')
+    if len(items) < 10:
+        return None
+
     body = items[10]
     ctx = body[2:body.find('}')]
     if not ctx:
@@ -37,7 +41,7 @@ def extract_line(line):
 
     service = items[9][2:]
     method, url, rid = ctx['CALLER'].split('+')
-    if method == 'CLI' or skipped_url(url):
+    if method == 'CLI' or is_skipped_url(url):
         return None
 
     sql = None
@@ -54,7 +58,17 @@ def extract_line(line):
 	return url, rid, service, 1000.0 * time, sql, time_span
 
 if __name__ == '__main__':
-    line = '>121024-163518 192.168.100.123 3309 KProxy KXI.SQA /SAMPLE:1/A T=0.001 9999/127.0.0.1:42162 377 Q=DBMan#app.sQuery X{CALLER^POST+www.kaixin001.com/city/gateway.php+18021f84; MASTER^~F} {kind^s_user_city_gray_inspect; hintId^88546966; convert^~T; sql^~!select orderid,fuid,binspect,extdata,ctime from s_user_city_gray_inspect where uid = 88546966  ~} A=0 {converted^~T; affectedRowNumber^0; fields^[orderid; fuid; binspect; extdata; ctime]; rows^[]}'
-    url, rid, service, time, sql, time_span = extract_line(line)
-    print url, rid, service, time, sql, time_span
-    print normalize_sql(sql)
+    while True:
+        line = sys.stdin.readline()
+        if not line:
+            break
+
+        parsed_result = extract_line(line)
+        if parsed_result is None:
+            print parsed_result
+            sys.stdout.flush()
+            continue
+
+        url, rid, service, time, sql, time_span = parsed_result
+        print url, rid, service, time, normalize_sql(sql), time_span
+        sys.stdout.flush()
