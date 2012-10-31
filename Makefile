@@ -66,7 +66,7 @@ real:install
 nreal:install
 	./bin/dlogmon -k noop -tick 30000 -progress -n 50
 
-prof:run
+prof:
 	@go tool pprof ./bin/dlogmon var/cpu.prof
 
 trace:install
