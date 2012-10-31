@@ -75,8 +75,10 @@ def feedback_json(url, rid, service, time, sql, time_span):
     try:
         encoded = json.dumps(obj)
     except:
+        # TODO gb18030
         feedback_invalid()
         return
+
     print encoded
     sys.stdout.flush()
 

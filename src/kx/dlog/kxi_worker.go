@@ -1,6 +1,7 @@
 package dlog
 
 import (
+    "encoding/json"
     "fmt"
     "kx/mr"
     T "kx/trace"
@@ -27,11 +28,29 @@ func (this *KxiWorker) IsLineValid(line string) bool {
 }
 
 func (this *KxiWorker) Map(line string, out chan<- mr.KeyValue) {
-    if x := this.Worker.ExtractLineInfo(line); x != nil {
-        if this.manager.option.debug {
-            fmt.Fprintf(os.Stderr, "%s", x)
-        }
+    const (
+        KEY_URL = "u"
+        KEY_RID = "i"
+        KEY_SERVICE = "s"
+        KEY_TIME = "t"
+        KEY_SQL = "q"
+    )
+    var streamResult interface{}
+    if streamResult = this.Worker.ExtractLineInfo(line); streamResult == nil {
+        // this line is invalid
+        return
     }
+
+    streamKv := make(map[string]interface{})
+    if err := json.Unmarshal([]byte(streamResult.(string)), &streamKv); err != nil {
+        panic(err)
+    }
+
+    if this.manager.option.debug {
+        fmt.Fprintf(os.Stderr, "stream=> %#v\n", streamKv)
+    }
+
+    //kv := mr.NewKeyValue()
     out <- mr.NewKeyValue()
 }
 
