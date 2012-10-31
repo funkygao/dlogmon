@@ -4,6 +4,7 @@
 
 import re
 import sys
+import json
 
 sql_find = re.compile(r'sqls?\^~?\d*!?.*')
 sql_replace = re.compile(r'sqls?\^~?\d*!?')
@@ -69,6 +70,16 @@ def feedback_invalid():
     print INVALID_FEEDBACK
     sys.stdout.flush()
 
+def feedback_json(url, rid, service, time, sql, time_span):
+    obj = {"u": url, "i": rid, "s": service, "t": time, "q": sql}
+    try:
+        encoded = json.dumps(obj)
+    except:
+        feedback_invalid()
+        return
+    print encoded
+    sys.stdout.flush()
+
 if __name__ == '__main__':
     while True:
         line = sys.stdin.readline()
@@ -85,5 +96,4 @@ if __name__ == '__main__':
             continue
 
         url, rid, service, time, sql, time_span = parsed_result
-        print url, rid, service, time, normalize_sql(sql), time_span
-        sys.stdout.flush()
+        feedback_json(url, rid, service, time, sql, time_span)
