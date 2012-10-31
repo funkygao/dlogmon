@@ -24,6 +24,9 @@ MapReduce in hadoop:
 
 WordCount as example:
                     lines
+                      |
+                      | split
+                      |
        -------------------------------
       |               |               |
       V               V               V

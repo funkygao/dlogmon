@@ -113,6 +113,13 @@ func (this *Sorter) Less(i, j int) bool {
         vi, vj := this.vals[i].(KeyValue), this.vals[j].(KeyValue)
         rvi, rvj := vi[this.keys[i]], vj[this.keys[j]]
         switch rvi.(type) {
+        case string:
+            rvi, rvj := rvi.(string), rvj.(string)
+            if this.asc() {
+                return rvi < rvj
+            } else {
+                return rvi > rvj
+            }
         case float64:
             rvi, rvj := rvi.(float64), rvj.(float64)
             if this.asc() {
