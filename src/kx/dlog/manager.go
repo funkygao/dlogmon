@@ -286,7 +286,6 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
     this.Println("all workers collected, next to merge and reduce...")
 
     // all workers done, so close the channels
-    this.Println("closing channels")
     close(chInMap)
     close(chInWorker)
     close(chRateLimit)
