@@ -8,27 +8,20 @@ import (
 )
 
 // Constructor factory
-func NewStream(name string, arg ...string) *Stream {
-    return &Stream{name: name, arg: arg}
+func NewStream(mode StreamMode, name string, arg ...string) *Stream {
+    return &Stream{name: name, arg: arg, mode: mode}
 }
 
-func (this *Stream) plainFileMode() bool {
-    return len(this.arg) == 0
-}
-
-// open stream
-func (this *Stream) Open() {
-    if this.plainFileMode() {
-        // direct file open instead of exec pipe stream
-        file, err := os.Open(this.name)
-        if err != nil {
-            panic(this.name + " not exist")
-        }
-
-        this.reader = bufio.NewReader(file)
-        return
+func (this *Stream) openPlainFile() {
+    file, err := os.Open(this.name)
+    if err != nil {
+        panic(this.name + " not exist")
     }
 
+    this.reader = bufio.NewReader(file)
+}
+
+func (this *Stream) openExecPipe() {
     this.cmd = exec.Command(this.name, this.arg...)
 
     // stdout pipe
@@ -53,6 +46,16 @@ func (this *Stream) Open() {
     this.writer = bufio.NewWriter(in)
 }
 
+// open stream
+func (this *Stream) Open() {
+    switch this.mode {
+    case EXEC_PIPE:
+        this.openExecPipe()
+    case PLAIN_FILE:
+        this.openPlainFile()
+    }
+}
+
 // get reader to read from the pipe output
 func (this Stream) Reader() *bufio.Reader {
     return this.reader
@@ -65,11 +68,10 @@ func (this Stream) Writer() *bufio.Writer {
 
 // close the stream
 func (this *Stream) Close() {
-    if this.plainFileMode() {
-        return
-    }
-
-    if err := this.cmd.Wait(); err != nil {
-        panic(err)
+    switch this.mode {
+    case EXEC_PIPE:
+        if err := this.cmd.Wait(); err != nil {
+            panic(err)
+        }
     }
 }

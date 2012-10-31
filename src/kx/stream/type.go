@@ -13,4 +13,7 @@ type Stream struct {
     cmd    *exec.Cmd
     reader *bufio.Reader
     writer *bufio.Writer
+    mode   StreamMode
 }
+
+type StreamMode uint8

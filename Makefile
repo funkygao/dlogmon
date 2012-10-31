@@ -73,7 +73,7 @@ trace:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -t -d
 
 mr:install
-	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -mapper ./mr/amfMapper.py -progress
+	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -mapper ./contrib/amfMapper.py -progress
 
 loc:
 	@echo `find src/kx -name '*.go' | xargs wc -l | tail -1` lines

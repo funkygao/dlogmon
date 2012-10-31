@@ -47,7 +47,7 @@ func (this *Worker) initMapper() *stream.Stream {
 
     option := this.manager.option
     if option.mapper != "" {
-        stream := stream.NewStream(option.mapper)
+        stream := stream.NewStream(stream.EXEC_PIPE, option.mapper)
         stream.Open()
 
         this.mapReader = stream.Reader()
@@ -94,9 +94,9 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, 
 
     var input *stream.Stream
     if this.manager.option.filemode {
-        input = stream.NewStream(this.filename)
+        input = stream.NewStream(stream.PLAIN_FILE, this.filename)
     } else {
-        input = stream.NewStream(LZOP_CMD, LZOP_OPTION, this.filename)
+        input = stream.NewStream(stream.EXEC_PIPE, LZOP_CMD, LZOP_OPTION, this.filename)
     }
     input.Open()
     defer input.Close()
