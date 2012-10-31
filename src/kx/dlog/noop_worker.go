@@ -20,12 +20,10 @@ func (this *NoopWorker) IsLineValid(line string) bool {
     return false
 }
 
-// Extract meta info related to amf from a valid line
 func (this *NoopWorker) Map(line string, out chan<- mr.KeyValue) {
     out <- mr.NewKeyValue()
 }
 
-// Reduce
 func (this *NoopWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyValue) {
     return
 }

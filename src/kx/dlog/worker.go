@@ -180,6 +180,11 @@ func (this *Worker) IsLineValid(line string) bool {
 // Only show top N final result
 // Default show all(0)
 func (this Worker) TopN() int {
+    t, e := this.manager.Conf().Int(this.self.Name(), "topN")
+    if e == nil {
+        return t
+    }
+
     return 0
 }
 

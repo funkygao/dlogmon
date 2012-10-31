@@ -3,6 +3,13 @@ package dlog
 import "log"
 
 const (
+    W_AMF = "amf"
+    W_KXI = "kxi"
+    W_NOOP = "noop"
+    W_FILE = "file"
+)
+
+const (
     LZOP_CMD            = "lzop"
     LZOP_OPTION         = "-dcf"
     EOL                 = '\n'

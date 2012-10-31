@@ -48,6 +48,9 @@ fmt:
 clean:
 	rm -rf ${BIN} ${PKG} ${VAR}
 
+kxi:install
+	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -k kxi -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
+
 amf:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
 

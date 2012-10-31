@@ -14,7 +14,7 @@ func (this KeyValue) ExportResult(printer Printer, top int) {
     // sort by value desc
     s.Sort(SORT_BY_VALUE, SORT_ORDER_DESC)
     sortedKeys := s.keys
-    if top > 0 {
+    if top > 0 && top < len(sortedKeys) {
         sortedKeys = sortedKeys[:top]
     }
     println()

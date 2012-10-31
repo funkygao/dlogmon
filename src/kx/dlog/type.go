@@ -52,6 +52,11 @@ type Worker struct {
     self     IWorker         // runtime dispatch
 }
 
+// KXI call analyzer
+type KxiWorker struct {
+    Worker
+}
+
 // AMF_SLOW tag analyzer
 type AmfWorker struct {
     Worker
