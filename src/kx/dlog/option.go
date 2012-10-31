@@ -98,7 +98,8 @@ func ParseFlags() (*Option, error) {
         now := time.Now()
         year, month, day := now.Date()
         if now.Hour() < 10 {
-            day --
+            yestoday := now.AddDate(0, 0, -1)
+            day = yestoday.Day()
         }
         dir = fmt.Sprintf("%4d%02d%02d", year, month, day)
         dir = dir[2:] // 20120918 -> 120918
