@@ -291,31 +291,29 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
     close(chInWorker)
     close(chRateLimit)
 
+    this.invokeGc()
+
+    // mappers must complete before reducers can begin
+    worker := this.getOneWorker()
+    this.Println(worker.Name(), "worker start to reduce with ordered keys...")
+    reduceResult := kvs.LaunchReducer(worker)
+    this.Println(worker.Name(), "worker reduce done")
+
+    this.invokeGc()
+
+    // export final result, possibly export to db
+    this.Println(worker.Name(), "worker start to export result...")
+    reduceResult.ExportResult(worker)
+
+    // WaitForCompletion will wait for this
+    this.chTotal <- newTotalResult(rawLines, validLines)
+}
+
+func (this Manager) invokeGc() {
     start := time.Now()
     alloced := T.MemAlloced()
     runtime.GC()
     this.Println("GC", time.Now().Sub(start), alloced, "->", T.MemAlloced())
-
-    worker := this.getOneWorker()
-
-    this.Println(worker.Name(), "worker start to reduce with ordered keys...")
-
-    // reduce the merged result
-    // reduce cannot start until all the mappers have finished
-    kv := kvs.LaunchReducer(worker)
-    this.Println(worker.Name(), "worker reduce done")
-
-    start = time.Now()
-    alloced = T.MemAlloced()
-    runtime.GC()
-    this.Println("GC", time.Now().Sub(start), alloced, "->", T.MemAlloced())
-
-    // export final result, possibly export to db
-    this.Println(worker.Name(), "worker start to export result...")
-    kv.ExportResult(worker)
-
-    // WaitForCompletion will wait for this
-    this.chTotal <- newTotalResult(rawLines, validLines)
 }
 
 func (this Manager) runTicker() {
