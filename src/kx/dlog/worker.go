@@ -207,8 +207,8 @@ func (this *Worker) ExtractLineInfo(line string) interface{} {
     }
 
     mapperLine, _ := this.mapReader.ReadString(EOL)
-    // TODO hardcode
-    if string(mapperLine) == "None\n" {
+    if string(mapperLine) == "\n" {
+        // empty result, just a EOL
         return nil
     }
 

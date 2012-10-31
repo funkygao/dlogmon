@@ -67,7 +67,7 @@ def extract_line(line):
 	return url, rid, service, 1000.0 * time, sql, time_span
 
 def feedback_invalid():
-    print INVALID_FEEDBACK
+    print 
     sys.stdout.flush()
 
 def feedback_json(url, rid, service, time, sql, time_span):
