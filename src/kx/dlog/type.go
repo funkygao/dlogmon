@@ -40,6 +40,7 @@ type IWorker interface {
 }
 
 // For 1 dlog file worker
+// Abstract
 type Worker struct {
     name      string
     seq       uint16 // sequence number
