@@ -47,12 +47,12 @@ func (this *Worker) initMapper() *stream.Stream {
 
     option := this.manager.option
     if option.mapper != "" {
-        mapper := stream.NewStream(option.mapper)
-        mapper.Open()
+        stream := stream.NewStream(option.mapper)
+        stream.Open()
 
-        this.mapReader = mapper.Reader()
-        this.mapWriter = mapper.Writer()
-        return mapper
+        this.mapReader = stream.Reader()
+        this.mapWriter = stream.Writer()
+        return stream
     }
 
     return nil
