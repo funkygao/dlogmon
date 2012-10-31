@@ -128,9 +128,13 @@ func ParseFlags() (*Option, error) {
         os.Exit(1)
     }
 
+    basedir, e := option.conf.String("default", "dlogbase")
+    if e != nil {
+        basedir = DEFAULT_DLOG_BASE_DIR
+    }
     globs := make([]string, 0)
     for i := h1; i <= h2; i++ {
-        globs = append(globs, fmt.Sprintf("%s%s/*.%s-%02d*", DLOG_BASE_DIR, dir, dir, i))
+        globs = append(globs, fmt.Sprintf("%s%s/*.%s-%02d*", basedir, dir, dir, i))
     }
 
     for _, glob := range globs {
