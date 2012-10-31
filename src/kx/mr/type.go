@@ -29,14 +29,14 @@ type Printer interface {
 }
 
 type (
-    SortType uint8
+    SortType     uint8
     SortOrdering uint8
 )
 
 type Sorter struct {
     keys []interface{}
     vals []interface{}
-    t SortType
-    o SortOrdering
+    t    SortType
+    o    SortOrdering
     sort.Interface
 }

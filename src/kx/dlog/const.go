@@ -3,24 +3,24 @@ package dlog
 import "log"
 
 const (
-    W_AMF = "amf"
-    W_KXI = "kxi"
+    W_AMF  = "amf"
+    W_KXI  = "kxi"
     W_NOOP = "noop"
     W_FILE = "file"
 )
 
 const (
-    LZOP_CMD            = "lzop"
-    LZOP_OPTION         = "-dcf"
-    EOL                 = '\n'
-    DEFAULT_DLOG_BASE_DIR       = "/kx/dlog/"
-    SAMPLER_HOST        = "100.123"
-    FLAG_TIMESPAN_SEP   = "-"
-    KEYTYPE_SEP         = ":"
-    LINES_PER_FILE      = 600000 // deprecated
-    PROGRESS_LINES_STEP = 50000  // TODO calculated instead of const
-    PROGRESS_CHAN_BUF   = 1000
-    LINE_CHAN_BUF       = 2000
+    LZOP_CMD              = "lzop"
+    LZOP_OPTION           = "-dcf"
+    EOL                   = '\n'
+    DEFAULT_DLOG_BASE_DIR = "/kx/dlog/"
+    SAMPLER_HOST          = "100.123"
+    FLAG_TIMESPAN_SEP     = "-"
+    KEYTYPE_SEP           = ":"
+    LINES_PER_FILE        = 600000 // deprecated
+    PROGRESS_LINES_STEP   = 50000  // TODO calculated instead of const
+    PROGRESS_CHAN_BUF     = 1000
+    LINE_CHAN_BUF         = 2000
 )
 
 const (

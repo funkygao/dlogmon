@@ -4,8 +4,8 @@ import (
     "fmt"
     "kx/mr"
     "kx/stats"
-    "os"
     T "kx/trace"
+    "os"
     "strings"
 )
 
@@ -59,7 +59,7 @@ func (this *AmfWorker) Map(line string, out chan<- mr.KeyValue) {
 
     kv := mr.NewKeyValue()
     var key [2]string // prepare key type
-    key[0] = req.class+"."+req.method
+    key[0] = req.class + "." + req.method
     key[1] = req.uri
     kv[key] = 1
 

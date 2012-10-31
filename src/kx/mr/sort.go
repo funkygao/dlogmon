@@ -61,7 +61,7 @@ func (this Sorter) lessStringSlice(si, sj []string) bool {
         }
     }
 
-    for i, _ := range si {
+    for i := range si {
         vi, vj := si[i], sj[i]
         if vi < vj {
             if this.asc() {

@@ -60,4 +60,3 @@ func arrayToSlice6(in [6]string) []string {
     }
     return out
 }
-

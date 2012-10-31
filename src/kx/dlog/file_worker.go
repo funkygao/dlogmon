@@ -47,7 +47,7 @@ func (this *FileWorker) Map(line string, out chan<- mr.KeyValue) {
             coOccurence[0] = strings.TrimSpace(term)
             coOccurence[1] = strings.TrimSpace(terms[j])
             kv[coOccurence] = 1
-            
+
         }
 
         // for each word occurence
