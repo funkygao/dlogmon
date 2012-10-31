@@ -17,7 +17,7 @@ PKG = pkg
 VAR = var
 
 install:mkvar
-	go install ${PKGS}
+	@go install ${PKGS}
 
 linux:
 	@echo 'cd /usr/local/go/src; CGO_ENABLED=0 GOOS=linux GOARCH=amd64 ./make.bash --no-clean'
@@ -49,22 +49,22 @@ clean:
 	rm -rf ${BIN} ${PKG} ${VAR}
 
 kxi:install
-	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -k kxi -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
+	@./bin/dlogmon -f test/fixture/lz.121015-104410 -d -k kxi -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
 amf:install
-	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
+	@./bin/dlogmon -f test/fixture/lz.121015-104410 -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
 file:install
-	./bin/dlogmon -f README.rst -filemode -d -tick 500 -progress -k file -progress
+	@./bin/dlogmon -f README.rst -filemode -d -tick 500 -progress -k file -progress
 
 noop:install
-	./bin/dlogmon -k noop -f test/fixture/lz.121015-104410 -d -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
+	@./bin/dlogmon -k noop -f test/fixture/lz.121015-104410 -d -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
 real:install
-	./bin/dlogmon -tick 30000 -progress -n 50
+	@./bin/dlogmon -tick 30000 -progress -n 50
 
 nreal:install
-	./bin/dlogmon -k noop -tick 30000 -progress -n 50
+	@./bin/dlogmon -k noop -tick 30000 -progress -n 50
 
 prof:
 	@go tool pprof ./bin/dlogmon var/cpu.prof
@@ -73,7 +73,7 @@ trace:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -t -d
 
 mr:install
-	./bin/dlogmon -f test/fixture/lz.121015-104410 -d -mapper ./contrib/amfMapper.py -progress
+	@./bin/dlogmon -f test/fixture/lz.121015-104410 -d -mapper ./contrib/amfMapper.py -progress
 
 loc:
 	@echo `find src/kx -name '*.go' | xargs wc -l | tail -1` lines

@@ -85,7 +85,7 @@ func ParseFlags() (*Option, error) {
     }
     if *f != "" {
         option.files = []string{*f}
-        option.Timespan = fmt.Sprintf("Single dlog file: %s", *f)
+        option.Timespan = fmt.Sprintf("%s worker => dlog file: %s", *kind, *f)
         return option, nil
     }
 
@@ -148,8 +148,8 @@ func ParseFlags() (*Option, error) {
         return option, errors.New("Fatal error: empty dlog")
     }
 
-    option.Timespan = fmt.Sprintf("20%s %02d:00-%02d:00[%d dlog files]", dir, 
-        h1, h2+1, len(option.files))
+    option.Timespan = fmt.Sprintf("%s worker => 20%s %02d:00-%02d:00[%d dlog files]", *kind,
+        dir, h1, h2+1, len(option.files))
 
     return option, nil
 }
