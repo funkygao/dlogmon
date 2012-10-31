@@ -87,6 +87,8 @@ func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- mr.KeyValu
 // chOutMap: 1
 // chOutWorker: 1
 func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, chOutWorker chan<- WorkerResult) {
+    defer T.Un(T.Trace(""))
+
     // invoke transform goroutine to transform k=>v into k=>[]v
     chKvs := make(chan mr.KeyValues)
     chKv := make(chan mr.KeyValue, LINE_CHAN_BUF)
@@ -126,8 +128,9 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, 
 
         validLines++
 
-        // run map for this line with EOL stripped
-        this.self.Map(line[:len(line)-1], chKv)
+        // run map for this line 
+        // for pipe stream flush to work, we can't strip EOL
+        this.self.Map(line, chKv)
     }
 
     chOutWorker <- newWorkerResult(rawLines, validLines)
