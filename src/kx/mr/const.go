@@ -1,5 +1,9 @@
 package mr
 
+import (
+    "os"
+)
+
 const (
     SORT_BY_KEY   SortType = iota + 1
     SORT_BY_VALUE
@@ -11,4 +15,9 @@ const (
 
     KEY_SECONDARY_KV = "skv"
     KEY_SECONDARY_VK = "svk"
+)
+
+const (
+    GOB_FILE_FLAG = os.O_CREATE|os.O_WRONLY
+    GOB_FILE_PERM = 0600
 )

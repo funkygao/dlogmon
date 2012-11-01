@@ -1,6 +1,8 @@
 package mr
 
 import (
+    "encoding/gob"
+    "os"
     "reflect"
 )
 
@@ -60,5 +62,20 @@ func (this KeyValue) ExportResult(printer Printer, top int) {
     println()
     for _, k := range sortedKeys {
         _ = printer.Printr(k, this[k]) // return sql dml statement, usually 'insert into'
+    }
+}
+
+func (this KeyValue) serialize(filename string) {
+    file, e := os.OpenFile(filename, GOB_FILE_FLAG, GOB_FILE_PERM)
+    if e != nil {
+        panic(e)
+    }
+    defer file.Close()
+
+    enc := gob.NewEncoder(file)
+    if e := enc.Encode(this); e != nil {
+        // TODO
+        // type not registered for interface: [3]string
+        panic(e)
     }
 }

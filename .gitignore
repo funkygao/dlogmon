@@ -3,6 +3,9 @@
 *.8
 *.6
 *.a
+*.gob
+*.json
+*.db
 bin/
 pkg/
 var
