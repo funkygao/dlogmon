@@ -8,6 +8,16 @@ func (this *Set) Add(v interface{}) {
     this.data[v] = true
 }
 
+func (this *Set) Remove(v interface{}) (ok bool) {
+    if _, ok = this.data[v]; !ok {
+        return
+    }
+
+    delete(this.data, v)
+    ok = true
+    return
+}
+
 func (this Set) Values() []interface{} {
     r := make([]interface{}, len(this.data))
     var i int
