@@ -4,9 +4,12 @@ import (
     "encoding/json"
     "fmt"
     "kx/mr"
+    "kx/stats"
     T "kx/trace"
     "os"
 )
+
+const KXI_KEY_LEN = 3
 
 func NewKxiWorker(manager *Manager, name, filename string, seq uint16) IWorker {
     defer T.Un(T.Trace(""))
@@ -58,13 +61,33 @@ func (this *KxiWorker) Map(line string, out chan<- mr.KeyValue) {
     }
 
     kv := mr.NewKeyValue()
+    kv[[KXI_KEY_LEN]string{"url_service", url, service}] = time
+    kv[[KXI_KEY_LEN]string{"url", url, ""}] = time
+    kv[[KXI_KEY_LEN]string{"service", service, ""}] = time
+    kv[[KXI_KEY_LEN]string{"url_rid", url, rid}] = time
+    kv[[KXI_KEY_LEN]string{"url_sql", url, sql}] = time
     out <- kv
 }
 
+// The key is already sorted
 func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyValue) {
+    parts := key.([KXI_KEY_LEN]string)
+    kind, k1, k2 := parts[0], parts[1], parts[2]
+    if this.manager.option.debug {
+        fmt.Fprintf(os.Stderr, "DEBUG=> %s %s %s %v\n", kind, k1, k2, values)
+    }
+
+    kv = mr.NewKeyValue()
+    if kind == "url_sql" {
+        kv[k1 + ":" + k2] = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
+        fmt.Println(kv)
+    }
     return
 }
 
 func (this KxiWorker) Printr(key interface{}, value interface{}) string {
+    v := value.(mr.KeyValue)
+    k := key.([KXI_KEY_LEN]string)
+    fmt.Println(k, v)
     return ""
 }
