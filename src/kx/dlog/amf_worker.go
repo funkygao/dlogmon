@@ -9,6 +9,8 @@ import (
     "strings"
 )
 
+const AMF_KEY_LEN = 2
+
 // Constructor of AmfWorker
 func NewAmfWorker(manager *Manager, name, filename string, seq uint16) IWorker {
     defer T.Un(T.Trace(""))
@@ -58,10 +60,7 @@ func (this *AmfWorker) Map(line string, out chan<- mr.KeyValue) {
     req.parseLine(line)
 
     kv := mr.NewKeyValue()
-    var key [2]string // prepare key type
-    key[0] = req.class + "." + req.method
-    key[1] = req.uri
-    kv[key] = 1
+    kv[[AMF_KEY_LEN]string{req.class + "." + req.method, req.uri}] = 1
 
     // emit an intermediate data
     out <- kv
@@ -81,7 +80,7 @@ func (this *AmfWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
 
 func (this AmfWorker) Printr(key interface{}, value interface{}) string {
     v := value.(mr.KeyValue)
-    k := key.([2]string)
+    k := key.([AMF_KEY_LEN]string)
     if count := v[k].(float64); count >= this.printThreshold() {
         fmt.Printf("%65s  %-35s %5.0f\n", k[0], k[1], v[k])
     }

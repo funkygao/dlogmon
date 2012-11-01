@@ -59,6 +59,7 @@ func (this KeyValue) ExportResult(printer Printer, top int) {
     if top > 0 && top < len(sortedKeys) {
         sortedKeys = sortedKeys[:top]
     }
+
     println()
     for _, k := range sortedKeys {
         _ = printer.Printr(k, this[k]) // return sql dml statement, usually 'insert into'
