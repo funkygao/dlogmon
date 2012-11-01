@@ -18,3 +18,11 @@ func (this Set) Values() []interface{} {
     return r
 }
 
+func (this Set) StrValues() []string {
+    r := make([]string, len(this.data))
+    for i, v := range this.Values() {
+        r[i] = v.(string)
+    }
+
+    return r
+}

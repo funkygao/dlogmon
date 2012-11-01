@@ -113,7 +113,7 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
 // kv are in the same group
 func (this KxiWorker) Printh(kv mr.KeyValue, top int) {
     s := mr.NewSort(kv)
-    s.Sort(mr.SORT_BY_VALUE, mr.SORT_ORDER_DESC)
+    s.Sort(mr.SORT_BY_KEY, mr.SORT_ORDER_DESC)
     sortedKeys := s.Keys()
     if top > 0 && top < len(sortedKeys) {
         sortedKeys = sortedKeys[:top]
@@ -135,6 +135,8 @@ func (this KxiWorker) Printh(kv mr.KeyValue, top int) {
 
     var lastK12 string
     for _, sk := range sortedKeys {
+    //    fmt.Println(sk)
+     //   continue
         value := kv[sk].(mr.KeyValue)
         tt := make(map[string]float64)
         for k, v := range value {
