@@ -116,8 +116,14 @@ func (this *Sorter) Less(i, j int) bool {
             return this.lessStringSlice(arrayToSlice8(ki), arrayToSlice8(kj))
         }
     } else if this.t == SORT_BY_VALUE {
-        vi, vj := this.vals[i].(KeyValue), this.vals[j].(KeyValue)
-        rvi, rvj := vi[this.keys[i]], vj[this.keys[j]]
+        // for reducer result, key is mappers' output key
+        // and value is reducers' output KeyValue
+        valsI, valsJ := this.vals[i].(KeyValue).Values(), this.vals[j].(KeyValue).Values()
+        if len(valsI) != len(valsJ) {
+            panic("value length not match")
+        }
+        // 这里的限制是，len(valsI) == 1
+        rvi, rvj := valsI[0], valsJ[0]
         switch rvi.(type) {
         case string:
             rvi, rvj := rvi.(string), rvj.(string)

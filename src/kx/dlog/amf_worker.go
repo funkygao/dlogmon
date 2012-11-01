@@ -80,19 +80,8 @@ func (this *AmfWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
 
 func (this AmfWorker) Printr(key interface{}, value mr.KeyValue) string {
     k := key.([AMF_KEY_LEN]string)
-    if count := value[k].(float64); count >= this.printThreshold() {
-        fmt.Printf("%65s  %-35s %5.0f\n", k[0], k[1], value[k])
-    }
+    fmt.Printf("%65s  %-35s %5.0f\n", k[0], k[1], value[k])
 
     return fmt.Sprintf("insert into %s(method, uri, c) values('%s', '%s', %d)",
         TABLE_AMF, k[0], k[1], value[k])
-}
-
-func (this AmfWorker) printThreshold() float64 {
-    const default_threshold = 5
-    t, e := this.manager.Conf().Float("amf", "export.threshold")
-    if e != nil {
-        return default_threshold
-    }
-    return t
 }

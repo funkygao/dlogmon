@@ -78,15 +78,15 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
     }
 
     kv = mr.NewKeyValue()
-    if kind == "url_sql" {
-        kv[k1 + ":" + k2] = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
-        fmt.Println(kv)
+    if kind == "service" {
+        kv[k1] = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
     }
     return
 }
 
 func (this KxiWorker) Printr(key interface{}, value mr.KeyValue) string {
-    k := key.([KXI_KEY_LEN]string)
-    fmt.Println(k, value)
+    for k, v := range value {
+        fmt.Printf("%50s %.0f\n", k, v)
+    }
     return ""
 }

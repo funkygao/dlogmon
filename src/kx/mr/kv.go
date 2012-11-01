@@ -25,6 +25,16 @@ func (this KeyValue) Keys() (keys []interface{}) {
     return
 }
 
+func (this KeyValue) Values() (values []interface{}) {
+    values = make([]interface{}, len(this))
+    var i int
+    for _, v := range this {
+        values[i] = v
+        i++
+    }
+    return
+}
+
 func (this KeyValue) sortType() SortType {
     var key interface{}
     for k, _ := range this {
