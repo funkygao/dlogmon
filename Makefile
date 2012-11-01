@@ -69,6 +69,9 @@ nreal:install
 prof:
 	@go tool pprof ./bin/dlogmon var/cpu.prof
 
+mprof:
+	@go tool pprof ./bin/dlogmon var/mem.prof
+
 trace:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -t -d
 
