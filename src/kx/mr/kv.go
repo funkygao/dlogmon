@@ -72,9 +72,38 @@ func (this KeyValue) sortType() SortType {
     return SORT_BY_VALUE
 }
 
+// Return []string
+func (this KeyValue) KeyTypes() []string {
+    t := make(KeyValue)
+    for k,_ := range this {
+        switch k.(type) {
+        case [2]string:
+            t[k.([2]string)[0]] = true
+        case [3]string:
+            t[k.([3]string)[0]] = true
+        case [4]string:
+            t[k.([4]string)[0]] = true
+        case [5]string:
+            t[k.([5]string)[0]] = true
+        case [6]string:
+            t[k.([6]string)[0]] = true
+        case [7]string:
+            t[k.([7]string)[0]] = true
+        case [8]string:
+            t[k.([8]string)[0]] = true
+        }
+    }
+
+    return InterfaceArrayToStringSlice(t.Keys())
+}
+
 // this with key as mappers' output keys
 // and value as reducer output value(KeyValue)
 func (this KeyValue) ExportResult(printer Printer, top int) {
+    for _, kt := range this.KeyTypes() {
+        println(kt)
+    }
+
     s := newSort(this)
     s.Sort(this.sortType(), SORT_ORDER_DESC)
     sortedKeys := s.keys
