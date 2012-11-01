@@ -27,3 +27,15 @@ func TestAppendSlice(t *testing.T) {
     f := ConvertAnySliceToFloat(d["a"])
     assert.Equal(t, f, []float64{2, 3.1, 4.1})
 }
+
+func TestKeyValueSortType(t *testing.T) {
+    kv := NewKeyValue()
+    kv["a"] = 1
+    kv["b"] = 2
+    assert.Equal(t, SORT_BY_VALUE, kv.sortType())
+
+    kv = NewKeyValue()
+    kv[[...]string{"avg", "www"}] = 1
+    kv[[...]string{"avg", "game"}] = 2
+    assert.Equal(t, SORT_SECONDARY_KV, kv.sortType())
+}
