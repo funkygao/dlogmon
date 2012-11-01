@@ -95,25 +95,25 @@ func (this *Sorter) Less(i, j int) bool {
             }
         case [2]string:
             ki, kj := this.keys[i].([2]string), this.keys[j].([2]string)
-            return this.lessStringSlice(arrayToSlice2(ki), arrayToSlice2(kj))
+            return this.lessStringSlice(ArrayToSlice(ki), ArrayToSlice(kj))
         case [3]string:
             ki, kj := this.keys[i].([3]string), this.keys[j].([3]string)
-            return this.lessStringSlice(arrayToSlice3(ki), arrayToSlice3(kj))
+            return this.lessStringSlice(ArrayToSlice(ki), ArrayToSlice(kj))
         case [4]string:
             ki, kj := this.keys[i].([4]string), this.keys[j].([4]string)
-            return this.lessStringSlice(arrayToSlice4(ki), arrayToSlice4(kj))
+            return this.lessStringSlice(ArrayToSlice(ki), ArrayToSlice(kj))
         case [5]string:
             ki, kj := this.keys[i].([5]string), this.keys[j].([5]string)
-            return this.lessStringSlice(arrayToSlice5(ki), arrayToSlice5(kj))
+            return this.lessStringSlice(ArrayToSlice(ki), ArrayToSlice(kj))
         case [6]string:
             ki, kj := this.keys[i].([6]string), this.keys[j].([6]string)
-            return this.lessStringSlice(arrayToSlice6(ki), arrayToSlice6(kj))
+            return this.lessStringSlice(ArrayToSlice(ki), ArrayToSlice(kj))
         case [7]string:
             ki, kj := this.keys[i].([7]string), this.keys[j].([7]string)
-            return this.lessStringSlice(arrayToSlice7(ki), arrayToSlice7(kj))
+            return this.lessStringSlice(ArrayToSlice(ki), ArrayToSlice(kj))
         case [8]string:
             ki, kj := this.keys[i].([8]string), this.keys[j].([8]string)
-            return this.lessStringSlice(arrayToSlice8(ki), arrayToSlice8(kj))
+            return this.lessStringSlice(ArrayToSlice(ki), ArrayToSlice(kj))
         }
     } else if this.t == SORT_BY_VALUE {
         // for reducer result, key is mappers' output key

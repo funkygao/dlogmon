@@ -79,7 +79,8 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
 
     kv = mr.NewKeyValue()
     if kind == "service" {
-        kv[k1] = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
+        kv[[...]string{"serviceT", k1}] = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
+        kv[[...]string{"serviceC", k1}] = float64(len(values))
     }
     return
 }
