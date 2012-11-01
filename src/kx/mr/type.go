@@ -25,7 +25,7 @@ type Reducer interface {
 }
 
 type Printer interface {
-    Printr(key interface{}, value interface{}) string
+    Printr(key interface{}, value KeyValue) string
 }
 
 type (

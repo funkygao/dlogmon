@@ -62,7 +62,7 @@ func (this KeyValue) ExportResult(printer Printer, top int) {
 
     println()
     for _, k := range sortedKeys {
-        _ = printer.Printr(k, this[k]) // return sql dml statement, usually 'insert into'
+        _ = printer.Printr(k, this[k].(KeyValue)) // return sql dml statement, usually 'insert into'
     }
 }
 

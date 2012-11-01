@@ -85,9 +85,8 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
     return
 }
 
-func (this KxiWorker) Printr(key interface{}, value interface{}) string {
-    v := value.(mr.KeyValue)
+func (this KxiWorker) Printr(key interface{}, value mr.KeyValue) string {
     k := key.([KXI_KEY_LEN]string)
-    fmt.Println(k, v)
+    fmt.Println(k, value)
     return ""
 }

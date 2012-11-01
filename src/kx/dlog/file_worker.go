@@ -72,11 +72,10 @@ func (this *FileWorker) Reduce(key interface{}, values []interface{}) (kv mr.Key
     return
 }
 
-func (this FileWorker) Printr(key interface{}, value interface{}) string {
-    v := value.(mr.KeyValue)
+func (this FileWorker) Printr(key interface{}, value mr.KeyValue) string {
     k := key.([2]string)
-    if v[k].(float64) > 1 {
-        fmt.Printf("%25s%25s %4.0f\n", k[0], k[1], v[k])
+    if value[k].(float64) > 1 {
+        fmt.Printf("%25s%25s %4.0f\n", k[0], k[1], value[k])
     }
     return ""
 }

@@ -28,6 +28,6 @@ func (this *NoopWorker) Reduce(key interface{}, values []interface{}) (kv mr.Key
     return
 }
 
-func (this NoopWorker) Printr(key interface{}, value interface{}) string {
+func (this NoopWorker) Printr(key interface{}, value mr.KeyValue) string {
     return ""
 }
