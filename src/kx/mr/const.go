@@ -21,3 +21,8 @@ const (
     GOB_FILE_FLAG = os.O_CREATE|os.O_WRONLY
     GOB_FILE_PERM = 0600
 )
+
+const (
+    KEY_GROUP = "_"
+    GROUP_HEADER_LEN = 80
+)
