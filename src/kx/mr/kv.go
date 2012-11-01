@@ -62,6 +62,8 @@ func (this KeyValue) sortType() SortType {
     return SORT_BY_VALUE
 }
 
+// this with key as mappers' output keys
+// and value as reducer output value(KeyValue)
 func (this KeyValue) ExportResult(printer Printer, top int) {
     s := newSort(this)
     s.Sort(this.sortType(), SORT_ORDER_DESC)
@@ -70,7 +72,7 @@ func (this KeyValue) ExportResult(printer Printer, top int) {
         sortedKeys = sortedKeys[:top]
     }
 
-    println()
+    println() // seperate from the progress bar
     for _, k := range sortedKeys {
         _ = printer.Printr(k, this[k].(KeyValue)) // return sql dml statement, usually 'insert into'
     }
