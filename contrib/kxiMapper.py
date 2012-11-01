@@ -71,7 +71,7 @@ def feedback_invalid():
     sys.stdout.flush()
 
 def feedback_json(url, rid, service, time, sql, time_span):
-    obj = {"u": url, "i": rid, "s": service, "t": time, "q": sql}
+    obj = {"u": url, "i": rid, "s": service, "t": time, "q": normalize_sql(sql)}
     try:
         encoded = json.dumps(obj)
     except:

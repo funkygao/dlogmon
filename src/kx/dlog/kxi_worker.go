@@ -46,8 +46,15 @@ func (this *KxiWorker) Map(line string, out chan<- mr.KeyValue) {
         panic(err)
     }
 
+    var (
+        url, rid, service, sql string
+        time float64
+    )
+    url, rid, service, time, sql = streamKv[KEY_URL].(string), streamKv[KEY_RID].(string),
+        streamKv[KEY_SERVICE].(string), streamKv[KEY_TIME].(float64),
+        streamKv[KEY_SQL].(string)
     if this.manager.option.debug {
-        fmt.Fprintf(os.Stderr, "stream=> %#v\n", streamKv)
+        fmt.Fprintf(os.Stderr, "DEBUG<= %s %s %s %f %s\n", url, rid, service, time, sql)
     }
 
     kv := mr.NewKeyValue()
