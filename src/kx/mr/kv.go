@@ -80,6 +80,7 @@ func (this KeyValue) Groupped() bool {
 }
 
 // 如果要分组，那么mapper输出的key，必须是[]string，而且第一个key值为KEY_GROUP
+// 第二个key值为group value
 func (this KeyValue) Groups() []string {
     t := make(KeyValue)
     for k,_ := range this {
@@ -119,7 +120,7 @@ func (this KeyValue) Groups() []string {
 }
 
 func (this KeyValue) exportForNonGrouped(printer Printer, top int) {
-    s := newSort(this)
+    s := NewSort(this)
     s.Sort(this.sortType(), SORT_ORDER_DESC)
     sortedKeys := s.keys
     if top > 0 && top < len(sortedKeys) {
@@ -136,10 +137,35 @@ func (this KeyValue) printGroupHeader(group string) {
     fmt.Println(strings.Repeat("=", GROUP_HEADER_LEN))
 }
 
+func (this KeyValue) newByGroup(group string) KeyValue {
+    if !this.Groupped() {
+        return this
+    }
+
+    r := NewKeyValue()
+    for k, v := range this {
+        // discard the first [2]string with 0:KEY_GROUP 1:group name
+        if key, ok := k.([3]string); ok && key[1] == group {
+            r[[...]string{key[2]}] = v
+        } else if key, ok := k.([4]string); ok && key[1] == group {
+            r[[...]string{key[2], key[3]}] = v
+        } else if key, ok := k.([5]string); ok && key[1] == group {
+            r[[...]string{key[2], key[3], key[4]}] = v
+        } else if key, ok := k.([6]string); ok && key[1] == group {
+            r[[...]string{key[2], key[3], key[4], key[5]}] = v
+        } else if key, ok := k.([7]string); ok && key[1] == group {
+            r[[...]string{key[2], key[3], key[4], key[5], key[6]}] = v
+        } else if key, ok := k.([8]string); ok && key[1] == group {
+            r[[...]string{key[2], key[3], key[4], key[5], key[6], key[7]}] = v
+        }
+    }
+    return r
+}
+
 // this with key as mappers' output keys
 // and value as reducer output value(KeyValue)
 func (this KeyValue) ExportResult(printer Printer, top int) {
-    println() // seperate from the progress bar
+    println("\n") // seperate from the progress bar
 
     if !this.Groupped() {
         this.exportForNonGrouped(printer, top)
@@ -149,17 +175,26 @@ func (this KeyValue) ExportResult(printer Printer, top int) {
     for _, group := range this.Groups() {
         // header for each key type
         this.printGroupHeader(group)
-    }
-    s := newSort(this)
-    s.Sort(this.sortType(), SORT_ORDER_DESC)
-    sortedKeys := s.keys
-    if top > 0 && top < len(sortedKeys) {
-        sortedKeys = sortedKeys[:top]
-    }
 
-    println() // seperate from the progress bar
-    for _, k := range sortedKeys {
-        _ = printer.Printr(k, this[k].(KeyValue)) // return sql dml statement, usually 'insert into'
+        kvGroup := this.newByGroup(group) // a new kv just for this group
+        if p, ok := printer.(Printher); ok {
+            // not only keys, values are also groupped
+            p.Printh(kvGroup, top)
+            continue
+        }
+
+        // only keys are groupped
+        s := NewSort(kvGroup)
+        s.Sort(SORT_BY_KEY, SORT_ORDER_DESC)
+        sortedKeys := s.keys
+        if top > 0 && top < len(sortedKeys) {
+            sortedKeys = sortedKeys[:top]
+        }
+        for _, k := range sortedKeys {
+            _ = printer.Printr(k, kvGroup[k].(KeyValue))
+        }
+
+        println()
     }
 }
 

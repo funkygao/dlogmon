@@ -9,7 +9,24 @@ import (
     "os"
 )
 
-const KXI_KEY_LEN = 3
+const (
+    KXI_M_KEYLEN = 4
+    KXI_R_KEYLEN = 3
+)
+
+const (
+    TIME_ALL = "T"
+    TIME_AVG = "Tm"
+    TIME_MAX = "Ta"
+    TIME_MIN = "Ti"
+    TIME_STD = "Td"
+
+    CALL_ALL = "C"
+    CALL_AVG = "Cm"
+    CALL_MAX = "Ca"
+    CALL_MIN = "Ci"
+    CALL_STD = "Cd"
+)
 
 func NewKxiWorker(manager *Manager, name, filename string, seq uint16) IWorker {
     defer T.Un(T.Trace(""))
@@ -61,33 +78,92 @@ func (this *KxiWorker) Map(line string, out chan<- mr.KeyValue) {
     }
 
     kv := mr.NewKeyValue()
-    kv[[KXI_KEY_LEN]string{"url_service", url, service}] = time
-    kv[[KXI_KEY_LEN]string{"url", url, ""}] = time
-    kv[[KXI_KEY_LEN]string{"service", service, ""}] = time
-    kv[[KXI_KEY_LEN]string{"url_rid", url, rid}] = time
-    kv[[KXI_KEY_LEN]string{"url_sql", url, sql}] = time
+    kv[[KXI_M_KEYLEN]string{mr.KEY_GROUP, "url call kxi service", url, service}] = time
+    kv[[KXI_M_KEYLEN]string{mr.KEY_GROUP, "url within a request", url, rid}] = time
+    kv[[KXI_M_KEYLEN]string{mr.KEY_GROUP, "url query db sql", url, sql}] = time
+    kv[[KXI_M_KEYLEN]string{mr.KEY_GROUP, "kxi servants", service, ""}] = time
     out <- kv
 }
 
 // The key is already sorted
 func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyValue) {
-    parts := key.([KXI_KEY_LEN]string)
-    kind, k1, k2 := parts[0], parts[1], parts[2]
+    parts := key.([KXI_M_KEYLEN]string)
+    grp, kind, k1, k2 := parts[0], parts[1], parts[2], parts[3]
     if this.manager.option.debug {
-        fmt.Fprintf(os.Stderr, "DEBUG=> %s %s %s %v\n", kind, k1, k2, values)
+        fmt.Fprintf(os.Stderr, "DEBUG=> %s %s %s %s %v\n", grp, kind, k1, k2, values)
     }
 
     kv = mr.NewKeyValue()
-    if kind == "service" {
-        kv[[...]string{"serviceT", k1}] = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
-        kv[[...]string{"serviceC", k1}] = float64(len(values))
+    switch kind {
+    case "url call kxi service":
+        url, service := k1, k2
+        kv[[KXI_R_KEYLEN]string{url, service, TIME_ALL}] = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
+        kv[[KXI_R_KEYLEN]string{url, service, CALL_ALL}] = float64(len(values))
+    case "url within a request":
+        url, rid := k1, k2
+        kv[[KXI_R_KEYLEN]string{url, rid, TIME_ALL}] = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
+        kv[[KXI_R_KEYLEN]string{url, rid, CALL_ALL}] = float64(len(values))
+    case "kxi servants":
+    case "url query db sql":
     }
+
     return
 }
 
+// kv are in the same group
+func (this KxiWorker) Printh(kv mr.KeyValue, top int) {
+    s := mr.NewSort(kv)
+    s.Sort(mr.SORT_BY_VALUE, mr.SORT_ORDER_DESC)
+    sortedKeys := s.Keys()
+    if top > 0 && top < len(sortedKeys) {
+        sortedKeys = sortedKeys[:top]
+    }
+
+    metrics := mr.NewKeyValue()
+    for _, sk := range sortedKeys {
+        value := kv[sk].(mr.KeyValue)
+        for k, _ := range value {
+            metric := k.([KXI_R_KEYLEN]string)[2]
+            metrics[metric] = true
+        }
+    }
+    fmt.Printf("%70s %20s", "", "")
+    for _, x := range metrics.Keys() {
+        fmt.Printf("%8s", x.(string))
+    }
+    println()
+
+    var lastK12 string
+    for _, sk := range sortedKeys {
+        value := kv[sk].(mr.KeyValue)
+        tt := make(map[string]float64)
+        for k, v := range value {
+            key := k.([KXI_R_KEYLEN]string)
+            tt[key[2]] = v.(float64)
+            //col := key[2]
+            if lastK12 == "" {
+                lastK12 = key[0]+key[1]
+            }
+            if lastK12 != key[0]+key[1] {
+                fmt.Printf("%70s %20s", key[0], key[1])
+                for _, bb := range metrics.Keys() {
+                    fmt.Printf("%8.0f", tt[bb.(string)])
+                }
+                println()
+                //fmt.Printf("%70s %20s %5s %10.0f\n", key[0], key[1], key[2], v)
+                lastK12 = key[0]+key[1]
+            }
+        }
+    }
+}
+
+// key is key of mapper output
+// value is output of reducer
+// Should the 2 key have relationship? TODO
 func (this KxiWorker) Printr(key interface{}, value mr.KeyValue) string {
     for k, v := range value {
-        fmt.Printf("%50s %.0f\n", k, v)
+        key := k.([KXI_R_KEYLEN]string)
+        fmt.Printf("%70s %20s %5s %10.0f\n", key[0], key[1], key[2], v)
     }
     return ""
 }

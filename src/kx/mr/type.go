@@ -28,6 +28,10 @@ type Printer interface {
     Printr(key interface{}, value KeyValue) string
 }
 
+type Printher interface {
+    Printh(KeyValue, int)
+}
+
 type (
     SortType     uint8
     SortOrdering uint8

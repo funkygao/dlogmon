@@ -4,7 +4,7 @@ import (
     "sort"
 )
 
-func newSort(p interface{}) *Sorter {
+func NewSort(p interface{}) *Sorter {
     if kv, ok := p.(KeyValue); ok {
         s := &Sorter{
             keys: make([]interface{}, len(kv)),
@@ -170,4 +170,8 @@ func (this *Sorter) Sort(t SortType, o SortOrdering) {
     this.o = o
 
     sort.Sort(this)
+}
+
+func (this Sorter) Keys() []interface{} {
+    return this.keys
 }

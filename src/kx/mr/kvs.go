@@ -51,7 +51,7 @@ func (this KeyValues) LaunchReducer(r Reducer) (out KeyValue) {
 
     // sort by key asc
     // the shuffling process
-    s := newSort(this)
+    s := NewSort(this)
     s.Sort(SORT_BY_KEY, SORT_ORDER_ASC)
     for _, k := range s.keys {
         // k is keys of mappers' output

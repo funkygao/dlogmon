@@ -24,5 +24,5 @@ const (
 
 const (
     KEY_GROUP = "_"
-    GROUP_HEADER_LEN = 80
+    GROUP_HEADER_LEN = 100
 )
