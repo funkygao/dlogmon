@@ -60,3 +60,18 @@ func arrayToSlice6(in [6]string) []string {
     }
     return out
 }
+
+func arrayToSlice7(in [7]string) []string {
+    out := make([]string, len(in))
+    for i, s := range in {
+        out[i] = s
+    }
+    return out
+}
+func arrayToSlice8(in [8]string) []string {
+    out := make([]string, len(in))
+    for i, s := range in {
+        out[i] = s
+    }
+    return out
+}

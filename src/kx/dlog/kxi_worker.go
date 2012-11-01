@@ -50,8 +50,8 @@ func (this *KxiWorker) Map(line string, out chan<- mr.KeyValue) {
         fmt.Fprintf(os.Stderr, "stream=> %#v\n", streamKv)
     }
 
-    //kv := mr.NewKeyValue()
-    out <- mr.NewKeyValue()
+    kv := mr.NewKeyValue()
+    out <- kv
 }
 
 func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyValue) {

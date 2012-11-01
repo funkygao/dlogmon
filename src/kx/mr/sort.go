@@ -108,6 +108,12 @@ func (this *Sorter) Less(i, j int) bool {
         case [6]string:
             ki, kj := this.keys[i].([6]string), this.keys[j].([6]string)
             return this.lessStringSlice(arrayToSlice6(ki), arrayToSlice6(kj))
+        case [7]string:
+            ki, kj := this.keys[i].([7]string), this.keys[j].([7]string)
+            return this.lessStringSlice(arrayToSlice7(ki), arrayToSlice7(kj))
+        case [8]string:
+            ki, kj := this.keys[i].([8]string), this.keys[j].([8]string)
+            return this.lessStringSlice(arrayToSlice8(ki), arrayToSlice8(kj))
         }
     } else if this.t == SORT_BY_VALUE {
         vi, vj := this.vals[i].(KeyValue), this.vals[j].(KeyValue)
