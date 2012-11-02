@@ -15,8 +15,10 @@ func main() {
         s string = "ab"
         sl []string = []string{"a", "b"}
         f func()
+        by byte
     )
 
+    fmt.Println("byte", unsafe.Sizeof(by))
     fmt.Println("bool", unsafe.Sizeof(b))
     fmt.Println("uint8", unsafe.Sizeof(u8))
     fmt.Println("int8", unsafe.Sizeof(i8))
