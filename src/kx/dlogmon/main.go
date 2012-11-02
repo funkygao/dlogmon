@@ -61,8 +61,7 @@ func main() {
 func displaySummary(logger *log.Logger, start time.Time, files, rawLines, validLines int) {
     defer T.Un(T.Trace(""))
 
-    end := time.Now()
-    delta := end.Sub(start)
+    delta := time.Since(start)
     summary := fmt.Sprintf("Parsed %d/%d lines in %d files within %s [%.1f lines per second]\n",
         validLines,
         rawLines,

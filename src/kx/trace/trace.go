@@ -101,9 +101,7 @@ func Timeit(fun interface{}, args ...interface{}) (result []reflect.Value, delta
 
     start := time.Now()
     result = f.Call(in) // call the universal func
-    end := time.Now()
-
-    delta = end.Sub(start)
+    delta = time.Since(start)
     return
 }
 
