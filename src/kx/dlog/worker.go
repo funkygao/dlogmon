@@ -89,10 +89,10 @@ func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- mr.KeyValu
 func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, chOutWorker chan<- WorkerResult) {
     defer T.Un(T.Trace(""))
 
-    // invoke transform goroutine to transform k=>v into k=>[]v
+    // invoke shuffle goroutine to transform k=>v into k=>[]v
     chKvs := make(chan mr.KeyValues)
     chKv := make(chan mr.KeyValue, LINE_CHAN_BUF)
-    go this.transform(chKv, chKvs)
+    go this.shuffle(chKv, chKvs)
 
     var input *stream.Stream
     if this.manager.option.filemode {
@@ -136,11 +136,11 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, 
     chOutWorker <- newWorkerResult(rawLines, validLines)
     this.Printf("%s worker[%d] %s parsed: %d/%d\n", this.name, this.seq, this.BaseName(), validLines, rawLines)
 
-    // transform feed done, must close before get data from tranResult
+    // shuffle feed done, must close before get data from tranResult
     close(chKv)
 
     var kvs mr.KeyValues = <-chKvs
-    this.Printf("%s worker[%d] %s transformed\n", this.name, this.seq, this.BaseName())
+    this.Printf("%s worker[%d] %s shuffled\n", this.name, this.seq, this.BaseName())
 
     // after the work has done it's job, run it's combiner as a whole of this worker
     if this.self.Combiner() != nil {
@@ -151,11 +151,11 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, 
         this.Printf("%s worker[%d] %s local combined\n", this.name, this.seq, this.BaseName())
     }
 
-    // output the transform result
+    // output the shuffled result
     chOutMap <- kvs
 }
 
-func (this *Worker) transform(in <-chan mr.KeyValue, out chan<- mr.KeyValues) {
+func (this *Worker) shuffle(in <-chan mr.KeyValue, out chan<- mr.KeyValues) {
     kvs := mr.NewKeyValues()
     for x := range in {
         for k, v := range x {

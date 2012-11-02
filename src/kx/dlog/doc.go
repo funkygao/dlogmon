@@ -32,7 +32,7 @@ Data flow:
                                                 |
                                                 V
                  KeValues           KeyValue    |
- collectWorkers<---------transform<------------/ 
+ collectWorkers<--------- shuffle <------------/ 
       |                                          
       V                                          
       |     KeyValues
