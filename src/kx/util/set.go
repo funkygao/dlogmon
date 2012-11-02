@@ -4,18 +4,35 @@ type Set struct {
     data map[interface{}] bool
 }
 
+func NewSet() *Set {
+    s := new(Set)
+    s.data = make(map[interface{}] bool)
+    return s
+}
+
 func (this *Set) Add(v interface{}) {
     this.data[v] = true
 }
 
-func (this *Set) Remove(v interface{}) (ok bool) {
-    if _, ok = this.data[v]; !ok {
+func (this *Set) Remove(v interface{}) (found bool) {
+    if _, found = this.data[v]; !found {
         return
     }
 
     delete(this.data, v)
-    ok = true
+    found = true
     return
+}
+
+func (this Set) Len() int {
+    return len(this.data)
+}
+
+func (this Set) Contains(v interface{}) bool {
+    if  _, found := this.data[v]; found {
+        return true
+    }
+    return false
 }
 
 func (this Set) Values() []interface{} {
