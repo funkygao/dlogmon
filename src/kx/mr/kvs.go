@@ -5,25 +5,6 @@ func NewKeyValues() KeyValues {
     return make(KeyValues)
 }
 
-func (this KeyValues) getOneKey() (key interface{}) {
-    for k := range this {
-        key = k
-        return
-    }
-
-    return
-}
-
-func (this KeyValues) Keys() (keys []interface{}) {
-    keys = make([]interface{}, len(this))
-    var i int
-    for k, _ := range this {
-        keys[i] = k
-        i++
-    }
-    return
-}
-
 func (this KeyValues) Empty() bool {
     return len(this) == 0
 }

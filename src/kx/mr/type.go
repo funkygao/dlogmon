@@ -24,6 +24,10 @@ type Reducer interface {
     Reduce(key interface{}, values []interface{}) (out KeyValue)
 }
 
+type Grouper interface {
+    Groups() []string
+}
+
 type Printer interface {
     Printr(key interface{}, value KeyValue) string
 }

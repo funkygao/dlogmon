@@ -37,6 +37,15 @@ func (this KeyValue) Values() (values []interface{}) {
     return
 }
 
+// Get a key
+func (this KeyValue) getOneKey() (key interface{}) {
+    for k, _ := range this {
+        key = k
+        return
+    }
+    return
+}
+
 func (this KeyValue) sortType() SortType {
     var key interface{}
     for k, _ := range this {

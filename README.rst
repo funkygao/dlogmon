@@ -60,3 +60,5 @@ Todo
 - select count(*) as count, service from dlog.20121212 where time>2000 group by service order by count desc
 
 - shuffle should be in manager.go
+
+- if group, each group is a dedicated reducer and goroutine

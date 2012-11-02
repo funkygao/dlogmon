@@ -3,6 +3,12 @@ Key of MapReduce:
     Is seperating the 'what' of distributed processing from the 'how'!
     MapReduce = select key, aggr(value) from ... group by key order by key
 
+Map:
+    extract something you care about from each record
+Reduce:
+    aggregate, summarize, filter, or transform
+
+
 Conceptually in MapReduce one can think of the mapper being applied to all input 
 key-value pairs and the reducer being applied to all values associated with the same key.
 
