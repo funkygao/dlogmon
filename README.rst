@@ -16,6 +16,18 @@ This is a single-node map reduce framework implementation. It is widely used in 
 dlog analysis and reporting system.
 
 
+Package with potential usage
+============================
+
+consisent hash
+--------------
+/Users/gaopeng/github/dlogmon/src/github.com/stathat/consistent
+
+msgpack
+-------
+/Users/gaopeng/github/dlogmon/src/github.com/msgpack
+
+
 Todo
 ====
 
@@ -40,3 +52,11 @@ Todo
 - Job abstraction
 
   it has member Option
+
+- MapReduce
+
+  Input -> Map -> Shuffle -> Reduce -> Output
+
+- select count(*) as count, service from dlog.20121212 where time>2000 group by service order by count desc
+
+- shuffle should be in manager.go
