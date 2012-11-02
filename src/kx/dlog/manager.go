@@ -1,3 +1,4 @@
+// Altanative name: controller
 package dlog
 
 import (
