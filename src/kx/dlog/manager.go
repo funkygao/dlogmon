@@ -281,7 +281,10 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
                 kvs.AppendSlice(k, v)
             }
             doneWorkers++
-            this.Println("workers done:", doneWorkers/MSG_PER_WORKER)
+
+            realDone := doneWorkers/MSG_PER_WORKER
+            this.Printf("workers done: %d/%d %.1f%%\n", realDone,
+                this.workersCount(), float64(100*realDone/this.workersCount()))
         }
 
         runtime.Gosched()
