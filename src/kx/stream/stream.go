@@ -4,6 +4,7 @@ package stream
 import (
     "bufio"
     "errors"
+    "fmt"
     "os"
     "os/exec"
 )
@@ -58,7 +59,7 @@ func (this *Stream) Open() error {
         return this.openPlainFile()
     }
 
-    return errors.New("non supported mode")
+    return errors.New(fmt.Sprintf("non supported mode, valid modes: %v", this.mode.Valids()))
 }
 
 // get reader to read from the pipe output
@@ -80,5 +81,5 @@ func (this *Stream) Close() error {
         }
     }
 
-    return errors.New("current mode stream can't be closed")
+    return errors.New(fmt.Sprintf("current mode:%s can't be closed", this.mode.String()))
 }
