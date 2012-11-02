@@ -242,10 +242,12 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
 
     kvs := mr.NewKeyValues()
 
+    const MSG_PER_WORKER = 2
+
     var (
         rawLines, validLines int
         doneWorkers          int
-        allDone              int = 2 * this.workersCount()
+        allDone              int = MSG_PER_WORKER * this.workersCount()
     )
 
     for {
@@ -274,11 +276,12 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
                 break
             }
 
-            // merge all output of workers to one key values pair
+            // merge all shuffled output of workers to one key values pair
             for k, v := range m {
                 kvs.AppendSlice(k, v)
             }
             doneWorkers++
+            this.Println("workers done:", doneWorkers/MSG_PER_WORKER)
         }
 
         runtime.Gosched()
@@ -301,6 +304,7 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
 
     this.invokeGc()
 
+    // enter into output phase
     // export final result, possibly export to db
     this.Println(worker.Name(), "worker start to export result...")
     reduceResult.ExportResult(worker, worker.TopN())

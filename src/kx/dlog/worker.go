@@ -103,7 +103,7 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, 
     input.Open()
     defer input.Close()
 
-    this.Printf("%s worker[%d] opened %s\n", this.name, this.seq, this.BaseName())
+    this.Printf("%s worker[%d] opened %s, start for Map\n", this.name, this.seq, this.BaseName())
 
     var rawLines, validLines int
     for {
