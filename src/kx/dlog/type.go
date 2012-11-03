@@ -55,25 +55,24 @@ type Worker struct {
     self     IWorker         // runtime dispatch
 }
 
-// KXI call analyzer
-type KxiWorker struct {
-    Worker
-}
+// Workers
+type (
+    KxiWorker struct {
+        Worker
+    }
 
-// AMF_SLOW tag analyzer
-type AmfWorker struct {
-    Worker
-}
+    AmfWorker struct {
+        Worker
+    }
 
-// A no operation worker, just scan lines without parsing
-type NoopWorker struct {
-    Worker
-}
+    NoopWorker struct {
+        Worker
+    }
 
-// A normal file worker
-type FileWorker struct {
-    Worker
-}
+    FileWorker struct {
+        Worker
+    }
+)
 
 // Worker constructor signature
 type WorkerConstructor func(*Manager, string, string, uint16) IWorker
