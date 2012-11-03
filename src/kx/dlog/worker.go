@@ -18,7 +18,7 @@ func (this *Worker) String() string {
         this.seq, this.BaseFilename(), this.manager.option)
 }
 
-func (this Worker) Kind () string {
+func (this Worker) Kind() string {
     return this.kind
 }
 
@@ -115,7 +115,7 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValue, c
             break
         }
 
-        this.RawLines ++
+        this.RawLines++
         if chOutProgress != nil && this.RawLines%PROGRESS_LINES_STEP == 0 {
             // report progress
             chOutProgress <- PROGRESS_LINES_STEP

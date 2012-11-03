@@ -6,5 +6,5 @@ const (
     PLAIN_FILE
 
     FIRST_MODE = EXEC_PIPE
-    LAST_MODE = PLAIN_FILE
+    LAST_MODE  = PLAIN_FILE
 )

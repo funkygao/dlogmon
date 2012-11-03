@@ -1,12 +1,12 @@
 package util
 
 type Set struct {
-    data map[interface{}] bool
+    data map[interface{}]bool
 }
 
 func NewSet() *Set {
     s := new(Set)
-    s.data = make(map[interface{}] bool)
+    s.data = make(map[interface{}]bool)
     return s
 }
 
@@ -29,7 +29,7 @@ func (this Set) Len() int {
 }
 
 func (this Set) Contains(v interface{}) bool {
-    if  _, found := this.data[v]; found {
+    if _, found := this.data[v]; found {
         return true
     }
     return false
@@ -38,7 +38,7 @@ func (this Set) Contains(v interface{}) bool {
 func (this Set) Values() []interface{} {
     r := make([]interface{}, len(this.data))
     var i int
-    for k, _ := range this.data {
+    for k := range this.data {
         r[i] = k
         i++
     }

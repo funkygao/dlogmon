@@ -129,7 +129,7 @@ func (this *Manager) Submit() (err error) {
 
     this.Println("submitted job accepted")
 
-    chMap := make(chan mr.KeyValue, this.workersCount() * LINE_CHANBUF_PER_WORKER)
+    chMap := make(chan mr.KeyValue, this.workersCount()*LINE_CHANBUF_PER_WORKER)
     chWorker := make(chan Worker, this.workersCount())
     this.chWorkersDone = make(chan bool)
 

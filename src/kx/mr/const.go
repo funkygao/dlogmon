@@ -5,7 +5,7 @@ import (
 )
 
 const (
-    SORT_BY_KEY   SortType = iota + 1
+    SORT_BY_KEY SortType = iota + 1
     SORT_BY_VALUE
     SORT_SECONDARY_KV // first key, then value
     SORT_SECONDARY_VK // first value, then key
@@ -18,11 +18,11 @@ const (
 )
 
 const (
-    GOB_FILE_FLAG = os.O_CREATE|os.O_WRONLY
+    GOB_FILE_FLAG = os.O_CREATE | os.O_WRONLY
     GOB_FILE_PERM = 0600
 )
 
 const (
-    KEY_GROUP = "_"
+    KEY_GROUP        = "_"
     GROUP_HEADER_LEN = 100
 )

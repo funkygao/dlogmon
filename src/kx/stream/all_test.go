@@ -21,4 +21,3 @@ func TestStreamModeValids(t *testing.T) {
     var mode StreamMode
     assert.Equal(t, mode.Valids(), []string{"ExecPipe", "LzopFile", "PlainText"})
 }
-

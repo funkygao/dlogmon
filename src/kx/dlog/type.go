@@ -42,13 +42,13 @@ type IWorker interface {
 // For 1 dlog file worker
 // Abstract
 type Worker struct {
-    kind      string
-    seq       uint16 // sequence number
-    filename  string // dlog filename
+    kind                      string
+    seq                       uint16 // sequence number
+    filename                  string // dlog filename
     CreatedAt, StartAt, EndAt time.Time
-    RawLines, ValidLines int
-    mapReader *bufio.Reader
-    mapWriter *bufio.Writer
+    RawLines, ValidLines      int
+    mapReader                 *bufio.Reader
+    mapWriter                 *bufio.Writer
     *log.Logger
     manager  *Manager
     combiner mr.CombinerFunc // can be nil
@@ -85,9 +85,9 @@ type Manager struct {
     lock                 *sync.Mutex
     ticker               *time.Ticker
     *log.Logger
-    workers    []IWorker
-    chWorkersDone    chan bool
-    chProgress chan int // default <nil>
+    workers       []IWorker
+    chWorkersDone chan bool
+    chProgress    chan int // default <nil>
 }
 
 // CLI options object

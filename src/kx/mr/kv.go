@@ -20,7 +20,7 @@ func (this KeyValue) Empty() bool {
 func (this KeyValue) Keys() (keys []interface{}) {
     keys = make([]interface{}, len(this))
     var i int
-    for k, _ := range this {
+    for k := range this {
         keys[i] = k
         i++
     }
@@ -39,7 +39,7 @@ func (this KeyValue) Values() (values []interface{}) {
 
 // Get a key
 func (this KeyValue) getOneKey() (key interface{}) {
-    for k, _ := range this {
+    for k := range this {
         key = k
         return
     }
@@ -48,7 +48,7 @@ func (this KeyValue) getOneKey() (key interface{}) {
 
 func (this KeyValue) sortType() SortType {
     var key interface{}
-    for k, _ := range this {
+    for k := range this {
         key = k
         break
     }
@@ -92,7 +92,7 @@ func (this KeyValue) Groupped() bool {
 // 第二个key值为group value
 func (this KeyValue) Groups() []string {
     t := make(KeyValue)
-    for k,_ := range this {
+    for k := range this {
         switch k.(type) {
         case [2]string:
             if k.([2]string)[0] == KEY_GROUP {

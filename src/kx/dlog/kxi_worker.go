@@ -49,11 +49,11 @@ func (this *KxiWorker) IsLineValid(line string) bool {
 
 func (this *KxiWorker) Map(line string, out chan<- mr.KeyValue) {
     type jsonFromMapper struct {
-        Url string `json:"u"`
-        Rid string `json:"i"`
-        Service string `json:"s"`
-        Time float64 `json:"t"`
-        Sql string `json:"q"`
+        Url     string  `json:"u"`
+        Rid     string  `json:"i"`
+        Service string  `json:"s"`
+        Time    float64 `json:"t"`
+        Sql     string  `json:"q"`
     }
 
     var streamResult interface{}
@@ -117,7 +117,7 @@ func (this KxiWorker) Printh(kv mr.KeyValue, top int) {
     metrics := mr.NewKeyValue()
     for _, sk := range sortedKeys {
         value := kv[sk].(mr.KeyValue)
-        for k, _ := range value {
+        for k := range value {
             metric := k.([KXI_R_KEYLEN]string)[2]
             metrics[metric] = true
         }
@@ -130,8 +130,8 @@ func (this KxiWorker) Printh(kv mr.KeyValue, top int) {
 
     var lastK12 string
     for _, sk := range sortedKeys {
-    //    fmt.Println(sk)
-     //   continue
+        //    fmt.Println(sk)
+        //   continue
         value := kv[sk].(mr.KeyValue)
         tt := make(map[string]float64)
         for k, v := range value {
@@ -139,7 +139,7 @@ func (this KxiWorker) Printh(kv mr.KeyValue, top int) {
             tt[key[2]] = v.(float64)
             //col := key[2]
             if lastK12 == "" {
-                lastK12 = key[0]+key[1]
+                lastK12 = key[0] + key[1]
             }
             if lastK12 != key[0]+key[1] {
                 fmt.Printf("%70s %20s", key[0], key[1])
@@ -148,7 +148,7 @@ func (this KxiWorker) Printh(kv mr.KeyValue, top int) {
                 }
                 println()
                 //fmt.Printf("%70s %20s %5s %10.0f\n", key[0], key[1], key[2], v)
-                lastK12 = key[0]+key[1]
+                lastK12 = key[0] + key[1]
             }
         }
     }

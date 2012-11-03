@@ -10,17 +10,17 @@ const (
 )
 
 const (
-    LZOP_CMD              = "lzop"
-    LZOP_OPTION           = "-dcf"
-    EOL                   = '\n'
-    DEFAULT_DLOG_BASE_DIR = "/kx/dlog/"
-    SAMPLER_HOST          = "100.123"
-    FLAG_TIMESPAN_SEP     = "-"
-    KEYTYPE_SEP           = ":"
-    LINES_PER_FILE        = 565000 // deprecated
-    PROGRESS_LINES_STEP   = 50000  // TODO calculated instead of const
-    PROGRESS_CHAN_BUF     = 1000
-    LINE_CHANBUF_PER_WORKER  = 100
+    LZOP_CMD                = "lzop"
+    LZOP_OPTION             = "-dcf"
+    EOL                     = '\n'
+    DEFAULT_DLOG_BASE_DIR   = "/kx/dlog/"
+    SAMPLER_HOST            = "100.123"
+    FLAG_TIMESPAN_SEP       = "-"
+    KEYTYPE_SEP             = ":"
+    LINES_PER_FILE          = 565000 // deprecated
+    PROGRESS_LINES_STEP     = 50000  // TODO calculated instead of const
+    PROGRESS_CHAN_BUF       = 1000
+    LINE_CHANBUF_PER_WORKER = 100
 )
 
 const (
