@@ -200,8 +200,6 @@ func (this *Manager) WaitForCompletion() {
     if this.ticker != nil {
         this.ticker.Stop()
     }
-
-    this.Println("got workers summary, ready to finish")
 }
 
 // Collect worker's output
@@ -223,7 +221,7 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
         }
 
         select {
-        case w, ok := <-chInWorker: // each worker send 1 msg to this chan
+        case worker, ok := <-chInWorker: // each worker send 1 msg to this chan
             if !ok {
                 // this can never happens, worker can't close this chan
                 this.Fatal("worker chan closed")
@@ -231,19 +229,17 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
             }
 
             doneWorkers++
-            this.Printf("workers done: %d/%d %.1f%%\n", doneWorkers,
+            this.Printf("%s workers done: %d/%d %.1f%%\n", worker.Kind(), doneWorkers,
                 this.workersCount(), float64(100*doneWorkers/this.workersCount()))
 
-            this.RawLines += w.RawLines
-            this.ValidLines += w.ValidLines
+            this.RawLines += worker.RawLines
+            this.ValidLines += worker.ValidLines
 
             chRateLimit <- true // 让贤
         }
 
         //runtime.Gosched()
     }
-
-    this.Println("all workers Map done, start to Shuffle...")
 
     // all workers done, so close the channels
     close(chInMap)
@@ -254,15 +250,16 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
 
     // mappers must complete before reducers can begin
     worker := this.getOneWorker()
-    this.Println(worker.Kind(), "worker start to reduce with ordered keys...")
-    reduceResult := (<-shuffledKvs).LaunchReducer(worker)
-    this.Println(worker.Kind(), "worker reduce done")
+    kvs := <- shuffledKvs
+    this.Println(worker.Kind(), "worker Shuffled")
+    reduceResult := kvs.LaunchReducer(worker)
+    this.Println(worker.Kind(), "worker Reduced")
 
     this.invokeGc()
 
     // enter into output phase
     // export final result, possibly export to db
-    this.Println(worker.Kind(), "worker start to export result...")
+    this.Println(worker.Kind(), "worker start to Output...")
     reduceResult.ExportResult(worker, worker.TopN())
 
     // WaitForCompletion will wait for this
