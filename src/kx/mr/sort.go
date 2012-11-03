@@ -1,3 +1,4 @@
+// TODO we need only save key or value in Sorter
 package mr
 
 import (
