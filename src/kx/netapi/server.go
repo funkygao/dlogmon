@@ -2,20 +2,20 @@ package netapi
 
 import (
     "net"
-    "net/http"
     "net/rpc"
 )
 
-func StartServer(i interface{}) error {
-    if e := rpc.Register(i); e != nil {
-        return e
-    }
-    rpc.HandleHTTP()
+func StartServer() error {
+    server := rpc.NewServer()
     l, e := net.Listen(PROTO, ADDRS)
     if e != nil {
         return e
     }
-    go http.Serve(l, nil)
+    go server.Accept(l)
 
     return nil
+}
+
+func Register(i interface{}) error {
+    return rpc.Register(i)
 }
