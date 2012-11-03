@@ -165,9 +165,9 @@ func (this Worker) TopN() int {
 
 // Base to extract meta info from a valid line string.
 // If mapper specified, return the mapper output, else return nil
-func (this *Worker) ExtractLineInfo(line string) interface{} {
+func (this *Worker) streamedResult(line string) StreamResult {
     if this.mapReader == nil || this.mapWriter == nil {
-        return nil
+        return emptyStreamResult
     }
 
     _, err := this.mapWriter.WriteString(line)
@@ -178,11 +178,9 @@ func (this *Worker) ExtractLineInfo(line string) interface{} {
         }
     }
 
-    mapperLine, _ := this.mapReader.ReadString(EOL)
-    if string(mapperLine) == "\n" {
-        // empty result, just a EOL
-        return nil
+    mapperLine, err := this.mapReader.ReadString(EOL)
+    if err != nil {
+        panic(err)
     }
-
-    return mapperLine
+    return StreamResult(mapperLine)
 }

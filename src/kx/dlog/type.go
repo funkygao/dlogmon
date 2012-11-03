@@ -9,6 +9,8 @@ import (
     "time"
 )
 
+type StreamResult string
+
 // dlog parser interface
 type DlogParser interface {
     IsLineValid(string) bool

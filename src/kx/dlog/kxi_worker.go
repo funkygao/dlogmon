@@ -1,7 +1,6 @@
 package dlog
 
 import (
-    "encoding/json"
     "fmt"
     "kx/mr"
     "kx/stats"
@@ -56,14 +55,13 @@ func (this *KxiWorker) Map(line string, out chan<- mr.KeyValue) {
         Sql     string  `json:"q"`
     }
 
-    var streamResult interface{}
-    if streamResult = this.Worker.ExtractLineInfo(line); streamResult == nil {
-        // this line is invalid
+    var streamResult StreamResult
+    if streamResult = this.Worker.streamedResult(line); streamResult.Empty() {
         return
     }
 
     j := new(jsonFromMapper)
-    if err := json.Unmarshal([]byte(streamResult.(string)), j); err != nil {
+    if err := streamResult.Decode(j); err != nil {
         panic(err)
     }
 
@@ -71,6 +69,8 @@ func (this *KxiWorker) Map(line string, out chan<- mr.KeyValue) {
         fmt.Fprintf(os.Stderr, "DEBUG<= %s %s %s %f %s\n",
             j.Url, j.Rid, j.Service, j.Time, j.Sql)
     }
+
+    // TODO refactor from here
 
     kv := mr.NewKeyValue()
     kv[[KXI_M_KEYLEN]string{mr.KEY_GROUP, "url call kxi service", j.Url, j.Service}] = j.Time

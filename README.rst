@@ -35,19 +35,9 @@ Todo
 
   enhance performance of strings.Contains
 
-- distributed
-
 - signal skipped not work
 
-- external map reduce stream
-
-  ExtractLineInfo deprecated
-
 - chain of workers and reducers
-
-- Task abstraction
-
-  channel direction in care
 
 - Job abstraction
 
@@ -58,7 +48,5 @@ Todo
   Input -> Map -> Shuffle -> Reduce -> Output
 
 - select count(*) as count, service from dlog.20121212 where time>2000 group by service order by count desc
-
-- shuffle should be in manager.go
 
 - if group, each group is a dedicated reducer and goroutine
