@@ -1,6 +1,5 @@
 package mr
 
-// Factory
 func NewKeyValues() KeyValues {
     return make(KeyValues)
 }
@@ -15,16 +14,6 @@ func (this KeyValues) Append(key interface{}, val interface{}) {
         this[key][0] = val
     } else {
         this[key] = append(this[key], val)
-    }
-}
-
-// deprecated, can be removed now
-func (this KeyValues) AppendSlice(key interface{}, val []interface{}) {
-    if _, ok := this[key]; !ok {
-        this[key] = make([]interface{}, 1)
-        this[key] = val
-    } else {
-        this[key] = append(this[key], val...)
     }
 }
 
