@@ -47,36 +47,35 @@ func (this *KxiWorker) IsLineValid(line string) bool {
 }
 
 func (this *KxiWorker) Map(line string, out chan<- mr.KeyValue) {
-    type jsonFromMapper struct {
+    var streamResult StreamResult
+    if streamResult = this.Worker.streamedResult(line); streamResult.Empty() {
+        return
+    }
+
+    type record struct {
         Url     string  `json:"u"`
         Rid     string  `json:"i"`
         Service string  `json:"s"`
         Time    float64 `json:"t"`
         Sql     string  `json:"q"`
     }
-
-    var streamResult StreamResult
-    if streamResult = this.Worker.streamedResult(line); streamResult.Empty() {
-        return
-    }
-
-    j := new(jsonFromMapper)
-    if err := streamResult.Decode(j); err != nil {
+    rec := new(record)
+    if err := streamResult.Decode(rec); err != nil {
         panic(err)
     }
 
     if this.manager.option.debug {
         fmt.Fprintf(os.Stderr, "DEBUG<= %s %s %s %f %s\n",
-            j.Url, j.Rid, j.Service, j.Time, j.Sql)
+            rec.Url, rec.Rid, rec.Service, rec.Time, rec.Sql)
     }
 
     // TODO refactor from here
 
     kv := mr.NewKeyValue()
-    kv[[KXI_M_KEYLEN]string{mr.KEY_GROUP, "url call kxi service", j.Url, j.Service}] = j.Time
-    kv[[KXI_M_KEYLEN]string{mr.KEY_GROUP, "url within a request", j.Url, j.Rid}] = j.Time
-    kv[[KXI_M_KEYLEN]string{mr.KEY_GROUP, "url query db sql", j.Url, j.Sql}] = j.Time
-    kv[[KXI_M_KEYLEN]string{mr.KEY_GROUP, "kxi servants", j.Service, ""}] = j.Time
+    kv[[KXI_M_KEYLEN]string{mr.KEY_GROUP, "url call kxi service", rec.Url, rec.Service}] = rec.Time
+    kv[[KXI_M_KEYLEN]string{mr.KEY_GROUP, "url within a request", rec.Url, rec.Rid}] = rec.Time
+    kv[[KXI_M_KEYLEN]string{mr.KEY_GROUP, "url query db sql", rec.Url, rec.Sql}] = rec.Time
+    kv[[KXI_M_KEYLEN]string{mr.KEY_GROUP, "kxi servants", rec.Service, ""}] = rec.Time
     out <- kv
 }
 
