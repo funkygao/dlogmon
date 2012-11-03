@@ -79,6 +79,9 @@ trace:install
 mr:install
 	@./bin/dlogmon -f test/fixture/lz.121015-104410 -mapper ./contrib/kxiMapper.py -progress=true -k kxi
 
+todo:
+	@find src/kx -name '*.go' | xargs grep -n -1 --color TODO
+
 loc:
 	@echo `find src/kx -name '*.go' | xargs wc -l | tail -1` lines
 	@echo `find src/kx -name '*.go' | wc -l | tail -1` files
