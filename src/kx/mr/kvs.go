@@ -18,6 +18,7 @@ func (this KeyValues) Append(key interface{}, val interface{}) {
     }
 }
 
+// deprecated, can be removed now
 func (this KeyValues) AppendSlice(key interface{}, val []interface{}) {
     if _, ok := this[key]; !ok {
         this[key] = make([]interface{}, 1)
