@@ -26,8 +26,7 @@ func NewAmfWorker(manager *Manager, name, filename string, seq uint16) IWorker {
 
 // Does a log line contain 'AMF_SLOW'?
 func (this *AmfWorker) IsLineValid(line string) bool {
-    // super
-    if !this.Worker.IsLineValid(line) {
+    if !isSamplerHostLine(line) {
         return false
     }
 

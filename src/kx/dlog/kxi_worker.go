@@ -38,7 +38,7 @@ func NewKxiWorker(manager *Manager, name, filename string, seq uint16) IWorker {
 }
 
 func (this *KxiWorker) IsLineValid(line string) bool {
-    if !this.Worker.IsLineValid(line) {
+    if !isSamplerHostLine(line) {
         return false
     }
 

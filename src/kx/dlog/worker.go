@@ -9,7 +9,6 @@ import (
     "log"
     "os"
     "path"
-    "strings"
     "time"
 )
 
@@ -141,15 +140,6 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValue, c
 // My combiner func pointer
 func (this *Worker) Combiner() mr.CombinerFunc {
     return this.combiner
-}
-
-// Is a line valid?
-// Only when log is from sampler host will it reuturn true
-func (this *Worker) IsLineValid(line string) bool {
-    if !strings.Contains(line, SAMPLER_HOST) {
-        return false
-    }
-    return true
 }
 
 // Only show top N final result
