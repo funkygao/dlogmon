@@ -20,11 +20,6 @@ func init() {
     db.Initialize(DbEngine, DbFile)
 }
 
-// Construct a TotalResult instance
-func newTotalResult(rawLines, validLines int) TotalResult {
-    return TotalResult{WorkerResult{rawLines, validLines}}
-}
-
 // Manager constructor
 func NewManager(option *Option) *Manager {
     defer T.Un(T.Trace(""))
@@ -46,9 +41,8 @@ func (this Manager) Conf() *config.Config {
     return this.option.conf
 }
 
-// Printable Manager
 func (this *Manager) String() string {
-    return fmt.Sprintf("Manager{%#v}", this.option)
+    return fmt.Sprintf("Manager{%+v}", this.option)
 }
 
 // Get any worker of the same type TODO
@@ -63,6 +57,11 @@ func (this *Manager) workersCount() int {
     return this.FilesCount()
 }
 
+// How many dlog files are being and to be analyzed
+func (this *Manager) FilesCount() int {
+    return len(this.option.files)
+}
+
 // How many lines added up
 // For progress bar purpose
 func (this Manager) totalLines() (total int) {
@@ -70,16 +69,6 @@ func (this Manager) totalLines() (total int) {
         total += w.TotalLines()
     }
     return
-}
-
-// How many dlog files are being and to be analyzed
-func (this *Manager) FilesCount() int {
-    return len(this.option.files)
-}
-
-// Altogether how many raw lines parsed
-func (this Manager) RawLines() int {
-    return this.rawLines
 }
 
 // Get the global mutex object
@@ -97,11 +86,6 @@ func (this Manager) Unlock() {
     this.lock.Unlock()
 }
 
-// Altogether how many valid lines were parsed
-func (this Manager) ValidLines() int {
-    return this.validLines
-}
-
 // Create all workers instances
 func (this *Manager) newWorkers() {
     var worker IWorker
@@ -109,13 +93,6 @@ func (this *Manager) newWorkers() {
     for seq, file := range this.option.files {
         worker = workerConstructors[this.option.Kind()](this, this.option.Kind(), file, uint16(seq+1))
         this.workers = append(this.workers, worker)
-
-        // type assertion
-        if w, ok := worker.(IWorker); ok {
-            if this.option.debug {
-                fmt.Fprintf(Stderr, "worker type: %T\n", w)
-            }
-        }
     }
 
     this.Println("all worker instances created")
@@ -152,14 +129,9 @@ func (this *Manager) Submit() (err error) {
 
     this.Println("submitted job accepted")
 
-    // each worker send map(combined) result to this chan
-    chMap := make(chan mr.KeyValues, this.workersCount())
-    // each worker send info of analyzed lines to this chan
-    chWorker := make(chan WorkerResult, this.workersCount())
-    // the barrier of sum up of all WorkerResult
-    this.chTotal = make(chan TotalResult)
-    // rate limit for the running workers
-    chRateLimit := this.initRateLimit()
+    chMap := make(chan mr.KeyValue, this.workersCount() * LINE_CHANBUF_PER_WORKER)
+    chWorker := make(chan Worker, this.workersCount())
+    this.chWorkersDone = make(chan bool)
 
     // create workers first
     this.newWorkers()
@@ -177,6 +149,7 @@ func (this *Manager) Submit() (err error) {
     }
 
     // collect all workers output
+    chRateLimit := this.initRateLimit()
     go this.collectWorkers(chRateLimit, chMap, chWorker)
 
     // launch workers in chunk
@@ -185,7 +158,7 @@ func (this *Manager) Submit() (err error) {
     return
 }
 
-func (this Manager) launchWorkers(chRateLimit <-chan bool, chMap chan<- mr.KeyValues, chWorker chan<- WorkerResult) {
+func (this Manager) launchWorkers(chRateLimit <-chan bool, chMap chan<- mr.KeyValue, chWorker chan<- Worker) {
     this.Println("starting workers...")
 
     for seq := 0; seq < this.workersCount(); seq++ {
@@ -203,24 +176,22 @@ func (this Manager) launchWorkers(chRateLimit <-chan bool, chMap chan<- mr.KeyVa
 func (this *Manager) WaitForCompletion() {
     defer T.Un(T.Trace(""))
 
-    // 也可能我走的太快，得等他们先把chTotal创建好之后再开始
-    for this.chTotal == nil {
+    // 也可能我走的太快，得等他们先创建好再开始
+    for this.chWorkersDone == nil {
         runtime.Gosched()
     }
 
     select {
-    case r, ok := <-this.chTotal:
+    case _, ok := <-this.chWorkersDone:
         if !ok {
-            panic("chTotal unkown error")
+            panic("unkown error")
         }
-
-        this.rawLines, this.validLines = r.RawLines, r.ValidLines
     case <-time.After(time.Hour):
         // timeout 1 hour? just demo useage of timeout
         break
     }
 
-    close(this.chTotal)
+    close(this.chWorkersDone)
     if this.chProgress != nil {
         close(this.chProgress)
     }
@@ -235,23 +206,19 @@ func (this *Manager) WaitForCompletion() {
 
 // Collect worker's output
 // including map data and worker summary
-func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyValues, chInWorker chan WorkerResult) {
+func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyValue, chInWorker chan Worker) {
     defer T.Un(T.Trace(""))
 
     this.Println("collectWorkers started")
 
-    kvs := mr.NewKeyValues()
+    shuffledKvs := make(chan mr.KeyValues)
+    go mr.Shuffle(chInMap, shuffledKvs)
 
     const MSG_PER_WORKER = 2
 
-    var (
-        rawLines, validLines int
-        doneWorkers          int
-        allDone              int = MSG_PER_WORKER * this.workersCount()
-    )
-
+    var doneWorkers int
     for {
-        if doneWorkers == allDone {
+        if doneWorkers == this.workersCount() {
             break
         }
 
@@ -264,33 +231,19 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
             }
 
             doneWorkers++
-            rawLines += w.RawLines
-            validLines += w.ValidLines
+            this.Printf("workers done: %d/%d %.1f%%\n", doneWorkers,
+                this.workersCount(), float64(100*doneWorkers/this.workersCount()))
 
-            chRateLimit <- true
+            this.RawLines += w.RawLines
+            this.ValidLines += w.ValidLines
 
-        case m, ok := <-chInMap:
-            if !ok {
-                // this can never happens, worker can't close this chan
-                this.Fatal("line chan closed")
-                break
-            }
-
-            // merge all shuffled output of workers to one key values pair
-            for k, v := range m {
-                kvs.AppendSlice(k, v)
-            }
-            doneWorkers++
-
-            realDone := doneWorkers/MSG_PER_WORKER
-            this.Printf("workers done: %d/%d %.1f%%\n", realDone,
-                this.workersCount(), float64(100*realDone/this.workersCount()))
+            chRateLimit <- true // 让贤
         }
 
-        runtime.Gosched()
+        //runtime.Gosched()
     }
 
-    this.Println("all workers collected, next to merge and reduce...")
+    this.Println("all workers Map done, start to Shuffle...")
 
     // all workers done, so close the channels
     close(chInMap)
@@ -301,19 +254,19 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
 
     // mappers must complete before reducers can begin
     worker := this.getOneWorker()
-    this.Println(worker.Name(), "worker start to reduce with ordered keys...")
-    reduceResult := kvs.LaunchReducer(worker)
-    this.Println(worker.Name(), "worker reduce done")
+    this.Println(worker.Kind(), "worker start to reduce with ordered keys...")
+    reduceResult := (<-shuffledKvs).LaunchReducer(worker)
+    this.Println(worker.Kind(), "worker reduce done")
 
     this.invokeGc()
 
     // enter into output phase
     // export final result, possibly export to db
-    this.Println(worker.Name(), "worker start to export result...")
+    this.Println(worker.Kind(), "worker start to export result...")
     reduceResult.ExportResult(worker, worker.TopN())
 
     // WaitForCompletion will wait for this
-    this.chTotal <- newTotalResult(rawLines, validLines)
+    this.chWorkersDone <- true
 }
 
 func (this Manager) invokeGc() {

@@ -14,8 +14,8 @@ type DlogParser interface {
     IsLineValid(string) bool
 }
 
-type Namer interface {
-    Name() string
+type Kinder interface {
+    Kind() string
 }
 
 type LineCounter interface {
@@ -28,8 +28,8 @@ type TopNer interface {
 
 // Worker struct method signatures
 type IWorker interface {
-    Namer // each kind of worker has a uniq name
-    SafeRun(chan<- int, chan<- mr.KeyValues, chan<- WorkerResult)
+    Kinder // each kind of worker has a uniq name
+    SafeRun(chan<- int, chan<- mr.KeyValue, chan<- Worker)
     Combiner() mr.CombinerFunc
     LineCounter
     DlogParser
@@ -42,9 +42,11 @@ type IWorker interface {
 // For 1 dlog file worker
 // Abstract
 type Worker struct {
-    name      string
+    kind      string
     seq       uint16 // sequence number
     filename  string // dlog filename
+    CreatedAt, StartAt, EndAt time.Time
+    RawLines, ValidLines int
     mapReader *bufio.Reader
     mapWriter *bufio.Writer
     *log.Logger
@@ -76,34 +78,16 @@ type FileWorker struct {
 // Worker constructor signature
 type WorkerConstructor func(*Manager, string, string, uint16) IWorker
 
-// Result of a worker
-type WorkerResult struct {
-    RawLines, ValidLines int
-}
-
-// Result of all workers
-type TotalResult struct {
-    WorkerResult
-}
-
 // Manager(coordinator) of all the dlog goroutines
 type Manager struct {
-    rawLines, validLines int
+    RawLines, ValidLines int
     option               *Option
     lock                 *sync.Mutex
     ticker               *time.Ticker
     *log.Logger
     workers    []IWorker
-    chTotal    chan TotalResult
+    chWorkersDone    chan bool
     chProgress chan int // default <nil>
-}
-
-// map -> sort -> merge -> reduce
-type Sorter interface {
-}
-
-// map -> sort -> merge -> reduce
-type Merger interface {
 }
 
 // CLI options object
@@ -119,8 +103,8 @@ type Option struct {
     Nworkers               uint8 // how many concurrent workers(goroutines) permitted
     tick                   int   // in ms
     cpuprofile, memprofile string
-    mapper                 string
-    reducer                string
+    mapper                 string // mapper stream exe filename
+    reducer                string // reducer stream exe filename
     kind                   string
     conf                   *config.Config
 }

@@ -17,15 +17,15 @@ const (
     SAMPLER_HOST          = "100.123"
     FLAG_TIMESPAN_SEP     = "-"
     KEYTYPE_SEP           = ":"
-    LINES_PER_FILE        = 600000 // deprecated
+    LINES_PER_FILE        = 565000 // deprecated
     PROGRESS_LINES_STEP   = 50000  // TODO calculated instead of const
     PROGRESS_CHAN_BUF     = 1000
-    LINE_CHAN_BUF         = 2000
+    LINE_CHANBUF_PER_WORKER  = 100
 )
 
 const (
     LOG_OPTIONS_DEBUG = log.Ldate | log.Lshortfile | log.Ltime | log.Lmicroseconds
-    LOG_OPTIONS       = log.LstdFlags
+    LOG_OPTIONS       = log.LstdFlags | log.Lshortfile
 )
 
 const (

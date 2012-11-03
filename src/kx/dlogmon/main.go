@@ -55,7 +55,7 @@ func main() {
     manager.WaitForCompletion()
 
     displaySummary(manager.Logger, start,
-        manager.FilesCount(), manager.RawLines(), manager.ValidLines())
+        manager.FilesCount(), manager.RawLines, manager.ValidLines)
 }
 
 func displaySummary(logger *log.Logger, start time.Time, files, rawLines, validLines int) {

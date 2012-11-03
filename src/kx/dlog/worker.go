@@ -10,20 +10,20 @@ import (
     "os"
     "path"
     "strings"
+    "time"
 )
 
-// Printable Worker
 func (this *Worker) String() string {
-    return fmt.Sprintf("Worker{filename: %s, option: %#v}", this.BaseName(), this.manager.option)
+    return fmt.Sprintf("Worker{seq: %d, filename: %s, option: %#v}",
+        this.seq, this.BaseFilename(), this.manager.option)
 }
 
-// Base of my dlog filename
-func (this Worker) BaseName() string {
+func (this Worker) Kind () string {
+    return this.kind
+}
+
+func (this Worker) BaseFilename() string {
     return path.Base(this.filename)
-}
-
-func newWorkerResult(rawLines, validLines int) WorkerResult {
-    return WorkerResult{rawLines, validLines}
 }
 
 // How many lines in this worker file
@@ -33,22 +33,27 @@ func (this Worker) TotalLines() int {
 }
 
 // Common for worker constructors
-func (this *Worker) init(manager *Manager, name, filename string, seq uint16) {
+func (this *Worker) init(manager *Manager, kind, filename string, seq uint16) {
     this.manager = manager
-    this.name = name
+    this.kind = kind
     this.filename = filename
     this.seq = seq
+    this.CreatedAt = time.Now()
 
     this.Logger = this.manager.Logger
 }
 
-func (this *Worker) initMapper() *stream.Stream {
+func (this *Worker) initExternalMapper() *stream.Stream {
     defer T.Un(T.Trace(""))
 
-    option := this.manager.option
-    if option.mapper != "" {
-        stream := stream.NewStream(stream.EXEC_PIPE, option.mapper)
-        stream.Open()
+    mapper := this.manager.option.mapper
+    if mapper != "" {
+        stream := stream.NewStream(stream.EXEC_PIPE, mapper)
+        if err := stream.Open(); err != nil {
+            this.Fatal(err)
+        }
+
+        this.Printf("external mapper stream opened: %s\n", mapper)
 
         this.mapReader = stream.Reader()
         this.mapWriter = stream.Writer()
@@ -58,9 +63,7 @@ func (this *Worker) initMapper() *stream.Stream {
     return nil
 }
 
-// Scan each line of a dlog file and apply validator and parser.
-// Invoke mapper if neccessary
-func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, chOutWorker chan<- WorkerResult) {
+func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- mr.KeyValue, chOutWorker chan<- Worker) {
     defer T.Un(T.Trace(""))
 
     // recover to make this worker safe for other workers
@@ -75,7 +78,7 @@ func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- mr.KeyValu
         fmt.Fprintln(os.Stderr, this)
     }
 
-    if mapper := this.initMapper(); mapper != nil {
+    if mapper := this.initExternalMapper(); mapper != nil {
         defer mapper.Close()
     }
 
@@ -84,15 +87,12 @@ func (this *Worker) SafeRun(chOutProgress chan<- int, chOutMap chan<- mr.KeyValu
 
 // 每个worker向chan写入的次数：
 // chOutProgress: N
-// chOutMap: 1
+// chOutMap: 1 for each parsed line
 // chOutWorker: 1
-func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, chOutWorker chan<- WorkerResult) {
+func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValue, chOutWorker chan<- Worker) {
     defer T.Un(T.Trace(""))
 
-    // invoke shuffle goroutine to transform k=>v into k=>[]v
-    chKvs := make(chan mr.KeyValues)
-    chKv := make(chan mr.KeyValue, LINE_CHAN_BUF)
-    go this.shuffle(chKv, chKvs)
+    this.StartAt = time.Now()
 
     var input *stream.Stream
     if this.manager.option.filemode {
@@ -103,9 +103,8 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, 
     input.Open()
     defer input.Close()
 
-    this.Printf("%s worker[%d] opened %s, start for Map\n", this.name, this.seq, this.BaseName())
+    this.Printf("%s worker[%d] opened %s, start to Map...\n", this.kind, this.seq, this.BaseFilename())
 
-    var rawLines, validLines int
     for {
         line, err := input.Reader().ReadString(EOL)
         if err != nil {
@@ -116,8 +115,8 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, 
             break
         }
 
-        rawLines++
-        if chOutProgress != nil && rawLines%PROGRESS_LINES_STEP == 0 {
+        this.RawLines ++
+        if chOutProgress != nil && this.RawLines%PROGRESS_LINES_STEP == 0 {
             // report progress
             chOutProgress <- PROGRESS_LINES_STEP
         }
@@ -126,44 +125,17 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValues, 
             continue
         }
 
-        validLines++
+        this.ValidLines++
 
         // run map for this line 
         // for pipe stream flush to work, we can't strip EOL
-        this.self.Map(line, chKv)
+        this.self.Map(line, chOutMap)
     }
+    this.EndAt = time.Now()
 
-    chOutWorker <- newWorkerResult(rawLines, validLines)
-    this.Printf("%s worker[%d] %s parsed: %d/%d\n", this.name, this.seq, this.BaseName(), validLines, rawLines)
-
-    // shuffle feed done, must close before get data from tranResult
-    close(chKv)
-
-    var kvs mr.KeyValues = <-chKvs
-    this.Printf("%s worker[%d] %s shuffled\n", this.name, this.seq, this.BaseName())
-
-    // after the work has done it's job, run it's combiner as a whole of this worker
-    if this.self.Combiner() != nil {
-        for k, v := range kvs {
-            kvs[k] = []interface{}{this.self.Combiner()(mr.ConvertAnySliceToFloat(v))} // [1]float64
-        }
-
-        this.Printf("%s worker[%d] %s local combined\n", this.name, this.seq, this.BaseName())
-    }
-
-    // output the shuffled result
-    chOutMap <- kvs
-}
-
-func (this *Worker) shuffle(in <-chan mr.KeyValue, out chan<- mr.KeyValues) {
-    kvs := mr.NewKeyValues()
-    for x := range in {
-        for k, v := range x {
-            kvs.Append(k, v)
-        }
-    }
-
-    out <- kvs
+    chOutWorker <- *this
+    this.Printf("%s worker[%d] %s done, parsed: %d/%d\n", this.kind, this.seq, this.BaseFilename(),
+        this.ValidLines, this.RawLines)
 }
 
 // My combiner func pointer
@@ -183,7 +155,7 @@ func (this *Worker) IsLineValid(line string) bool {
 // Only show top N final result
 // Default show all(0)
 func (this Worker) TopN() int {
-    t, e := this.manager.Conf().Int(this.self.Name(), "topN")
+    t, e := this.manager.Conf().Int(this.self.Kind(), "topN")
     if e == nil {
         return t
     }
@@ -213,8 +185,4 @@ func (this *Worker) ExtractLineInfo(line string) interface{} {
     }
 
     return mapperLine
-}
-
-func (this Worker) Name() string {
-    return this.name
 }
