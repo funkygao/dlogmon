@@ -6,6 +6,7 @@ import (
     "github.com/kless/goconfig/config"
     "kx/db"
     "kx/mr"
+    "kx/netapi"
     "kx/progress"
     T "kx/trace"
     . "os"
@@ -33,6 +34,13 @@ func NewManager(option *Option) *Manager {
     this.lock = new(sync.Mutex)
 
     this.Println("manager created")
+
+    if this.option.rpc {
+        if e := netapi.StartServer(); e != nil {
+            this.Fatal(e)
+        }
+        this.Println("RPC server startup at", netapi.ADDRS)
+    }
 
     return this
 }

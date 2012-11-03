@@ -10,7 +10,8 @@ PKGS = kx/dlogmon \
 	   kx/trace \
 	   kx/cache \
 	   kx/util \
-	   kx/stats
+	   kx/stats \
+	   kx/netapi
 SRC = src
 BIN = bin
 PKG = pkg

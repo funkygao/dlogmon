@@ -50,6 +50,7 @@ func ParseFlags() (*Option, error) {
     f := flag.String("f", "", "specify a single dlog file to analyze")
     verbose := flag.Bool("v", false, "verbose")
     version := flag.Bool("V", false, "show version")
+    rpc := flag.Bool("rpc", false, "start rpc server")
     progress := flag.Bool("progress", true, "show progress bar")
     kind := flag.String("k", "amf", "what kind of content to scan in dlog[amf|xxx]")
     cpuprofile := flag.String("cpuprofile", "", "write cpu profile to a file for pprof")
@@ -74,6 +75,7 @@ func ParseFlags() (*Option, error) {
     option.memprofile = *memprofile
     option.kind = *kind
     option.version = *version
+    option.rpc = *rpc
     option.filemode = *filemode
     option.tick = *tick
     option.Nworkers = uint8(*nworkers)
