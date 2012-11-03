@@ -12,12 +12,6 @@ import (
     "time"
 )
 
-const VERSION = "1.0.6r"
-
-const (
-    maxprocsenv = "GOMAXPROCS"
-)
-
 // assert cwd is right
 func init() {
     if !util.FileExists(dlog.VarDir) {
