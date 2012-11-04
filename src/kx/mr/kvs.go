@@ -8,13 +8,11 @@ func (this KeyValues) Empty() bool {
     return len(this) == 0
 }
 
-func (this KeyValues) Append(key interface{}, val interface{}) {
+func (this KeyValues) Append(key interface{}, val ...interface{}) {
     if _, ok := this[key]; !ok {
-        this[key] = make([]interface{}, 1)
-        this[key][0] = val
-    } else {
-        this[key] = append(this[key], val)
+        this[key] = make([]interface{}, 0, 100)
     }
+    this[key] = append(this[key], val...)
 }
 
 func (this KeyValues) LaunchReducer(r Reducer) (out KeyValue) {
