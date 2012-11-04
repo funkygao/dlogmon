@@ -1,4 +1,4 @@
 /*
 log4go
 */
-package log
+package logger

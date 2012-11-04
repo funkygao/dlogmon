@@ -14,7 +14,7 @@ func mockManager() *Manager {
 
 func TestNewManager(t *testing.T) {
     m := mockManager()
-    if m.rawLines != 0 {
+    if m.RawLines != 0 {
         t.Error("rawLines")
     }
 }

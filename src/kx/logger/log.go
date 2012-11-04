@@ -1,5 +1,5 @@
 // TODO vitess/relog
-package log
+package logger
 
 import (
     "flag"
