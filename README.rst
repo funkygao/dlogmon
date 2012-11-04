@@ -50,3 +50,22 @@ Todo
 - select count(*) as count, service from dlog.20121212 where time>2000 group by service order by count desc
 
 - if group, each group is a dedicated reducer and goroutine
+
+- func return chan
+
+  ::
+
+        func f() chan int {
+            ch := make(chan int)
+            go func() {
+                for i:=0; i<10; i++ {
+                    ch <- i
+                }
+            }()
+            return ch
+        }
+
+        x := f()
+        println(<-x)
+
+
