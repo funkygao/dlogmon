@@ -220,8 +220,6 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
     shuffledKvs := make(chan mr.KeyValues)
     go mr.Shuffle(chInMap, shuffledKvs)
 
-    const MSG_PER_WORKER = 2
-
     var doneWorkers int
     for {
         if doneWorkers == this.workersCount() {
