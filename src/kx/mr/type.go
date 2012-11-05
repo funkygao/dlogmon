@@ -14,6 +14,10 @@ type KeyValue map[interface{}]interface{}
 // key->[]value pair with key and value being any type
 type KeyValues map[interface{}][]interface{}
 
+type Filter interface {
+    IsLineValid(string) bool
+}
+
 type Mapper interface {
     Map(line string, out chan<- KeyValue)
 }

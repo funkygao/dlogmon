@@ -11,11 +11,6 @@ import (
 
 type StreamResult string
 
-// dlog parser interface
-type DlogParser interface {
-    IsLineValid(string) bool
-}
-
 type Kinder interface {
     Kind() string
 }
@@ -34,9 +29,9 @@ type IWorker interface {
     SafeRun(chan<- int, chan<- mr.KeyValue, chan<- Worker)
     Combiner() mr.CombinerFunc
     LineCounter
-    DlogParser
     mr.Mapper
     mr.Reducer
+    mr.Filter
     TopNer
     mr.Printer
 }
