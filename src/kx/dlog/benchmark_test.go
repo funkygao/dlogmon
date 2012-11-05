@@ -27,3 +27,22 @@ func BenchmarkMutex(b *testing.B) {
         lock.Unlock()
     }
 }
+
+func BenchmarkTypeCheckSwitch(b *testing.B) {
+    var x interface{} = 5
+    for i := 0; i < b.N; i++ {
+        switch x.(type) {
+        case int:
+        case string:
+        }
+    }
+}
+
+func BenchmarkTypeCheckIf(b *testing.B) {
+    var x interface{} = 5
+    for i := 0; i < b.N; i++ {
+        if _, ok := x.(int); ok {
+        } else if _, ok := x.(string); ok {
+        }
+    }
+}
