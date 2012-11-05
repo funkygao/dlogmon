@@ -3,6 +3,7 @@ package util
 import (
     "github.com/bmizerany/assert"
     "testing"
+    "unsafe"
 )
 
 func TestSet(t *testing.T) {
@@ -30,4 +31,21 @@ func TestEncodeDecodeSlice(t *testing.T) {
     for i, v := range x {
         assert.Equal(t, de[i], v)
     }
+}
+
+func BenchmarkGobEncodeSlice(b *testing.B) {
+    x := []string{"123456", "7890", "123456"}
+    for i := 0; i < b.N; i++ {
+        EncodeStrSlice(x)
+    }
+    b.SetBytes(int64(unsafe.Sizeof(x)))
+}
+
+func BenchmarkGobDecodeSlice(b *testing.B) {
+    x := []string{"funky", "gao peng", "kaixin"}
+    se, _ := EncodeStrSlice(x)
+    for i := 0; i < b.N; i++ {
+        DecodeStrToSlice(se)
+    }
+    b.SetBytes(int64(unsafe.Sizeof(x)))
 }
