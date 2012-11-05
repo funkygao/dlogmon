@@ -99,9 +99,10 @@ func Timeit(fun interface{}, args ...interface{}) (result []reflect.Value, delta
         in[i] = reflect.ValueOf(arg)
     }
 
-    start := time.Now()
+    defer func(start time.Time) {
+        delta = time.Since(start)
+    }(time.Now())
     result = f.Call(in) // call the universal func
-    delta = time.Since(start)
     return
 }
 
