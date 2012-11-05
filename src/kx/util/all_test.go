@@ -16,3 +16,18 @@ func TestSet(t *testing.T) {
     s.Add("string")
     assert.Equal(t, 2, s.Len())
 }
+
+func TestEncodeDecodeSlice(t *testing.T) {
+    x := []string{"funky", "gao peng", "kaixin"}
+    se, e := EncodeStrSlice(x)
+    assert.Equal(t, e, nil)
+
+    de, e := DecodeStrToSlice(se)
+    assert.Equal(t, e, nil)
+
+    assert.Equal(t, len(x), len(de))
+
+    for i, v := range x {
+        assert.Equal(t, de[i], v)
+    }
+}
