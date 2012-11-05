@@ -210,6 +210,12 @@ func (this *Manager) WaitForCompletion() {
     }
 }
 
+func (this Manager) shuffle(chInMap <-chan mr.KeyValue) chan mr.KeyValues {
+    r := make(chan mr.KeyValues)
+    go mr.Shuffle(chInMap, r)
+    return r
+}
+
 // Collect worker's output
 // including map data and worker summary
 func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyValue, chInWorker chan Worker) {
@@ -217,8 +223,7 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
 
     this.Println("collectWorkers started")
 
-    shuffledKvs := make(chan mr.KeyValues)
-    go mr.Shuffle(chInMap, shuffledKvs)
+    shuffledKvs := this.shuffle(chInMap)
 
     var doneWorkers int
     for {
