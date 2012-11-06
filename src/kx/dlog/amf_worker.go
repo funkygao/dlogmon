@@ -8,8 +8,6 @@ import (
     "strings"
 )
 
-const AMF_KEY_LEN = 2
-
 // Constructor of AmfWorker
 func NewAmfWorker(manager *Manager, name, filename string, seq uint16) IWorker {
     defer T.Un(T.Trace(""))
@@ -17,9 +15,6 @@ func NewAmfWorker(manager *Manager, name, filename string, seq uint16) IWorker {
     this := new(AmfWorker)
     this.self = this // don't forget this
     this.init(manager, name, filename, seq)
-
-    // set the combiner
-    //this.combiner = stats.StatsSum
 
     return this
 }
@@ -52,10 +47,10 @@ func (this *AmfWorker) Map(line string, out chan<- mr.KeyValue) {
     req.parseLine(line)
 
     kv := mr.NewKeyValue()
-    kv[[AMF_KEY_LEN]string{req.class + "." + req.method, req.uri}] = 1
+    key := mr.NewKey(req.class, req.method, req.uri)
+    kv[key] = 1
 
-    // emit an intermediate data
-    out <- kv
+    kv.Emit(out)
 }
 
 func (this *AmfWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyValue) {
@@ -64,16 +59,16 @@ func (this *AmfWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
     aggregate := stats.StatsSum(mr.ConvertAnySliceToFloat(values))
     if aggregate > 0 {
         kv = mr.NewKeyValue()
-        kv[key] = aggregate
+        kv[NIL_KEY] = aggregate
     }
 
     return
 }
 
 func (this AmfWorker) Printr(key interface{}, value mr.KeyValue) string {
-    k := key.([AMF_KEY_LEN]string)
-    fmt.Printf("%65s  %-35s %5.0f\n", k[0], k[1], value[k])
-
-    return fmt.Sprintf("insert into %s(method, uri, c) values('%s', '%s', %d)",
-        TABLE_AMF, k[0], k[1], value[k])
+    k := key.(mr.Key)
+    keys := k.Keys()
+    method := keys[0] + "." + keys[1]
+    fmt.Printf("%65s  %-35s %v\n", method, keys[2], value[NIL_KEY])
+    return ""
 }
