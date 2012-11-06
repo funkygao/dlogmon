@@ -57,7 +57,7 @@ func (this *FileWorker) Map(line string, out chan<- mr.KeyValue) {
         kv[coOccurence] = 1
     }
 
-    out <- kv
+    kv.Emit(out)
 }
 
 // Reduce
