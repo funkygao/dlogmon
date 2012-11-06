@@ -3,12 +3,14 @@ package main
 import (
     "fmt"
     "github.com/funkygao/cmd"
+    "kx/mr"
 )
 
 type dlogmonCli struct {
 }
 
 var cli cmd.Cmd
+var result mr.KeyValue
 
 func init() {
     cli = cmd.New(new(dlogmonCli))
@@ -16,15 +18,16 @@ func init() {
     cli.Prompt = DLOOGMON_PROMPT
 }
 
-func cmdloop() {
+func cmdloop(reduceResult mr.KeyValue) {
+    result = reduceResult
     cli.Cmdloop()
 }
 
 func (this dlogmonCli) Help() {
     fmt.Println(`Available commands:
-group sort top
+group sort top raw
 
-Use "help [topic]" for more information about that topic.`)
+Use "help [command]" for more information about a command.`)
 }
 
 func (this dlogmonCli) Help_group() {
@@ -37,4 +40,26 @@ func (this dlogmonCli) Help_sort() {
 
 func (this dlogmonCli) Help_top() {
     fmt.Println("top {N}")
+}
+
+func (this dlogmonCli) Help_raw() {
+    fmt.Println(`raw
+output raw reducer's data`)
+}
+
+func (this dlogmonCli) Do_raw() {
+    for k, v := range result {
+        fmt.Printf("key=> %#v\n", k)
+        fmt.Printf("val=> %#v\n", v)
+        fmt.Println()
+    }
+}
+
+func (this dlogmonCli) Do_top(n string) {
+}
+
+func (this dlogmonCli) Do_sort(col string) {
+}
+
+func (this dlogmonCli) Do_group(group string) {
 }
