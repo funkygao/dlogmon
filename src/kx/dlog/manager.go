@@ -72,7 +72,7 @@ func (this *Manager) String() string {
 }
 
 // Get any worker of the same type TODO
-func (this *Manager) getOneWorker() IWorker {
+func (this *Manager) GetOneWorker() IWorker {
     defer T.Un(T.Trace(""))
 
     return this.workers[0]
@@ -157,7 +157,7 @@ func (this *Manager) Submit() (err error) {
 
     chMap := make(chan mr.KeyValue, this.workersCount()*LINE_CHANBUF_PER_WORKER)
     chWorker := make(chan Worker, this.workersCount())
-    this.chWorkersDone = make(chan bool)
+    this.chWorkersDone = make(chan mr.KeyValue)
 
     // create workers first
     this.newWorkers()
@@ -199,7 +199,7 @@ func (this Manager) launchWorkers(chRateLimit <-chan bool, chMap chan<- mr.KeyVa
 
 // Wait for all the dlog goroutines finish and collect final result
 // Must run after collectWorkers() finished
-func (this *Manager) WaitForCompletion() {
+func (this *Manager) WaitForCompletion() (r mr.KeyValue) {
     defer T.Un(T.Trace(""))
 
     // 也可能我走的太快，得等他们先创建好再开始
@@ -208,10 +208,11 @@ func (this *Manager) WaitForCompletion() {
     }
 
     select {
-    case _, ok := <-this.chWorkersDone:
+    case reduceResult, ok := <-this.chWorkersDone:
         if !ok {
             panic("unkown error")
         }
+        r = reduceResult
     case <-time.After(time.Hour):
         // timeout 1 hour? just demo useage of timeout
         break
@@ -226,6 +227,7 @@ func (this *Manager) WaitForCompletion() {
     if this.ticker != nil {
         this.ticker.Stop()
     }
+    return
 }
 
 func (this Manager) shuffle(chInMap <-chan mr.KeyValue) chan mr.KeyValues {
@@ -278,7 +280,7 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
     this.invokeGc()
 
     // mappers must complete before reducers can begin
-    worker := this.getOneWorker()
+    worker := this.GetOneWorker()
     kvs := <- shuffledKvs
     this.Println(worker.Kind(), "worker Shuffled")
     reduceResult := kvs.LaunchReducer(worker)
@@ -292,7 +294,7 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
     reduceResult.ExportResult(worker, worker.TopN())
 
     // WaitForCompletion will wait for this
-    this.chWorkersDone <- true
+    this.chWorkersDone <- reduceResult
 }
 
 func (this Manager) invokeGc() {

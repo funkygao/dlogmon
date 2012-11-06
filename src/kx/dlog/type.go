@@ -82,7 +82,7 @@ type Manager struct {
     ticker               *time.Ticker
     *log.Logger
     workers       []IWorker
-    chWorkersDone chan bool
+    chWorkersDone chan mr.KeyValue
     chProgress    chan int // default <nil>
 }
 

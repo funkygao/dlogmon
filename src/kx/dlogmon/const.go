@@ -6,7 +6,7 @@ const (
     DLOGMON_INTRO = `
 =================================================
 dlogmon - kaixin dlog parser and report generator
-Enter "help" to see how to use it
+Enter "help | h" to see how to use it
 =================================================`
     DLOOGMON_PROMPT = "(dlog) "
 )

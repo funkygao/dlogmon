@@ -27,9 +27,9 @@ linux:
 	@echo 'cd ~/github/dlogmon;  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dlogmon_linux kx/dlogmon'
 
 up:
+	go get -u github.com/funkygao/cmd
 	go get -u github.com/bmizerany/assert
 	go get -u github.com/kless/goconfig/config
-	go get -u github.com/funkygao/cmd
 	go get -u github.com/mattn/go-sqlite3
 
 rb:clean install

@@ -46,12 +46,14 @@ func main() {
     dumpMemProfile(option.Memprofile())
 
     manager.Println("waiting for completion...")
-    manager.WaitForCompletion()
+    kvResult := manager.WaitForCompletion()
 
     displaySummary(manager.Logger, start,
         manager.FilesCount(), manager.RawLines, manager.ValidLines)
 
-    cmdloop()
+    if kvResult.Groupped() {
+        cmdloop(manager.GetOneWorker(), kvResult)
+    }
 }
 
 func displaySummary(logger *log.Logger, start time.Time, files, rawLines, validLines int) {
@@ -63,9 +65,9 @@ func displaySummary(logger *log.Logger, start time.Time, files, rawLines, validL
         rawLines,
         files,
         delta, float64(rawLines)/delta.Seconds())
+    // render to both log and stderr
     logger.Print(summary)
     fmt.Fprintf(os.Stderr, summary)
-    fmt.Fprintf(os.Stderr, "interactive mode ready!\n")
 }
 
 func initialize(option *dlog.Option, err error) {
