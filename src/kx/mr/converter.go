@@ -20,11 +20,3 @@ func ConvertAnySliceToFloat(v []interface{}) []float64 {
 
     return r
 }
-
-func InterfaceArrayToStringSlice(in []interface{}) []string {
-    r := make([]string, len(in))
-    for i, v := range in {
-        r[i] = v.(string)
-    }
-    return r
-}

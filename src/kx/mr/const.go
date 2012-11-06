@@ -7,8 +7,7 @@ import (
 const (
     SORT_BY_KEY SortType = iota + 1
     SORT_BY_VALUE
-    SORT_SECONDARY_KV // first key, then value
-    SORT_SECONDARY_VK // first value, then key
+    SORT_BY_COL
 
     SORT_ORDER_ASC  = 1
     SORT_ORDER_DESC = 2
@@ -24,5 +23,10 @@ const (
 
 const (
     GROUP_HEADER_LEN = 100
-    KEY_SEP = "|"
 )
+
+var KEY_SEP string
+func init() {
+    sep := []byte{0x0}
+    KEY_SEP = string(sep)
+}

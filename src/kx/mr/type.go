@@ -31,11 +31,23 @@ type MapReducer interface {
     Reducer
 }
 
+type GroupKey struct {
+    group string
+    Key
+}
+
+type Key struct {
+    key string // gob'ed slice of strings
+}
+
 type Grouper interface {
-    Groups() []string
+    Group() string
 }
 
 type Printer interface {
+}
+
+type Printrer interface {
     Printr(key interface{}, value KeyValue) string
 }
 
@@ -53,5 +65,6 @@ type Sorter struct {
     vals []interface{}
     t    SortType
     o    SortOrdering
+    col  interface{}
     sort.Interface
 }
