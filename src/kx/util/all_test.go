@@ -23,6 +23,10 @@ func TestEncodeDecodeSlice(t *testing.T) {
     se, e := EncodeStrSlice(x)
     assert.Equal(t, e, nil)
 
+    // encode twice, decode once
+    x = []string{"funky", "gao peng", "kaixin"}
+    EncodeStrSlice(x)
+
     de, e := DecodeStrToSlice(se)
     assert.Equal(t, e, nil)
 

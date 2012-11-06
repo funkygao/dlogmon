@@ -12,7 +12,7 @@ var (
 )
 
 func EncodeStrSlice(s []string) (r string, e error) {
-    buf.Reset()
+    //buf.Reset()
     if e = enc.Encode(s); e != nil {
         return
     }
@@ -21,10 +21,12 @@ func EncodeStrSlice(s []string) (r string, e error) {
 }
 
 func DecodeStrToSlice(s string) (r []string, e error) {
-    buf.Reset()
+    //buf.Reset()
     buf.WriteString(s)
+    buf.Write([]byte(s))
     r = make([]string, 0)
     if e = dec.Decode(&r); e != nil {
+        panic(e)
         return
     }
     return
