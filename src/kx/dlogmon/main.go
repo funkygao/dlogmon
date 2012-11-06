@@ -50,6 +50,8 @@ func main() {
 
     displaySummary(manager.Logger, start,
         manager.FilesCount(), manager.RawLines, manager.ValidLines)
+
+    cmdloop()
 }
 
 func displaySummary(logger *log.Logger, start time.Time, files, rawLines, validLines int) {
@@ -63,6 +65,7 @@ func displaySummary(logger *log.Logger, start time.Time, files, rawLines, validL
         delta, float64(rawLines)/delta.Seconds())
     logger.Print(summary)
     fmt.Fprintf(os.Stderr, summary)
+    fmt.Fprintf(os.Stderr, "interactive mode ready!\n")
 }
 
 func initialize(option *dlog.Option, err error) {
