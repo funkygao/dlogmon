@@ -31,9 +31,12 @@ func init() {
 func cmdloop(w dlog.IWorker, reduceResult mr.KeyValue) {
     result = reduceResult
     worker = w
+
+    // startup the loop
     cli.Cmdloop()
 }
 
+// universal help
 func (this dlogmonCli) Help() {
     fmt.Println(`Available commands:
 group sort top raw worker show
@@ -81,6 +84,7 @@ func (this dlogmonCli) Do_worker() {
 }
 
 func (this dlogmonCli) Do_show() {
+    //result.ExportResult()
 }
 
 func (this dlogmonCli) Do_top(n string) {
@@ -91,14 +95,16 @@ func (this dlogmonCli) Do_top(n string) {
 
     if t > 0 {
         this.top = t // remember this
-        result.ExportResult(worker, this.top)
+        result.ExportResult(worker, this.group, this.sortCol, this.top)
     }
 }
 
 func (this dlogmonCli) Do_sort(col string) {
     this.sortCol = col
+    result.ExportResult(worker, this.group, this.sortCol, this.top)
 }
 
 func (this dlogmonCli) Do_group(group string) {
     this.group = group
+    result.ExportResult(worker, group, this.sortCol, this.top)
 }

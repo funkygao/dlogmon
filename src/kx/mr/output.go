@@ -21,19 +21,22 @@ func (this KeyValue) exportForNonGrouped(printer Printer, top int) {
     }
 }
 
-func (this KeyValue) exportForGroupped(printer Printer, top int) {
+func (this KeyValue) exportForGroupped(printer Printer, group, sortCol string, top int) {
     defer T.Un(T.Trace(""))
 
-    for _, group := range this.Groups() {
-        kvGroup := this.newByGroup(group) // a new kv just for this group
-        kvGroup.OutputGroup(printer, top)
+    for _, grp := range this.Groups() {
+        if group != "" && grp !=group {
+            continue
+        }
+        kvGroup := this.newByGroup(grp) // a new kv just for this group
+        kvGroup.OutputGroup(printer, grp, "", top)
         println()
     }
 }
 
 // this with key as mappers' output keys
 // and value as reducer output value(KeyValue)
-func (this KeyValue) ExportResult(printer Printer, top int) {
+func (this KeyValue) ExportResult(printer Printer, group, sortCol string, top int) {
     defer T.Un(T.Trace(""))
 
     println("\n") // seperate from the progress bar
@@ -42,17 +45,13 @@ func (this KeyValue) ExportResult(printer Printer, top int) {
         this.exportForNonGrouped(printer, top)
         return
     } else {
-        this.exportForGroupped(printer, top)
+        this.exportForGroupped(printer, group, sortCol, top)
     }
 
 }
 
-func (kv KeyValue) OutputGroup(printer Printer, top int) {
+func (kv KeyValue) OutputGroup(printer Printer, group, sortCol string, top int) {
     defer T.Un(T.Trace(""))
-
-    // my group info
-    groupKey := kv.getOneKey().(GroupKey)
-    group := groupKey.Group()
 
     // print group header
     fmt.Println(group)
@@ -72,8 +71,9 @@ func (kv KeyValue) OutputGroup(printer Printer, top int) {
 
     // sort by column
     s := NewSort(kv)
-    if cs, ok := printer.(GroupSorter); ok {
-        s.SortCol(cs.SortCol(group))
+    if sortCol != "" {
+        s.SortCol(sortCol)
+        println("ha", sortCol)
     } else {
         // default sort by 1st colomn
         s.SortCol(valKeys[0])

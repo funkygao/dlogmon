@@ -64,6 +64,11 @@ func terminalWidth() int {
     return int(winsize.Col)
 }
 
+func terminalHeight() int {
+    winsize := getWinsize()
+    return int(winsize.Row)
+}
+
 func progress(current, total, cols int) string {
     prefix := strconv.Itoa(current) + " / " + strconv.Itoa(total)
     bar_start := " ["
