@@ -27,15 +27,3 @@ func TestAppendVariadics(t *testing.T) {
     f = ConvertAnySliceToFloat(d["b"])
     assert.Equal(t, f, []float64{3})
 }
-
-func TestKeyValueSortType(t *testing.T) {
-    kv := NewKeyValue()
-    kv["a"] = 1
-    kv["b"] = 2
-    assert.Equal(t, SORT_BY_VALUE, kv.sortType())
-
-    kv = NewKeyValue()
-    kv[[...]string{"avg", "www"}] = 1
-    kv[[...]string{"avg", "game"}] = 2
-    assert.Equal(t, SORT_BY_VALUE, kv.sortType())
-}

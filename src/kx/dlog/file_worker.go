@@ -43,18 +43,11 @@ func (this *FileWorker) Map(line string, out chan<- mr.KeyValue) {
     terms := strings.Split(line, " ")
     for i, term := range terms {
         for j := i + 1; j < len(terms); j++ {
-            var coOccurence [2]string
-            coOccurence[0] = strings.TrimSpace(term)
-            coOccurence[1] = strings.TrimSpace(terms[j])
+            coOccurence := mr.NewKey(strings.TrimSpace(term), strings.TrimSpace(terms[j]))
             kv[coOccurence] = 1
 
         }
 
-        // for each word occurence
-        var coOccurence [2]string
-        coOccurence[0] = strings.TrimSpace(term)
-        coOccurence[1] = "*"
-        kv[coOccurence] = 1
     }
 
     kv.Emit(out)
@@ -66,16 +59,17 @@ func (this *FileWorker) Reduce(key interface{}, values []interface{}) (kv mr.Key
     var occurence = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
     if occurence > threhold {
         kv = mr.NewKeyValue()
-        kv[key] = occurence
+        kv[NIL_KEY] = occurence
     }
 
     return
 }
 
 func (this FileWorker) Printr(key interface{}, value mr.KeyValue) string {
-    k := key.([2]string)
-    if value[k].(float64) > 1 {
-        fmt.Printf("%25s%25s %4.0f\n", k[0], k[1], value[k])
+    k := key.(mr.Key)
+    keys := k.Keys()
+    if value[NIL_KEY].(float64) > 1 {
+        fmt.Printf("%25s%25s %4.0f\n", keys[0], keys[1], value[NIL_KEY])
     }
     return ""
 }
