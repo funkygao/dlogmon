@@ -9,8 +9,10 @@ import (
 )
 
 const (
-    KXI_M_KEYLEN = 4
-    KXI_R_KEYLEN = 3
+    GROUP_URL_SERV = "url call kxi service"
+    GROUP_URL_RID = "url within a request"
+    GROUP_URL_SQL = "url query db sql"
+    GROUP_KXI = "kxi servants"
 )
 
 const (
@@ -69,13 +71,11 @@ func (this *KxiWorker) Map(line string, out chan<- mr.KeyValue) {
             rec.Url, rec.Rid, rec.Service, rec.Time, rec.Sql)
     }
 
-    // TODO refactor from here
-
     kv := mr.NewKeyValue()
-    kg1 := mr.NewGroupKey("url call kxi service", rec.Url, rec.Service)
-    kg2 := mr.NewGroupKey("url within a request", rec.Url, rec.Rid)
-    kg3 := mr.NewGroupKey("url query db sql", rec.Url, rec.Sql)
-    kg4 := mr.NewGroupKey("kxi servants", rec.Service)
+    kg1 := mr.NewGroupKey(GROUP_URL_SERV, rec.Url, rec.Service)
+    kg2 := mr.NewGroupKey(GROUP_URL_RID, rec.Url, rec.Rid)
+    kg3 := mr.NewGroupKey(GROUP_URL_SQL, rec.Url, rec.Sql)
+    kg4 := mr.NewGroupKey(GROUP_KXI, rec.Service)
     kv[kg1] = rec.Time
     kv[kg2] = rec.Time
     kv[kg3] = rec.Time
@@ -87,31 +87,37 @@ func (this *KxiWorker) Map(line string, out chan<- mr.KeyValue) {
 // The key is already sorted
 func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyValue) {
     kv = mr.NewKeyValue()
+    vals := mr.ConvertAnySliceToFloat(values)
     switch key.(mr.GroupKey).Group() {
-    case "url call kxi service":
-        kv[TIME_ALL] = stats.StatsSum(mr.ConvertAnySliceToFloat(values))
-        kv[CALL_ALL] = float64(len(values))
-    case "url within a request":
-    case "kxi servants":
-    case "url query db sql":
+    case GROUP_URL_SERV:
+        kv[TIME_ALL] = stats.StatsSum(vals)
+        kv[TIME_MIN] = stats.StatsMin(vals)
+        kv[TIME_MAX] = stats.StatsMax(vals)
+        kv[TIME_AVG] = stats.StatsMean(vals)
+        kv[TIME_STD] = stats.StatsSampleStandardDeviation(vals)
+        kv[CALL_ALL] = float64(stats.StatsCount(vals))
+    case GROUP_KXI:
+    case GROUP_URL_RID:
+    case GROUP_URL_SQL:
     }
 
     return
 }
 
 func (this KxiWorker) SortCol(group string) string {
-    switch group {
-    case "url call kxi service":
-        return TIME_ALL
+    rule := map[string]string{
+        GROUP_URL_SERV: TIME_ALL,
     }
-    return ""
+    return rule[group]
 }
 
 func (this KxiWorker) KeyLengths(group string) []int {
     switch group {
-    case "url call kxi service":
-        return []int{60, 20}
+    case GROUP_URL_SERV:
+        if r, e := this.manager.ConfInts(W_KXI, "keyLen url call kxi service"); e == nil {
+            return r
+        }
+        return []int{50, 20}
     }
     return nil
 }
-

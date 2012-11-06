@@ -23,7 +23,7 @@ const (
 
 const (
     OUTPUT_GROUP_HEADER_LEN = 100
-    OUTPUT_VAL_WIDTH = 8
+    OUTPUT_VAL_WIDTH = 7
 )
 
 var KEY_SEP string

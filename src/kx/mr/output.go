@@ -89,13 +89,16 @@ func (kv KeyValue) OutputGroup(printer Printer, top int) {
         mapKey := sk.(GroupKey)
         // the keys
         for i, k := range mapKey.Keys() {
+            if len(k) > keyLengths[i] {
+                k = k[:keyLengths[i]-1]
+            }
             fmt.Printf("%*s", keyLengths[i], k)
         }
 
         // the values
         val := kv[sk].(KeyValue)
         for _, k := range valKeys {
-            fmt.Printf("%*.0f", OUTPUT_VAL_WIDTH, val[k])
+            fmt.Printf("%*.1f", OUTPUT_VAL_WIDTH, val[k])
         }
 
         println()
