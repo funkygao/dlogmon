@@ -66,6 +66,14 @@ func ParseFlags() (*Option, error) {
         trace = flag.Bool("t", false, "trace each func call")
     )
 
+    flag.Usage = func() {
+        const usage = `dlogmon - kaixin dlog parser and report generator
+
+Flags:
+`
+        fmt.Fprint(os.Stderr, usage)
+        flag.PrintDefaults()
+    }
     flag.Parse()
 
     option := new(Option)
