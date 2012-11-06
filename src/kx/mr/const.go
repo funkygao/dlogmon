@@ -23,6 +23,6 @@ const (
 )
 
 const (
-    KEY_GROUP        = "_"
     GROUP_HEADER_LEN = 100
+    KEY_SEP = "|"
 )
