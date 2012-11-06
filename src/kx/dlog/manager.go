@@ -12,6 +12,7 @@ import (
     . "os"
     "os/signal"
     "runtime"
+    "strconv"
     "strings"
     "sync"
     "time"
@@ -47,6 +48,23 @@ func NewManager(option *Option) *Manager {
 
 func (this Manager) Conf() *config.Config {
     return this.option.conf
+}
+
+func (this Manager) ConfInts(section, option string) (ints []int, err error) {
+    raw, e := this.Conf().RawString(section, option)
+    if e != nil {
+        err = e
+        return
+    }
+
+    ints = make([]int, 0)
+    for _, v := range strings.Split(raw, ",") {
+        if i, e := strconv.Atoi(strings.TrimSpace(v)); e == nil {
+            ints = append(ints, i)
+        }
+    }
+
+    return
 }
 
 func (this *Manager) String() string {
