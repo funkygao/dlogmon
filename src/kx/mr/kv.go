@@ -32,6 +32,14 @@ func (this KeyValue) Keys() (keys []interface{}) {
     return
 }
 
+func (this KeyValue) OneValue() (val interface{}) {
+    for _, v := range this {
+        val = v
+        return
+    }
+    return
+}
+
 func (this KeyValue) Values() (values []interface{}) {
     values = make([]interface{}, len(this))
     var i int

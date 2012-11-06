@@ -12,6 +12,8 @@ PKGS = kx/dlogmon \
 	   kx/util \
 	   kx/stats \
 	   kx/netapi
+BENCHES = kx/util \
+		  kx/dlog
 SRC = src
 BIN = bin
 PKG = pkg
@@ -38,7 +40,7 @@ test:install
 	@go test ${PKGS}
 
 bench:
-	go test -test.bench=".*" -test.benchtime 5 kx/dlog
+	go test -test.bench=".*" -test.benchtime 5 ${BENCHES}
 
 benchmark:
 	go test -v -test.bench=".*" github.com/feyeleanor/gospeed
@@ -77,7 +79,7 @@ trace:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -t -d
 
 mr:install
-	@./bin/dlogmon -f test/fixture/lz.121015-104410 -mapper ./contrib/kxiMapper.py -progress=true -k kxi
+	@./bin/dlogmon -f test/fixture/lz.121015-104410 -mapper ./contrib/kxiMapper.py -progress=true -k kxi -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
 todo:
 	@find src/kx -name '*.go' | xargs grep -n -1 --color TODO
