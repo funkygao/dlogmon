@@ -17,6 +17,7 @@ const (
     SAMPLER_HOST            = "100.123"
     FLAG_TIMESPAN_SEP       = "-"
     KEYTYPE_SEP             = ":"
+    NIL_KEY                 = ""
     LINES_PER_FILE          = 565000 // deprecated
     PROGRESS_LINES_STEP     = 50000  // TODO calculated instead of const
     PROGRESS_CHAN_BUF       = 1000
