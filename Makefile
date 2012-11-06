@@ -29,6 +29,7 @@ linux:
 up:
 	go get -u github.com/bmizerany/assert
 	go get -u github.com/kless/goconfig/config
+	go get -u github.com/funkygao/cmd
 	go get -u github.com/mattn/go-sqlite3
 
 rb:clean install
