@@ -99,38 +99,19 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
     return
 }
 
-// kv are in the same group
-func (this KxiWorker) Printh(kv mr.KeyValue, top int) {
-    defer T.Un(T.Trace(""))
-
-    // output the aggregate header
-    oneVal := kv.OneValue().(mr.KeyValue)
-    valKeys := oneVal.Keys()
-    fmt.Printf("%70s %20s", "", "")
-    for _, x := range valKeys {
-        fmt.Printf("%8s", x.(string))
+func (this KxiWorker) SortCol(group string) string {
+    switch group {
+    case "url call kxi service":
+        return TIME_ALL
     }
-    println()
+    return ""
+}
 
-    s := mr.NewSort(kv)
-    s.SortCol(TIME_ALL)
-    s.Sort(mr.SORT_BY_COL, mr.SORT_ORDER_DESC)
-    sortedKeys := s.Keys()
-    if top > 0 && top < len(sortedKeys) {
-        sortedKeys = sortedKeys[:top]
+func (this KxiWorker) KeyLengths(group string) []int {
+    switch group {
+    case "url call kxi service":
+        return []int{60, 20}
     }
-
-    for _, sk := range sortedKeys {
-        mapKey := sk.(mr.GroupKey)
-        for _, k := range mapKey.Keys() {
-            fmt.Printf("%30s", k)
-        }
-
-        val := kv[sk].(mr.KeyValue)
-        for _, k := range valKeys {
-            fmt.Printf("%8.0f", val[k])
-        }
-        println()
-    }
+    return nil
 }
 

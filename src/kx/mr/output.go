@@ -25,23 +25,10 @@ func (this KeyValue) exportForGroupped(printer Printer, top int) {
     defer T.Un(T.Trace(""))
 
     for _, group := range this.Groups() {
-        // header for each key type
-        this.printGroupHeader(group)
-
         kvGroup := this.newByGroup(group) // a new kv just for this group
-        if p, ok := printer.(Printher); ok {
-            p.Printh(kvGroup, top)
-        }
-
+        kvGroup.OutputGroup(printer, top)
         println()
     }
-}
-
-func (this KeyValue) printGroupHeader(group string) {
-    defer T.Un(T.Trace(""))
-
-    fmt.Println(group)
-    fmt.Println(strings.Repeat("=", GROUP_HEADER_LEN))
 }
 
 // this with key as mappers' output keys
@@ -58,4 +45,59 @@ func (this KeyValue) ExportResult(printer Printer, top int) {
         this.exportForGroupped(printer, top)
     }
 
+}
+
+func (kv KeyValue) OutputGroup(printer Printer, top int) {
+    defer T.Un(T.Trace(""))
+
+    // my group info
+    groupKey := kv.getOneKey().(GroupKey)
+    group := groupKey.Group()
+
+    // print group header
+    fmt.Println(group)
+    fmt.Println(strings.Repeat("=", OUTPUT_GROUP_HEADER_LEN))
+
+    // output the aggregate columns header
+    oneVal := kv.OneValue().(KeyValue)
+    valKeys := oneVal.Keys()
+    keyLengths := printer.(KeyLengther).KeyLengths(group)
+    for _, l := range keyLengths {
+        fmt.Printf("%*s", l, "")
+    }
+    for _, x := range valKeys {
+        fmt.Printf("%*s", OUTPUT_VAL_WIDTH, x)
+    }
+    println()
+
+    // sort by column
+    s := NewSort(kv)
+    if cs, ok := printer.(GroupSorter); ok {
+        s.SortCol(cs.SortCol(group))
+    } else {
+        // default sort by 1st colomn
+        s.SortCol(valKeys[0])
+    }
+    s.Sort(SORT_BY_COL, SORT_ORDER_DESC)
+    sortedKeys := s.Keys()
+    if top > 0 && top < len(sortedKeys) {
+        sortedKeys = sortedKeys[:top]
+    }
+
+    // output each key's values per line
+    for _, sk := range sortedKeys {
+        mapKey := sk.(GroupKey)
+        // the keys
+        for i, k := range mapKey.Keys() {
+            fmt.Printf("%*s", keyLengths[i], k)
+        }
+
+        // the values
+        val := kv[sk].(KeyValue)
+        for _, k := range valKeys {
+            fmt.Printf("%*.0f", OUTPUT_VAL_WIDTH, val[k])
+        }
+
+        println()
+    }
 }

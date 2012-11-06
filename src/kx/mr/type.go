@@ -51,8 +51,12 @@ type Printrer interface {
     Printr(key interface{}, value KeyValue) string
 }
 
-type Printher interface {
-    Printh(KeyValue, int)
+type KeyLengther interface {
+    KeyLengths(group string) []int
+}
+
+type GroupSorter interface {
+    SortCol(group string) string
 }
 
 type (
