@@ -51,6 +51,14 @@ func (this dlogmonCli) Help_groups() {
     fmt.Println("groups\nshow all groups")
 }
 
+func (this dlogmonCli) Help_save() {
+    fmt.Println("save {filename}\nsave current parsed result to a file")
+}
+
+func (this dlogmonCli) Help_load() {
+    fmt.Println("load {filename}\nload parsed result from a file")
+}
+
 func (this dlogmonCli) Help_sort() {
     fmt.Println("sort {col_name}")
 }
@@ -129,4 +137,10 @@ func (this dlogmonCli) Do_groups() {
 func (this dlogmonCli) Do_status() {
     fmt.Printf("group=%s, sort column=%s, top=%d\n", this.group, this.sortCol, this.top)
     fmt.Printf("mem:%v, goroutines:%v\n", T.MemAlloced(), runtime.NumGoroutine())
+}
+
+func (this dlogmonCli) Do_save(filename string) {
+}
+
+func (this dlogmonCli) Do_load(filename string) {
 }
