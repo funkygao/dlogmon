@@ -20,3 +20,16 @@ func ConvertAnySliceToFloat(v []interface{}) []float64 {
 
     return r
 }
+
+func ConvertAnySliceToString(v []interface{}) []string {
+    r := make([]string, 0)
+    for i := range v {
+        if d, ok := v[i].(string); ok {
+            r = append(r, d)
+        } else {
+            panic("Unkown type")
+        }
+    }
+
+    return r
+}

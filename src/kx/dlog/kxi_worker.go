@@ -13,6 +13,7 @@ const (
     GROUP_URL_RID = "which request hit the most kxi call"
     GROUP_URL_SQL = "what kind of sql are most frequent"
     GROUP_KXI = "running stats of kxi servants"
+    GROUP_URL = "which url is accessed most"
 )
 
 const (
@@ -27,11 +28,14 @@ const (
     CALL_MAX = "Cmax"
     CALL_MIN = "Cmin"
     CALL_STD = "Cstd"
+
+    REQ_ALL = "Rsum"
 )
 
 var KEY_LENS = map[string][]int{
     GROUP_URL_SERV: []int{50, 24},
     GROUP_KXI: []int{50},
+    GROUP_URL: []int{60},
     GROUP_URL_SQL:[]int{40, 57},
     GROUP_URL_RID: []int{60, 20}}
 
@@ -90,15 +94,18 @@ func (this *KxiWorker) Map(line string, out chan<- mr.KeyValue) {
         kv[kg4] = rec.Time
     }
 
+    kg5 := mr.NewGroupKey(GROUP_URL, rec.Url)
+    kv[kg5] = rec.Rid // key is url, val is rid(string)
+
     kv.Emit(out)
 }
 
 // The key is already sorted
 func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyValue) {
     kv = mr.NewKeyValue()
-    vals := mr.ConvertAnySliceToFloat(values)
     switch key.(mr.GroupKey).Group() {
     case GROUP_URL_SERV:
+        vals := mr.ConvertAnySliceToFloat(values)
         kv[TIME_ALL] = stats.StatsSum(vals)
         kv[TIME_MIN] = stats.StatsMin(vals)
         kv[TIME_MAX] = stats.StatsMax(vals)
@@ -106,6 +113,7 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
         kv[TIME_STD] = stats.StatsSampleStandardDeviationCoefficient(vals)
         kv[CALL_ALL] = float64(stats.StatsCount(vals))
     case GROUP_KXI:
+        vals := mr.ConvertAnySliceToFloat(values)
         kv[TIME_ALL] = stats.StatsSum(vals)
         kv[TIME_MIN] = stats.StatsMin(vals)
         kv[TIME_MAX] = stats.StatsMax(vals)
@@ -113,12 +121,18 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
         kv[TIME_STD] = stats.StatsSampleStandardDeviationCoefficient(vals)
         kv[CALL_ALL] = float64(stats.StatsCount(vals))
     case GROUP_URL_RID:
+        vals := mr.ConvertAnySliceToFloat(values)
         kv[CALL_ALL] = float64(stats.StatsCount(vals))
         kv[TIME_ALL] = stats.StatsSum(vals)
     case GROUP_URL_SQL:
+        vals := mr.ConvertAnySliceToFloat(values)
         kv[CALL_ALL] = float64(stats.StatsCount(vals))
         kv[TIME_MAX] = stats.StatsMax(vals)
         kv[TIME_AVG] = stats.StatsMean(vals)
+    case GROUP_URL:
+        vals := mr.ConvertAnySliceToString(values) // rids of this url
+        c := stats.NewCounter(vals)
+        kv[REQ_ALL] = float64(len(c))
     }
 
     return
