@@ -35,7 +35,7 @@ func New(total int) *Progress {
     this := new(Progress)
     this.bar = BAR
     this.total = total
-    this.terminalWidth = terminalWidth()
+    this.terminalWidth = TerminalWidth()
     this.lock = new(sync.Mutex)
     return this
 }
@@ -59,12 +59,12 @@ func bold(str string) string {
     return "\033[1m" + str + "\033[0m"
 }
 
-func terminalWidth() int {
+func TerminalWidth() int {
     winsize := getWinsize()
     return int(winsize.Col)
 }
 
-func terminalHeight() int {
+func TerminalHeight() int {
     winsize := getWinsize()
     return int(winsize.Row)
 }

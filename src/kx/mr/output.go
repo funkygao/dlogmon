@@ -56,7 +56,7 @@ func (kv KeyValue) OutputGroup(printer Printer, group, sortCol string, top int) 
 
     // print group header
     fmt.Println(group)
-    fmt.Println(strings.Repeat("=", OUTPUT_GROUP_HEADER_LEN))
+    fmt.Println(strings.Repeat("-", OUTPUT_GROUP_HEADER_LEN))
 
     // output the aggregate columns header
     oneVal := kv.OneValue().(KeyValue)

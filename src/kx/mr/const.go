@@ -1,8 +1,6 @@
 package mr
 
-import (
-    "os"
-)
+import "os"
 
 const (
     SORT_BY_KEY SortType = iota + 1
@@ -22,12 +20,5 @@ const (
 )
 
 const (
-    OUTPUT_GROUP_HEADER_LEN = 100
     OUTPUT_VAL_WIDTH = 7
 )
-
-var KEY_SEP string
-func init() {
-    sep := []byte{0x0}
-    KEY_SEP = string(sep)
-}

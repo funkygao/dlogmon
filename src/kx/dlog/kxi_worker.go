@@ -18,15 +18,15 @@ const (
 const (
     TIME_ALL = "T"
     TIME_AVG = "Tm"
-    TIME_MAX = "Ta"
-    TIME_MIN = "Ti"
-    TIME_STD = "Td"
+    TIME_MAX = "Tmax"
+    TIME_MIN = "Tmin"
+    TIME_STD = "Tstd"
 
     CALL_ALL = "C"
     CALL_AVG = "Cm"
-    CALL_MAX = "Ca"
-    CALL_MIN = "Ci"
-    CALL_STD = "Cd"
+    CALL_MAX = "Cmax"
+    CALL_MIN = "Cmin"
+    CALL_STD = "Cstd"
 )
 
 func NewKxiWorker(manager *Manager, name, filename string, seq uint16) IWorker {
