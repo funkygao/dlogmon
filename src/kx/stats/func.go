@@ -74,6 +74,10 @@ func StatsSampleStandardDeviation(data []float64) float64 {
     return math.Sqrt(StatsSampleVariance(data))
 }
 
+func StatsSampleStandardDeviationCoefficient(data []float64) float64 {
+    return math.Sqrt(StatsSampleVariance(data))/StatsMean(data)
+}
+
 func StatsPopulationSkew(data []float64) (skew float64) {
     mean := StatsMean(data)
     n := float64(len(data))

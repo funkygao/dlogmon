@@ -16,14 +16,14 @@ const (
 )
 
 const (
-    TIME_ALL = "T"
-    TIME_AVG = "Tm"
+    TIME_ALL = "Tsum"
+    TIME_AVG = "Tmean"
     TIME_MAX = "Tmax"
     TIME_MIN = "Tmin"
     TIME_STD = "Tstd"
 
-    CALL_ALL = "C"
-    CALL_AVG = "Cm"
+    CALL_ALL = "Csum"
+    CALL_AVG = "Cmean"
     CALL_MAX = "Cmax"
     CALL_MIN = "Cmin"
     CALL_STD = "Cstd"
@@ -103,14 +103,14 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
         kv[TIME_MIN] = stats.StatsMin(vals)
         kv[TIME_MAX] = stats.StatsMax(vals)
         kv[TIME_AVG] = stats.StatsMean(vals)
-        kv[TIME_STD] = stats.StatsSampleStandardDeviation(vals)
+        kv[TIME_STD] = stats.StatsSampleStandardDeviationCoefficient(vals)
         kv[CALL_ALL] = float64(stats.StatsCount(vals))
     case GROUP_KXI:
         kv[TIME_ALL] = stats.StatsSum(vals)
         kv[TIME_MIN] = stats.StatsMin(vals)
         kv[TIME_MAX] = stats.StatsMax(vals)
         kv[TIME_AVG] = stats.StatsMean(vals)
-        kv[TIME_STD] = stats.StatsSampleStandardDeviation(vals)
+        kv[TIME_STD] = stats.StatsSampleStandardDeviationCoefficient(vals)
         kv[CALL_ALL] = float64(stats.StatsCount(vals))
     case GROUP_URL_RID:
         kv[CALL_ALL] = float64(stats.StatsCount(vals))
