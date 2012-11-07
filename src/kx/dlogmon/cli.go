@@ -14,6 +14,7 @@ import (
 type dlogmonCli struct {
     group, sortCol string
     top int
+    groups map[string] string
     result mr.KeyValue  // reducer's result, maybe grouped by key
     worker dlog.IWorker
 }
@@ -24,6 +25,10 @@ func cliCmdloop(worker dlog.IWorker, reduceResult mr.KeyValue) {
     cli = new(dlogmonCli)
     cli.result = reduceResult
     cli.worker = worker
+    cli.groups = make(map[string] string)
+    for i, g := range cli.result.Groups() {
+        cli.groups[strconv.Itoa(i)] = g
+    }
 
     cmd := cmd.New(cli)
     cmd.Intro = DLOGMON_INTRO
@@ -40,6 +45,10 @@ func (this dlogmonCli) Help() {
 
 func (this dlogmonCli) Help_group() {
     fmt.Println("group {group_name}")
+}
+
+func (this dlogmonCli) Help_groups() {
+    fmt.Println("groups\nshow all groups")
 }
 
 func (this dlogmonCli) Help_sort() {
@@ -107,8 +116,14 @@ func (this dlogmonCli) Do_gc() {
 }
 
 func (this *dlogmonCli) Do_group(group string) {
-    this.group = group
+    this.group = this.groups[group]
     this.render()
+}
+
+func (this dlogmonCli) Do_groups() {
+    for k, v := range this.groups {
+        fmt.Printf("%2s => %s\n", k, v)
+    }
 }
 
 func (this dlogmonCli) Do_status() {
