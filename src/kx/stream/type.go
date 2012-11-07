@@ -3,6 +3,7 @@ package stream
 
 import (
     "bufio"
+    "io"
     "os/exec"
 )
 
@@ -14,6 +15,8 @@ type Stream struct {
     reader *bufio.Reader
     writer *bufio.Writer
     mode   StreamMode
+    pw     io.WriteCloser
+    pr     io.ReadCloser
 }
 
 type StreamMode uint8

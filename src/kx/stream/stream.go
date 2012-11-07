@@ -27,14 +27,13 @@ func (this *Stream) openPlainFile() error {
 func (this *Stream) openExecPipe() error {
     this.cmd = exec.Command(this.name, this.arg...)
 
-    // stdout pipe
-    out, err := this.cmd.StdoutPipe()
+    var err error
+    this.pr, err = this.cmd.StdoutPipe()
     if err != nil {
         return err
     }
 
-    // stdin pipe
-    in, err := this.cmd.StdinPipe()
+    this.pw, err = this.cmd.StdinPipe()
     if err != nil {
         return err
     }
@@ -45,8 +44,8 @@ func (this *Stream) openExecPipe() error {
     }
 
     // prepare the reader/writer
-    this.reader = bufio.NewReader(out)
-    this.writer = bufio.NewWriter(in)
+    this.reader = bufio.NewReader(this.pr)
+    this.writer = bufio.NewWriter(this.pw)
     return nil
 }
 
@@ -76,6 +75,9 @@ func (this Stream) Writer() *bufio.Writer {
 func (this *Stream) Close() error {
     switch this.mode {
     case EXEC_PIPE:
+        // close my writer stream so that client can get EOF
+        this.pw.Close()
+        // wait for client to exit
         if err := this.cmd.Wait(); err != nil {
             return err
         }
