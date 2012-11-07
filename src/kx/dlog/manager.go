@@ -268,8 +268,6 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
 
             chRateLimit <- true // 让贤
         }
-
-        //runtime.Gosched()
     }
 
     // all workers done, so close the channels

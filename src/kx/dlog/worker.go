@@ -16,8 +16,12 @@ func (this *Worker) String() string {
     return fmt.Sprintf("Worker %s\nseq: %d, filename: %s, duration: %s\ncreat:\t%s\nstart:\t%s\nend:\t%s\n",
         this.kind,
         this.seq, this.BaseFilename(),
-        this.EndAt.Sub(this.StartAt),
+        this.Duration(),
         this.CreatedAt, this.StartAt, this.EndAt)
+}
+
+func (this Worker) Duration() time.Duration {
+    return this.EndAt.Sub(this.StartAt)
 }
 
 func (this Worker) Kind() string {
@@ -136,8 +140,8 @@ func (this *Worker) run(chOutProgress chan<- int, chOutMap chan<- mr.KeyValue, c
     this.EndAt = time.Now()
 
     chOutWorker <- *this
-    this.Printf("%s worker[%d] %s done, parsed: %d/%d\n", this.kind, this.seq, this.BaseFilename(),
-        this.ValidLines, this.RawLines)
+    this.Printf("%s worker[%d] %s done, parsed: %d/%d, duration: %v\n", this.kind, this.seq, this.BaseFilename(),
+        this.ValidLines, this.RawLines, this.Duration())
 }
 
 // My combiner func pointer
