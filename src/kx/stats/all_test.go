@@ -30,3 +30,11 @@ func TestFuncUsage(t *testing.T) {
     assert.Equal(t, 3, StatsCount(v))
     assert.Equal(t, 515.3396937942972, StatsSampleStandardDeviation(v))
 }
+
+func TestCount(t *testing.T) {
+    vals := []string{"a", "b", "a", "a", "c", "c"}
+    c := NewCounter(vals)
+    assert.Equal(t, 3, c["a"])
+    assert.Equal(t, 1, c["b"])
+    assert.Equal(t, 2, c["c"])
+}
