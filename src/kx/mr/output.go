@@ -52,17 +52,19 @@ func (this KeyValue) ExportResult(printer Printer, group, sortCol string, top in
 func (kv KeyValue) OutputGroup(printer Printer, group, sortCol string, top int) {
     defer T.Un(T.Trace(""))
 
-    // print group header
+    // print group title
     fmt.Println(group)
     fmt.Println(strings.Repeat("-", OUTPUT_GROUP_HEADER_LEN))
 
-    // output the aggregate columns header
+    // output the aggregate columns title
     oneVal := kv.OneValue().(KeyValue)
     valKeys := oneVal.Keys()
     keyLengths := printer.(KeyLengther).KeyLengths(group)
+    var keyLen int // key placeholder len total
     for _, l := range keyLengths {
-        fmt.Printf("%*s", l, "")
+        keyLen += l
     }
+    fmt.Printf("%*d#", keyLen-1, len(kv))
     // default sort column
     if sortCol == "" {
         sortCol = valKeys[0].(string)
@@ -73,6 +75,8 @@ func (kv KeyValue) OutputGroup(printer Printer, group, sortCol string, top int) 
         }
         fmt.Printf("%*s", OUTPUT_VAL_WIDTH, x)
     }
+
+    // title done
     println()
 
     // sort by column
