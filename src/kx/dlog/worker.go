@@ -13,7 +13,7 @@ import (
 )
 
 func (this *Worker) String() string {
-    return fmt.Sprintf("Worker %s\nseq: %d, filename: %s, duration: %s\ncreat:\t%s\nstart:\t%s\nend:\t%s\n",
+    return fmt.Sprintf("Worker %s\nseq: %d, filename: %s, duration: %s\ncreat:\t%s\nstart:\t%s\nend:\t%s",
         this.kind,
         this.seq, this.BaseFilename(),
         this.Duration(),
