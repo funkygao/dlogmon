@@ -65,7 +65,10 @@ noop:install
 	@./bin/dlogmon -k noop -f test/fixture/lz.121015-104410 -d -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
 real:install
-	@./bin/dlogmon -tick 30000 -progress -n 50
+	@./bin/dlogmon -tick 30000 -progress -n 8 -k kxi -mapper ./contrib/kxiMapper.py
+
+tm:
+	lzop -dcf test/fixture/lz.121015-104410 | ./contrib/kxiMapper.py
 
 nreal:install
 	@./bin/dlogmon -k noop -tick 30000 -progress -n 50

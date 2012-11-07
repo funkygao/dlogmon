@@ -289,6 +289,7 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
     // enter into output phase
     // export final result, possibly export to db
     this.Println(worker.Kind(), "worker start to Output...")
+    fmt.Println() // seperated from progress bar
     reduceResult.ExportResult(worker, "", "", worker.TopN())
 
     // WaitForCompletion will wait for this

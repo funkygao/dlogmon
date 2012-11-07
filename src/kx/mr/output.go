@@ -40,8 +40,6 @@ func (this KeyValue) exportForGroupped(printer Printer, group, sortCol string, t
 func (this KeyValue) ExportResult(printer Printer, group, sortCol string, top int) {
     defer T.Un(T.Trace(""))
 
-    println("\n") // seperate from the progress bar
-
     if !this.Groupped() {
         this.exportForNonGrouped(printer, top)
         return
@@ -91,7 +89,7 @@ func (kv KeyValue) OutputGroup(printer Printer, group, sortCol string, top int) 
         mapKey := sk.(GroupKey)
         // the keys
         for i, k := range mapKey.Keys() {
-            if len(k) > keyLengths[i] {
+            if len(k) >= keyLengths[i] {
                 k = k[:keyLengths[i]-1]
             }
             fmt.Printf("%*s", keyLengths[i], k)
