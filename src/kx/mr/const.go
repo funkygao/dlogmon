@@ -20,5 +20,5 @@ const (
 )
 
 const (
-    OUTPUT_VAL_WIDTH = 7
+    OUTPUT_VAL_WIDTH = 9
 )
