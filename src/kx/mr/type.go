@@ -55,10 +55,6 @@ type KeyLengther interface {
     KeyLengths(group string) []int
 }
 
-type GroupSorter interface {
-    SortCol(group string) string
-}
-
 type (
     SortType     uint8
     SortOrdering uint8
