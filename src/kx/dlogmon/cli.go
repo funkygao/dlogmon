@@ -25,7 +25,7 @@ func init() {
     dlogCli = new(dlogmonCli)
     cli = cmd.New(dlogCli)
     cli.Intro = DLOGMON_INTRO
-    cli.Prompt = DLOOGMON_PROMPT
+    cli.Prompt = DLOGMON_PROMPT
 }
 
 func cmdloop(w dlog.IWorker, reduceResult mr.KeyValue) {
@@ -38,10 +38,7 @@ func cmdloop(w dlog.IWorker, reduceResult mr.KeyValue) {
 
 // universal help
 func (this dlogmonCli) Help() {
-    fmt.Println(`Available commands:
-group sort top raw worker show
-
-Use "help | h [command]" for more information about a command.`)
+    fmt.Println(DLOGMON_HELP)
 }
 
 func (this dlogmonCli) Help_group() {
