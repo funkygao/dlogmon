@@ -26,10 +26,11 @@ def normalize_sql(sql):
 
 def is_skipped_url(url):
     if 'kaixin002' in url:
-        return None
+        return True
     if '/admin/' in url:
         # 后台的不计算在内
-        return None
+        return True
+    return False
 
 def extract_line(line):
     '''从日志的一行记录里提取结构化信息'''
@@ -64,14 +65,19 @@ def extract_line(line):
         if len(sql) > MAX_SQL_DISPLAY_LEN: 
             sql = sql[:MAX_SQL_DISPLAY_LEN] + '...' + str(len(sql) - MAX_SQL_DISPLAY_LEN)
 
-	return url, rid, service, 1000.0 * time, sql, time_span
+    return url, rid, service, 1000.0 * time, sql, time_span
 
 def feedback_invalid():
     print 
     sys.stdout.flush()
 
 def feedback_json(url, rid, service, time, sql, time_span):
-    obj = {"u": url, "i": rid, "s": service, "t": time, "q": normalize_sql(sql)}
+    if sql is None:
+        sql = ""
+    else:
+        sql = normalize_sql(sql)
+
+    obj = {"u": url, "i": rid, "s": service, "t": time, "q": sql}
     try:
         encoded = json.dumps(obj)
     except:
