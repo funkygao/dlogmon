@@ -6,6 +6,7 @@ import (
     T "kx/trace"
     "kx/dlog"
     "kx/mr"
+    "path/filepath"
     "runtime"
     "strconv"
 )
@@ -57,6 +58,10 @@ func (this dlogmonCli) Help_save() {
 
 func (this dlogmonCli) Help_load() {
     fmt.Println("load {filename}\nload parsed result from a file")
+}
+
+func (this dlogmonCli) Help_hist() {
+    fmt.Println("hist\nloadable history parsed results")
 }
 
 func (this dlogmonCli) Help_sort() {
@@ -143,4 +148,17 @@ func (this dlogmonCli) Do_save(filename string) {
 }
 
 func (this dlogmonCli) Do_load(filename string) {
+}
+
+func (this dlogmonCli) Do_hist() {
+    fmt.Println("Available history files:")
+    files, _:= filepath.Glob(dlog.VarDir + "/*.gob")
+    var found bool
+    for _, file := range files {
+        fmt.Println(filepath.Base(file))
+        found = true
+    }
+    if !found {
+        fmt.Println("not found")
+    }
 }
