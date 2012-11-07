@@ -60,11 +60,14 @@ func displaySummary(logger *log.Logger, start time.Time, files, rawLines, validL
     defer T.Un(T.Trace(""))
 
     delta := time.Since(start)
-    summary := fmt.Sprintf("Parsed %d/%d lines in %d files within %s [%.1f lines per second]\n",
+    summary := fmt.Sprintf("Parsed %d/%d(%.4f%s) lines in %d files within %s [%.1f lines per second]\n",
         validLines,
         rawLines,
+        100 * float64(validLines)/float64(rawLines),
+        "%%",
         files,
-        delta, float64(rawLines)/delta.Seconds())
+        delta,
+        float64(rawLines)/delta.Seconds())
     // render to both log and stderr
     logger.Print(summary)
     fmt.Fprintf(os.Stderr, summary)
