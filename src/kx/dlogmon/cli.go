@@ -3,8 +3,10 @@ package main
 import (
     "fmt"
     "github.com/funkygao/cmd"
+    T "kx/trace"
     "kx/dlog"
     "kx/mr"
+    "runtime"
     "strconv"
 )
 
@@ -96,6 +98,14 @@ func (this *dlogmonCli) Do_sort(col string) {
     this.render()
 }
 
+func (this dlogmonCli) Do_show() {
+    this.render()
+}
+
+func (this dlogmonCli) Do_gc() {
+    runtime.GC()
+}
+
 func (this *dlogmonCli) Do_group(group string) {
     this.group = group
     this.render()
@@ -103,4 +113,5 @@ func (this *dlogmonCli) Do_group(group string) {
 
 func (this dlogmonCli) Do_status() {
     fmt.Printf("group=%s, sort column=%s, top=%d\n", this.group, this.sortCol, this.top)
+    fmt.Printf("mem:%v, goroutines:%v\n", T.MemAlloced(), runtime.NumGoroutine())
 }

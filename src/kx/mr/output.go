@@ -28,8 +28,9 @@ func (this KeyValue) exportForGroupped(printer Printer, group, sortCol string, t
         if group != "" && grp !=group {
             continue
         }
+
         kvGroup := this.newByGroup(grp) // a new kv just for this group
-        kvGroup.OutputGroup(printer, grp, "", top)
+        kvGroup.OutputGroup(printer, grp, sortCol, top)
         println()
     }
 }
@@ -64,20 +65,21 @@ func (kv KeyValue) OutputGroup(printer Printer, group, sortCol string, top int) 
     for _, l := range keyLengths {
         fmt.Printf("%*s", l, "")
     }
+    // default sort column
+    if sortCol == "" {
+        sortCol = valKeys[0].(string)
+    }
     for _, x := range valKeys {
+        if x == sortCol {
+            x = x.(string) + "*"
+        }
         fmt.Printf("%*s", OUTPUT_VAL_WIDTH, x)
     }
     println()
 
     // sort by column
     s := NewSort(kv)
-    if sortCol != "" {
-        s.SortCol(sortCol)
-        println("ha", sortCol)
-    } else {
-        // default sort by 1st colomn
-        s.SortCol(valKeys[0])
-    }
+    s.SortCol(sortCol)
     s.Sort(SORT_BY_COL, SORT_ORDER_DESC)
     sortedKeys := s.Keys()
     if top > 0 && top < len(sortedKeys) {
