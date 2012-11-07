@@ -50,7 +50,7 @@ def extract_line(line):
         return None
 
     service = items[9][2:]
-    method, url, rid = ctx['CALLER'].split('+')
+    method, url, rid = ctx['CALLER'].split('+', 3)
     if method == 'CLI' or is_skipped_url(url):
         return None
 
