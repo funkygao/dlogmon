@@ -29,6 +29,12 @@ const (
     CALL_STD = "Cstd"
 )
 
+var KEY_LENS = map[string][]int{
+    GROUP_URL_SERV: []int{50, 24},
+    GROUP_KXI: []int{50},
+    GROUP_URL_SQL:[]int{40, 57},
+    GROUP_URL_RID: []int{60, 20}}
+
 func NewKxiWorker(manager *Manager, name, filename string, seq uint16) IWorker {
     defer T.Un(T.Trace(""))
 
@@ -78,6 +84,7 @@ func (this *KxiWorker) Map(line string, out chan<- mr.KeyValue) {
     kv[kg1] = rec.Time
     kv[kg2] = rec.Time
     kv[kg3] = rec.Time
+
     if rec.Sql != "" {
         kg4 := mr.NewGroupKey(GROUP_URL_SQL, rec.Url, rec.Sql)
         kv[kg4] = rec.Time
@@ -107,6 +114,7 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
         kv[CALL_ALL] = float64(stats.StatsCount(vals))
     case GROUP_URL_RID:
         kv[CALL_ALL] = float64(stats.StatsCount(vals))
+        kv[TIME_ALL] = stats.StatsSum(vals)
     case GROUP_URL_SQL:
         kv[CALL_ALL] = float64(stats.StatsCount(vals))
         kv[TIME_MAX] = stats.StatsMax(vals)
@@ -117,18 +125,9 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
 }
 
 func (this KxiWorker) KeyLengths(group string) []int {
-    switch group {
-    case GROUP_URL_SERV:
-        if r, e := this.manager.ConfInts(W_KXI, "keyLen url call kxi service"); e == nil {
-            return r
-        }
-        return []int{50, 24}
-    case GROUP_KXI:
-        return []int{50}
-    case GROUP_URL_SQL:
-        return []int{40, 57}
-    case GROUP_URL_RID:
-        return []int{60, 20}
+    if r, e := this.manager.ConfInts(W_KXI, group + " keylen"); e == nil {
+        return r
     }
-    return nil
+
+    return KEY_LENS[group]
 }
