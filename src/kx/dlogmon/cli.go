@@ -74,7 +74,7 @@ func (this dlogmonCli) Do_raw() {
 }
 
 func (this dlogmonCli) Do_worker() {
-    fmt.Printf("%#v\n", this.worker)
+    fmt.Println(this.worker)
 }
 
 func (this *dlogmonCli) Do_top(n string) {

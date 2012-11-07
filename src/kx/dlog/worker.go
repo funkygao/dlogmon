@@ -13,8 +13,11 @@ import (
 )
 
 func (this *Worker) String() string {
-    return fmt.Sprintf("Worker{seq: %d, filename: %s, option: %#v}",
-        this.seq, this.BaseFilename(), this.manager.option)
+    return fmt.Sprintf("Worker %s\nseq: %d, filename: %s, duration: %s\ncreat:\t%s\nstart:\t%s\nend:\t%s\n",
+        this.kind,
+        this.seq, this.BaseFilename(),
+        this.EndAt.Sub(this.StartAt),
+        this.CreatedAt, this.StartAt, this.EndAt)
 }
 
 func (this Worker) Kind() string {
