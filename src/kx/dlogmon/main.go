@@ -63,7 +63,7 @@ func displaySummary(logger *log.Logger, start time.Time, files, rawLines, validL
     summary := fmt.Sprintf("Parsed %d/%d(%.4f%s) lines in %d files within %s [%.1f lines per second]\n",
         validLines,
         rawLines,
-        100 * float64(validLines)/float64(rawLines),
+        100*float64(validLines)/float64(rawLines),
         "%%",
         files,
         delta,

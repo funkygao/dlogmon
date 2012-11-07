@@ -1,6 +1,6 @@
 package stats
 
-type Counter map[string] int
+type Counter map[string]int
 
 func NewCounter(vals []string) Counter {
     c := make(Counter)
@@ -8,7 +8,7 @@ func NewCounter(vals []string) Counter {
         if _, found := c[v]; !found {
             c[v] = 1
         } else {
-            c[v] ++
+            c[v]++
         }
     }
     return c

@@ -25,7 +25,7 @@ func (this KeyValue) exportForGroupped(printer Printer, group, sortCol string, t
     defer T.Un(T.Trace(""))
 
     for _, grp := range this.Groups() {
-        if group != "" && grp !=group {
+        if group != "" && grp != group {
             continue
         }
 

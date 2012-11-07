@@ -23,7 +23,7 @@ func (this Key) Less(that Key, asc bool) bool {
 
 func NewGroupKey(group string, keys ...string) GroupKey {
     k := strings.Join(keys, KEY_SEP)
-    this := GroupKey{group:group, Key:Key{key: k}}
+    this := GroupKey{group: group, Key: Key{key: k}}
     return this
 }
 

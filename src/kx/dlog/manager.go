@@ -279,7 +279,7 @@ func (this *Manager) collectWorkers(chRateLimit chan bool, chInMap chan mr.KeyVa
 
     // mappers must complete before reducers can begin
     worker := this.GetOneWorker()
-    kvs := <- shuffledKvs
+    kvs := <-shuffledKvs
     this.Println(worker.Kind(), "worker Shuffled")
     reduceResult := kvs.LaunchReducer(worker)
     this.Println(worker.Kind(), "worker Reduced")

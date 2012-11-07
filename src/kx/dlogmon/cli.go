@@ -3,9 +3,9 @@ package main
 import (
     "fmt"
     "github.com/funkygao/cmd"
-    T "kx/trace"
     "kx/dlog"
     "kx/mr"
+    T "kx/trace"
     "path/filepath"
     "runtime"
     "strconv"
@@ -14,10 +14,10 @@ import (
 // Current CLI params
 type dlogmonCli struct {
     group, sortCol string
-    top int
-    groups map[string] string
-    result mr.KeyValue  // reducer's result, maybe grouped by key
-    worker dlog.IWorker
+    top            int
+    groups         map[string]string
+    result         mr.KeyValue // reducer's result, maybe grouped by key
+    worker         dlog.IWorker
 }
 
 var cli *dlogmonCli
@@ -26,7 +26,7 @@ func cliCmdloop(worker dlog.IWorker, reduceResult mr.KeyValue) {
     cli = new(dlogmonCli)
     cli.result = reduceResult
     cli.worker = worker
-    cli.groups = make(map[string] string)
+    cli.groups = make(map[string]string)
     for i, g := range cli.result.Groups() {
         cli.groups[strconv.Itoa(i)] = g
     }
@@ -152,7 +152,7 @@ func (this dlogmonCli) Do_load(filename string) {
 
 func (this dlogmonCli) Do_hist() {
     fmt.Println("Available history files:")
-    files, _:= filepath.Glob(dlog.VarDir + "/*.gob")
+    files, _ := filepath.Glob(dlog.VarDir + "/*.gob")
     var found bool
     for _, file := range files {
         fmt.Println(filepath.Base(file))

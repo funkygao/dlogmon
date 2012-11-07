@@ -5,7 +5,7 @@ import (
 )
 
 var (
-    KEY_SEP string
+    KEY_SEP                 string
     OUTPUT_GROUP_HEADER_LEN int
 )
 

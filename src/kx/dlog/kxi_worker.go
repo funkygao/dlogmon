@@ -10,10 +10,10 @@ import (
 
 const (
     GROUP_URL_SERV = "how kxi are called by web"
-    GROUP_URL_RID = "which request hit the most kxi call"
-    GROUP_URL_SQL = "what kind of sql are most frequent"
-    GROUP_KXI = "running stats of kxi servants"
-    GROUP_URL = "which url is accessed most"
+    GROUP_URL_RID  = "which request hit the most kxi call"
+    GROUP_URL_SQL  = "what kind of sql are most frequent"
+    GROUP_KXI      = "running stats of kxi servants"
+    GROUP_URL      = "which url is accessed most"
 )
 
 const (
@@ -33,11 +33,11 @@ const (
 )
 
 var KEY_LENS = map[string][]int{
-    GROUP_URL_SERV: []int{50, 24},
-    GROUP_KXI: []int{50},
-    GROUP_URL: []int{60},
-    GROUP_URL_SQL:[]int{40, 57},
-    GROUP_URL_RID: []int{60, 20}}
+    GROUP_URL_SERV: {50, 24},
+    GROUP_KXI:      {50},
+    GROUP_URL:      {60},
+    GROUP_URL_SQL:  {40, 57},
+    GROUP_URL_RID:  {60, 20}}
 
 func NewKxiWorker(manager *Manager, name, filename string, seq uint16) IWorker {
     defer T.Un(T.Trace(""))
@@ -139,7 +139,7 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
 }
 
 func (this KxiWorker) KeyLengths(group string) []int {
-    if r, e := this.manager.ConfInts(W_KXI, group + " keylen"); e == nil {
+    if r, e := this.manager.ConfInts(W_KXI, group+" keylen"); e == nil {
         return r
     }
 
