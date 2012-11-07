@@ -52,7 +52,7 @@ func main() {
         manager.FilesCount(), manager.RawLines, manager.ValidLines)
 
     if kvResult.Groupped() {
-        cmdloop(manager.GetOneWorker(), kvResult)
+        cliCmdloop(manager.GetOneWorker(), kvResult)
     }
 }
 

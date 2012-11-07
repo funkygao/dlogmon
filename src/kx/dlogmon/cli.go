@@ -12,28 +12,23 @@ import (
 type dlogmonCli struct {
     group, sortCol string
     top int
-}
-
-var (
-    cli cmd.Cmd
-    dlogCli *dlogmonCli
     result mr.KeyValue  // reducer's result, maybe grouped by key
     worker dlog.IWorker
-)
-
-func init() {
-    dlogCli = new(dlogmonCli)
-    cli = cmd.New(dlogCli)
-    cli.Intro = DLOGMON_INTRO
-    cli.Prompt = DLOGMON_PROMPT
 }
 
-func cmdloop(w dlog.IWorker, reduceResult mr.KeyValue) {
-    result = reduceResult
-    worker = w
+var cli *dlogmonCli
+
+func cliCmdloop(worker dlog.IWorker, reduceResult mr.KeyValue) {
+    cli = new(dlogmonCli)
+    cli.result = reduceResult
+    cli.worker = worker
+
+    cmd := cmd.New(cli)
+    cmd.Intro = DLOGMON_INTRO
+    cmd.Prompt = DLOGMON_PROMPT
 
     // startup the loop
-    cli.Cmdloop()
+    cmd.Cmdloop()
 }
 
 // universal help
@@ -69,7 +64,7 @@ show current worker info`)
 }
 
 func (this dlogmonCli) Do_raw() {
-    for k, v := range result {
+    for k, v := range this.result {
         fmt.Printf("key=> %#v\n", k)
         fmt.Printf("val=> %#v\n", v)
         fmt.Println()
@@ -77,14 +72,10 @@ func (this dlogmonCli) Do_raw() {
 }
 
 func (this dlogmonCli) Do_worker() {
-    fmt.Printf("%#v\n", worker)
+    fmt.Printf("%#v\n", this.worker)
 }
 
-func (this dlogmonCli) Do_show() {
-    //result.ExportResult()
-}
-
-func (this dlogmonCli) Do_top(n string) {
+func (this *dlogmonCli) Do_top(n string) {
     t, e := strconv.Atoi(n)
     if e != nil {
         panic("top {N}, N must be unsined integer")
@@ -92,16 +83,24 @@ func (this dlogmonCli) Do_top(n string) {
 
     if t > 0 {
         this.top = t // remember this
-        result.ExportResult(worker, this.group, this.sortCol, this.top)
+        this.render()
     }
 }
 
-func (this dlogmonCli) Do_sort(col string) {
-    this.sortCol = col
-    result.ExportResult(worker, this.group, this.sortCol, this.top)
+func (this dlogmonCli) render() {
+    this.result.ExportResult(this.worker, this.group, this.sortCol, this.top)
 }
 
-func (this dlogmonCli) Do_group(group string) {
+func (this *dlogmonCli) Do_sort(col string) {
+    this.sortCol = col
+    this.render()
+}
+
+func (this *dlogmonCli) Do_group(group string) {
     this.group = group
-    result.ExportResult(worker, group, this.sortCol, this.top)
+    this.render()
+}
+
+func (this dlogmonCli) Do_status() {
+    fmt.Printf("group=%s, sort column=%s, top=%d\n", this.group, this.sortCol, this.top)
 }
