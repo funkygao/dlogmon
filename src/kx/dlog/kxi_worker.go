@@ -6,6 +6,7 @@ import (
     "kx/stats"
     T "kx/trace"
     "os"
+    "strconv"
 )
 
 const (
@@ -17,12 +18,14 @@ const (
 )
 
 const (
+    TOPSUM = "10"
+
     TIME_ALL = "Tsum"
     TIME_AVG = "Tmean"
     TIME_MAX = "Tmax"
     TIME_MIN = "Tmin"
     TIME_STD = "Tstd"
-    TIME_TOP = "Tsum10"
+    TIME_TOP = "Tsum" + TOPSUM
 
     CALL_ALL = "Csum"
     CALL_AVG = "Cmean"
@@ -32,6 +35,12 @@ const (
 
     REQ_ALL = "Rsum"
 )
+
+var topsum int
+
+func init() {
+    topsum, _ = strconv.Atoi(TOPSUM)
+}
 
 var KEY_LENS = map[string][]int{
     GROUP_URL_SERV: {50, 24},
@@ -109,7 +118,7 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
         vals := mr.ConvertAnySliceToFloat(values)
         kv[TIME_ALL] = stats.StatsSum(vals)
         kv[TIME_MAX] = stats.StatsMax(vals)
-        kv[TIME_TOP] = stats.StatsSumTopN(vals, 10)
+        kv[TIME_TOP] = stats.StatsSumTopN(vals, topsum)
         kv[TIME_AVG] = stats.StatsMean(vals)
         kv[TIME_STD] = stats.StatsSampleStandardDeviationCoefficient(vals)
         kv[CALL_ALL] = float64(stats.StatsCount(vals))
@@ -117,6 +126,7 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
         vals := mr.ConvertAnySliceToFloat(values)
         kv[TIME_ALL] = stats.StatsSum(vals)
         kv[TIME_MIN] = stats.StatsMin(vals)
+        kv[TIME_TOP] = stats.StatsSumTopN(vals, topsum)
         kv[TIME_MAX] = stats.StatsMax(vals)
         kv[TIME_AVG] = stats.StatsMean(vals)
         kv[TIME_STD] = stats.StatsSampleStandardDeviationCoefficient(vals)

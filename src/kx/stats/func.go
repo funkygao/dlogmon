@@ -46,7 +46,7 @@ func StatsSum(data []float64) (sum float64) {
 func StatsSumTopN(data []float64, top int) (sum float64) {
     l := len(data)
     if l <= top {
-        return StatsSum(data)
+        return 0.
     }
 
     sort.Float64s(data)
