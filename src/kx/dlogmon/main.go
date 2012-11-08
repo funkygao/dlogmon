@@ -51,7 +51,7 @@ func main() {
     displaySummary(manager.Logger, start,
         manager.FilesCount(), manager.RawLines, manager.ValidLines)
 
-    if kvResult.Groupped() {
+    if option.Shell {
         cliCmdloop(manager.GetOneWorker(), kvResult)
     }
 }

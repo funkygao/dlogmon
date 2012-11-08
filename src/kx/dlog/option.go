@@ -58,6 +58,7 @@ func ParseFlags() (*Option, error) {
         memprofile = flag.String("memprofile", "", "write cpu profile to a file for pprof")
         nworkers   = flag.Int("n", 10, "how many concurrent workers permitted")
         debug      = flag.Bool("d", false, "debug mode")
+        shell      = flag.Bool("shell", false, "run in shell, interactive mode")
         mapper     = flag.String("mapper", "", "let a runnable script be the mapper")
         reducer    = flag.String("reducer", "", "let a runnable script be the reducer")
         conf       = flag.String("conf", "conf/dlogmon.ini", "conf file path")
@@ -80,6 +81,7 @@ Flags:
     option.debug = *debug
     option.progress = *progress
     option.mapper = *mapper
+    option.Shell = *shell
     option.reducer = *reducer
     option.cpuprofile = *cpuprofile
     option.memprofile = *memprofile

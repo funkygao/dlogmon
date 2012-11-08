@@ -95,6 +95,7 @@ type Option struct {
     verbose                bool
     version                bool
     filemode               bool
+    Shell                  bool
     rpc                    bool
     progress               bool
     Nworkers               uint8 // how many concurrent workers(goroutines) permitted

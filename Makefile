@@ -83,7 +83,7 @@ trace:install
 	./bin/dlogmon -f test/fixture/lz.121015-104410 -t -d
 
 mr:install
-	@./bin/dlogmon -f test/fixture/lz.121015-104410 -mapper ./contrib/kxiMapper.py -progress=true -k kxi -cpuprofile var/cpu.prof -memprofile var/mem.prof
+	@./bin/dlogmon -f test/fixture/lz.121015-104410 -mapper ./contrib/kxiMapper.py -progress=true -k kxi -cpuprofile var/cpu.prof -memprofile var/mem.prof -shell
 
 todo:
 	@find src/kx -name '*.go' | xargs grep -n -1 --color TODO
