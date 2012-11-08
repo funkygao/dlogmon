@@ -22,6 +22,7 @@ const (
     TIME_MAX = "Tmax"
     TIME_MIN = "Tmin"
     TIME_STD = "Tstd"
+    TIME_TOP = "Tsum10"
 
     CALL_ALL = "Csum"
     CALL_AVG = "Cmean"
@@ -107,8 +108,8 @@ func (this *KxiWorker) Reduce(key interface{}, values []interface{}) (kv mr.KeyV
     case GROUP_URL_SERV:
         vals := mr.ConvertAnySliceToFloat(values)
         kv[TIME_ALL] = stats.StatsSum(vals)
-        kv[TIME_MIN] = stats.StatsMin(vals)
         kv[TIME_MAX] = stats.StatsMax(vals)
+        kv[TIME_TOP] = stats.StatsSumTopN(vals, 10)
         kv[TIME_AVG] = stats.StatsMean(vals)
         kv[TIME_STD] = stats.StatsSampleStandardDeviationCoefficient(vals)
         kv[CALL_ALL] = float64(stats.StatsCount(vals))

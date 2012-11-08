@@ -2,6 +2,7 @@ package stats
 
 import (
     "math"
+    "sort"
 )
 
 func StatsCount(data []float64) int {
@@ -37,6 +38,20 @@ func StatsMax(data []float64) float64 {
 func StatsSum(data []float64) (sum float64) {
     for _, v := range data {
         sum += v
+    }
+    return
+}
+
+// 除去最大值后的前N大值之和
+func StatsSumTopN(data []float64, top int) (sum float64) {
+    l := len(data)
+    if l <= top {
+        return StatsSum(data)
+    }
+
+    sort.Float64s(data)
+    for i:=1; i<top; i++ {
+        sum += data[l-1-i]
     }
     return
 }
