@@ -77,7 +77,8 @@ func initialize(option *dlog.Option, err error) {
     defer T.Un(T.Trace(""))
 
     if option.Version() {
-        fmt.Fprintf(os.Stderr, "%s %s\n", "dlogmon", VERSION)
+        fmt.Fprintf(os.Stderr, "%s %s %s %s\n", "dlogmon", VERSION,
+            runtime.GOOS, runtime.GOARCH)
         os.Exit(0)
     }
 
