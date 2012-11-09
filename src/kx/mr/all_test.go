@@ -27,3 +27,9 @@ func TestAppendVariadics(t *testing.T) {
     f = ConvertAnySliceToFloat(d["b"])
     assert.Equal(t, f, []float64{3})
 }
+
+func TestGenericSlice(t *testing.T) {
+    ints := []int{3, 2, 8}
+    s := GenericSlice(ints)
+    assert.Equal(t, 3, len(s))
+}

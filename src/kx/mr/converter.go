@@ -1,5 +1,23 @@
 package mr
 
+import (
+    "fmt"
+    "reflect"
+)
+
+func GenericSlice(slice interface{}) []interface{} {
+    v := reflect.ValueOf(slice)
+    if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
+        panic(fmt.Errorf("Expected slice or array, got %T", slice))
+    }
+    l := v.Len()
+    r := make([]interface{}, l)
+    for i:=0; i<l; i++ {
+        r[i] = v.Index(i).Interface()
+    }
+    return r
+}
+
 // []interface{}.([]float64) is not supported in golang, see FAQ
 // so we need do it ourself
 func ConvertAnySliceToFloat(v []interface{}) []float64 {
