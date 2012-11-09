@@ -86,6 +86,10 @@ Flags:
     option.cpuprofile = *cpuprofile
     option.memprofile = *memprofile
     option.kind = *kind
+    if _, validKind := workerConstructors[*kind]; !validKind {
+        fmt.Fprintln(os.Stderr, "Invalid kind option:", *kind)
+        os.Exit(1)
+    }
     option.version = *version
     option.rpc = *rpc
     option.filemode = *filemode
@@ -138,7 +142,7 @@ Flags:
         panic(err)
     }
     if h1 > h2 {
-        fmt.Println("Invalid hour option:", *h)
+        fmt.Fprintln(os.Stderr, "Invalid hour option:", *h)
         os.Exit(1)
     }
 
