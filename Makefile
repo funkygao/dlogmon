@@ -56,7 +56,7 @@ kxi:install
 	@./bin/dlogmon -f test/fixture/lz.121015-104410 -d -k kxi -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
 
 uni:install
-	@./bin/dlogmon -f test/fixture/lz.121015-104410 -k uni -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
+	@./bin/dlogmon -f test/fixture/lz.121015-104410 -k uni -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof -shell
 
 amf:install
 	@./bin/dlogmon -f test/fixture/lz.121015-104410 -tick 500 -progress -cpuprofile var/cpu.prof -memprofile var/mem.prof
