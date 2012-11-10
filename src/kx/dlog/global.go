@@ -9,6 +9,7 @@ var (
     workerConstructors = map[string]WorkerConstructor{
         W_AMF:  NewAmfWorker,
         W_KXI:  NewKxiWorker,
+        W_UNI:  NewUniWorker,
         W_FILE: NewFileWorker,
         W_NOOP: NewNoopWorker}
 

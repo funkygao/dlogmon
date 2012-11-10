@@ -62,6 +62,11 @@ type (
         Worker
     }
 
+    // universal
+    UniWorker struct {
+        Worker
+    }
+
     NoopWorker struct {
         Worker
     }

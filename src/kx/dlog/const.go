@@ -5,6 +5,7 @@ import "log"
 const (
     W_AMF  = "amf"
     W_KXI  = "kxi"
+    W_UNI  = "uni"
     W_NOOP = "noop"
     W_FILE = "file"
 )
