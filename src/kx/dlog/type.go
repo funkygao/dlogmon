@@ -11,6 +11,8 @@ import (
 
 type StreamResult string
 
+type LogLevel uint8
+
 type Kinder interface {
     Kind() string
 }
@@ -86,6 +88,7 @@ type Manager struct {
     lock                 *sync.Mutex
     ticker               *time.Ticker
     *log.Logger
+    logLevel            LogLevel
     workers       []IWorker
     chWorkersDone chan mr.KeyValue
     chProgress    chan int // default <nil>
