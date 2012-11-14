@@ -46,3 +46,16 @@ const (
 const (
     TABLE_AMF = "t_amf"
 )
+
+const (
+    LogEmergency = LogLevel(iota)
+    LogAlert
+    LogCritical
+    LogError
+    LogWarning
+    LogNotice
+    LogInfo
+    LogDebug
+
+    DefaultLogLevel = LogInfo
+)

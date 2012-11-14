@@ -33,6 +33,7 @@ func NewManager(option *Option) *Manager {
     this.Logger = newLogger(option)
     this.option = option
     this.lock = new(sync.Mutex)
+    this.logLevel = DefaultLogLevel
 
     this.Println("manager created")
 
@@ -351,4 +352,26 @@ func (this Manager) trapSignal() {
         fmt.Fprintf(Stderr, "prepare to shutdown...")
         this.Shutdown()
     }()
+}
+
+func (this Manager) renderLog(level LogLevel, format string, v ...interface{}) {
+    if this.logLevel <= level {
+        this.Printf(format, v...)
+    }
+}
+
+func (this Manager) Debug(format string, v ...interface{}) {
+    this.renderLog(LogDebug, format, v...)
+}
+
+func (this Manager) Info(format string, v ...interface{}) {
+    this.renderLog(LogInfo, format, v...)
+}
+
+func (this Manager) Warn(format string, v ...interface{}) {
+    this.renderLog(LogWarning, format, v...)
+}
+
+func (this Manager) Notice(format string, v ...interface{}) {
+    this.renderLog(LogNotice, format, v...)
 }
