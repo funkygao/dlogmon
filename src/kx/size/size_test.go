@@ -46,3 +46,12 @@ func TestByteSizeConsts(t *testing.T) {
         t.Error("EB", int64(EB))
     }
 }
+
+func TestComma(t *testing.T) {
+    expected := "33,434,433"
+    got := Comma(33434433)
+    if got != expected {
+        // echo got result
+        t.Error("Expected:", expected, "Got:", got)
+    }
+}
