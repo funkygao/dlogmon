@@ -108,7 +108,7 @@ func Timeit(fun interface{}, args ...interface{}) (result []reflect.Value, delta
 
 // How much mem allocated
 func MemAlloced() size.ByteSize {
-    ms := &runtime.MemStats{}
+    ms := new(runtime.MemStats)
     runtime.ReadMemStats(ms)
     return size.ByteSize(ms.Alloc)
 }

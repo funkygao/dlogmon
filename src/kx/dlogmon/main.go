@@ -88,6 +88,7 @@ func initialize(option *dlog.Option, err error) {
     }
 
     // enable gc trace
+    // this will not work, the only way is to setenv before invoke me
     os.Setenv("GOGCTRACE", "1")
 
     // parallel level
