@@ -87,6 +87,9 @@ func initialize(option *dlog.Option, err error) {
         os.Exit(1)
     }
 
+    // enable gc trace
+    os.Setenv("GOGCTRACE", "1")
+
     // parallel level
     if os.Getenv(maxprocsenv) == "" {
         parallel := runtime.NumCPU()/2 + 1
