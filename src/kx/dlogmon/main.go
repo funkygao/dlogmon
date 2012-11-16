@@ -4,6 +4,7 @@ import (
     "fmt"
     "kx/dlog"
     T "kx/trace"
+    "kx/size"
     "kx/util"
     "log"
     "os"
@@ -60,9 +61,9 @@ func displaySummary(logger *log.Logger, start time.Time, files, rawLines, validL
     defer T.Un(T.Trace(""))
 
     delta := time.Since(start)
-    summary := fmt.Sprintf("Parsed %d/%d(%.4f%s) lines in %d files within %s [%.1f lines per second]\n",
-        validLines,
-        rawLines,
+    summary := fmt.Sprintf("Parsed %s/%s(%.4f%s) lines in %d files within %s [%.1f lines per second]\n",
+        size.Comma(int64(validLines)),
+        size.Comma(int64(rawLines)),
         100*float64(validLines)/float64(rawLines),
         "%%",
         files,
