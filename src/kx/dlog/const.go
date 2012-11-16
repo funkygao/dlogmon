@@ -48,7 +48,7 @@ const (
 )
 
 const (
-    LogEmergency = LogLevel(iota)
+    LogEmergency = LogLevel( 1 << iota)
     LogAlert
     LogCritical
     LogError
